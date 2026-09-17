@@ -1,0 +1,69 @@
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+.pnpm-store/
+
+# Environment Variables & Secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.pem
+*.key
+
+# Build & Compilation Outputs
+dist/
+build/
+out/
+.next/
+.turbo/
+*.tsbuildinfo
+
+# Mobile (React Native / Expo / Android / iOS)
+.expo/
+web-build/
+android/app/build/
+android/.gradle/
+*.apk
+*.aab
+*.keystore
+ios/Pods/
+ios/build/
+
+# Testing & Coverage
+coverage/
+.nyc_output/
+
+# Logs & Runtime
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Cache
+.cache/
+.eslintcache
+.parcel-cache/
+
+# Local Database & Infrastructure State
+postgres-data/
+redis-data/
+*.sqlite
+*.sqlite-journal
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE & Editor Files
+.idea/
+*.swp
+*.swo
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
