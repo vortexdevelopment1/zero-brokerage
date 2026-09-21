@@ -1,3 +1,5 @@
+import { KycDocument, KycStatus } from "./kyc";
+
 export type BrokerStatus = "pending" | "verified" | "suspended" | "rejected";
 
 export interface Broker {
@@ -13,6 +15,8 @@ export interface Broker {
   status: "active" | "suspended";
   createdAt: string;
   city: string;
+  kycStatus?: KycStatus;
+  kycDocuments?: KycDocument[];
 }
 
 export interface BrokerReview {

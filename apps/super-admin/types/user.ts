@@ -1,3 +1,5 @@
+import { KycDocument, KycStatus } from "./kyc";
+
 export type UserStatus = "active" | "blocked" | "pending";
 export type VerificationStatus = "verified" | "unverified" | "pending";
 export type UserSubscriptionTier =
@@ -19,6 +21,8 @@ export interface AppUser {
   status: UserStatus;
   city: string;
   createdAt: string;
+  kycStatus?: KycStatus;
+  kycDocuments?: KycDocument[];
 }
 
 export interface UserActivitySummary {

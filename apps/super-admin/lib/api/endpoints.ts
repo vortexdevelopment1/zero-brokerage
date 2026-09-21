@@ -31,6 +31,9 @@ export const apiEndpoints = {
       detail: (id: string) => `/api/admin/users/${id}`,
       updateStatus: (id: string) => `/api/admin/users/${id}/status`,
       remove: (id: string) => `/api/admin/users/${id}`,
+      kyc: (id: string) => `/api/admin/users/${id}/kyc`,
+      approveKyc: (id: string) => `/api/admin/users/${id}/kyc/approve`,
+      rejectKyc: (id: string) => `/api/admin/users/${id}/kyc/reject`,
     },
     brokers: {
       list: "/api/admin/brokers",
@@ -39,6 +42,9 @@ export const apiEndpoints = {
       reject: (id: string) => `/api/admin/brokers/${id}/reject`,
       updateStatus: (id: string) => `/api/admin/brokers/${id}/status`,
       reviews: (id: string) => `/api/admin/brokers/${id}/reviews`,
+      kyc: (id: string) => `/api/admin/brokers/${id}/kyc`,
+      approveKyc: (id: string) => `/api/admin/brokers/${id}/kyc/approve`,
+      rejectKyc: (id: string) => `/api/admin/brokers/${id}/kyc/reject`,
     },
     agencies: {
       list: "/api/admin/agencies",

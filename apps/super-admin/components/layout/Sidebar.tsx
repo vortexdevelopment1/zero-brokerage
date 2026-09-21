@@ -137,11 +137,11 @@ export function Sidebar() {
       <div className="flex h-16 shrink-0 items-center justify-between px-4">
         <Link href="/admin/dashboard" className="flex items-center gap-2.5 overflow-hidden">
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-600 text-sm font-bold text-white">
-            VC
+            ZB
           </div>
           {!sidebarCollapsed && (
             <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-white">VortexCubes</p>
+              <p className="truncate text-sm font-semibold text-white">ZeroBroker</p>
               <p className="truncate text-[10px] uppercase tracking-wide text-ink-400">Super Admin</p>
             </div>
           )}
