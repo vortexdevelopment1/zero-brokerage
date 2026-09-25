@@ -1,18 +1,28 @@
 import { simulateNetwork } from "@/lib/api/client";
 import { PaginatedResult, PaginationParams } from "@/types/common";
 import {
-  CommissionEntry, SubscriptionEntry, MicroTransactionEntry, TransactionEntry, RevenueOverview,
+  CommissionEntry,
+  SubscriptionEntry,
+  MicroTransactionEntry,
+  TransactionEntry,
+  RevenueOverview,
+  CancellationRevenueEntry,
 } from "@/types/revenue";
 import {
-  MOCK_COMMISSIONS, MOCK_SUBSCRIPTIONS, MOCK_MICRO_TRANSACTIONS, MOCK_TRANSACTIONS,
+  MOCK_COMMISSIONS,
+  MOCK_SUBSCRIPTIONS,
+  MOCK_MICRO_TRANSACTIONS,
+  MOCK_TRANSACTIONS,
 } from "@/services/mock/revenue.mock";
+import { MOCK_AD_REVENUE_OVERVIEW } from "@/services/mock/adRevenue.mock";
+import { MOCK_CANCELLATIONS } from "@/services/mock/cancellations.mock";
 import { paginate, matchesSearch } from "@/services/mock/paginate";
 
 /**
- * Revenue service. Four distinct monetization streams are kept separate per
- * the BRD/SOW (subscriptions, commission, micro-transactions, consolidated
- * transactions) rather than folded into one generic "payments" table.
- * Proposed contract: GET /api/admin/revenue/{overview,subscriptions,commission,micro-transactions,transactions}
+ * Revenue service. Distinct monetization streams are kept separate per
+ * the BRD/SOW (subscriptions, commission, micro-transactions, ad revenue,
+ * and cancellation fees) rather than folded into one generic table.
+ * Proposed contract: GET /api/admin/revenue/{overview,subscriptions,commission,micro-transactions,transactions,ads,cancellations}
  */
 export const revenueService = {
   getOverview: (): Promise<RevenueOverview> =>
@@ -26,7 +36,18 @@ export const revenueService = {
         (a, b) => a + b.amount,
         0
       );
-      const totalRevenue = subscriptionRevenue + commissionRevenue + microTransactionRevenue;
+      const adRevenue = MOCK_AD_REVENUE_OVERVIEW.totalRevenue;
+      const cancellationRevenue = MOCK_CANCELLATIONS.filter(
+        (c) => c.status === "cancelled" || c.status === "approved"
+      ).reduce((a, b) => a + b.cancellationFeeAmount + (b.brokerPenaltyAmount ?? 0), 0);
+
+      const totalRevenue =
+        subscriptionRevenue +
+        commissionRevenue +
+        microTransactionRevenue +
+        adRevenue +
+        cancellationRevenue;
+
       const months = ["Apr", "May", "Jun", "Jul", "Aug", "Sep"];
       let base = totalRevenue * 0.6;
       const revenueTrend = months.map((m) => {
@@ -38,11 +59,15 @@ export const revenueService = {
         subscriptionRevenue,
         commissionRevenue,
         microTransactionRevenue,
+        adRevenue,
+        cancellationRevenue,
         revenueTrend,
         revenueBySource: [
           { source: "Subscriptions", value: subscriptionRevenue },
           { source: "Commission", value: commissionRevenue },
           { source: "Micro-Transactions", value: microTransactionRevenue },
+          { source: "Ad Revenue", value: adRevenue },
+          { source: "Cancellation Fees", value: cancellationRevenue },
         ],
       };
     }),
@@ -89,6 +114,33 @@ export const revenueService = {
       let rows = MOCK_TRANSACTIONS;
       if (filters.type && filters.type !== "all") rows = rows.filter((t) => t.type === filters.type);
       if (filters.search) rows = rows.filter((t) => matchesSearch([t.entity, t.id], filters.search));
+      return paginate(rows, pagination);
+    }),
+
+  getCancellationRevenue: (
+    filters: { search?: string; paymentMode?: string } = {},
+    pagination: PaginationParams = {}
+  ): Promise<PaginatedResult<CancellationRevenueEntry>> =>
+    simulateNetwork(() => {
+      let rows: CancellationRevenueEntry[] = MOCK_CANCELLATIONS.map((c) => ({
+        id: c.id,
+        dealId: c.dealId,
+        property: `${c.property.title}, ${c.property.locality}`,
+        initiator: c.initiatedBy,
+        dealValue: c.dealAmount,
+        cancellationFeePercent: c.cancellationFeePercent,
+        cancellationFeeAmount: c.cancellationFeeAmount,
+        brokerPenaltyAmount: c.brokerPenaltyAmount,
+        paymentMode: c.paymentMode,
+        refundPaymentStatus: c.refundPaymentStatus,
+        date: c.requestedAt,
+      }));
+      if (filters.paymentMode && filters.paymentMode !== "all") {
+        rows = rows.filter((r) => r.paymentMode === filters.paymentMode);
+      }
+      if (filters.search) {
+        rows = rows.filter((r) => matchesSearch([r.property, r.dealId, r.id], filters.search));
+      }
       return paginate(rows, pagination);
     }),
 };

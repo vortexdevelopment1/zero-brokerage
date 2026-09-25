@@ -55,11 +55,27 @@ export interface TransactionEntry {
   date: string;
 }
 
+export interface CancellationRevenueEntry {
+  id: string;
+  dealId: string;
+  property: string;
+  initiator: "buyer" | "broker" | "agency";
+  dealValue: number;
+  cancellationFeePercent: number;
+  cancellationFeeAmount: number;
+  brokerPenaltyAmount?: number;
+  paymentMode: "platform_collected" | "external_transaction";
+  refundPaymentStatus: "auto_deducted" | "invoice_pending" | "invoice_paid" | "refund_processed" | "waived";
+  date: string;
+}
+
 export interface RevenueOverview {
   totalRevenue: number;
   subscriptionRevenue: number;
   commissionRevenue: number;
   microTransactionRevenue: number;
+  adRevenue: number;
+  cancellationRevenue: number;
   revenueTrend: { month: string; revenue: number }[];
   revenueBySource: { source: string; value: number }[];
 }

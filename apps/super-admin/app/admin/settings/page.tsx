@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { Scale } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { useAuthStore } from "@/store/authStore";
 import { useToastStore } from "@/store/toastStore";
@@ -15,7 +17,19 @@ export default function SettingsPage() {
 
   return (
     <>
-      <PageHeader title="Settings" description="Manage your admin profile, security and notification preferences." crumbs={[{ label: "Dashboard", href: "/admin/dashboard" }, { label: "Settings" }]} />
+      <PageHeader
+        title="Settings"
+        description="Manage your admin profile, security and notification preferences."
+        crumbs={[{ label: "Dashboard", href: "/admin/dashboard" }, { label: "Settings" }]}
+        actions={
+          <Link
+            href="/admin/settings/rules"
+            className="flex items-center gap-1.5 rounded-lg border border-brand-300 bg-brand-50 px-3.5 py-2 text-sm font-medium text-brand-700 hover:bg-brand-100 transition-colors"
+          >
+            <Scale className="h-4 w-4" /> Deal & Cancellation Rules
+          </Link>
+        }
+      />
 
       <div className="mb-5 flex flex-wrap gap-1 border-b border-ink-200">
         {TABS.map((t) => (
