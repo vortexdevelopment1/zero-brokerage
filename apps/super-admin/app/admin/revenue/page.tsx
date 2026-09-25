@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Wallet, CreditCard, Percent, MessageSquareText, ArrowRight } from "lucide-react";
+import { Wallet, CreditCard, Percent, MessageSquareText, ArrowRight, Megaphone, ReceiptText } from "lucide-react";
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts";
@@ -20,6 +20,8 @@ const STREAMS = [
   { label: "Commission", href: "/admin/revenue/commission", desc: "1–2% platform fee · 0% on luxury" },
   { label: "Micro Transactions", href: "/admin/revenue/micro-transactions", desc: "₹5–₹10 WhatsApp/SMS alerts" },
   { label: "Transactions", href: "/admin/revenue/transactions", desc: "Consolidated payment history" },
+  { label: "Ad Revenue", href: "/admin/revenue/ads", desc: "Sponsored listings, banners & geo-ads" },
+  { label: "Cancellation Revenue", href: "/admin/revenue/cancellations", desc: "1–2% cancellation fee deductions & penalties" },
 ];
 
 export default function RevenueOverviewPage() {
@@ -57,11 +59,13 @@ export default function RevenueOverviewPage() {
     <>
       <PageHeader title="Revenue" description="Monetization overview across all revenue streams." crumbs={[{ label: "Dashboard", href: "/admin/dashboard" }, { label: "Revenue" }]} />
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         <StatCard label="Total Revenue" value={formatCurrencyINR(data.totalRevenue)} icon={Wallet} tone="accent" />
-        <StatCard label="Subscription Revenue" value={formatCurrencyINR(data.subscriptionRevenue)} icon={CreditCard} tone="brand" />
-        <StatCard label="Commission Revenue" value={formatCurrencyINR(data.commissionRevenue)} icon={Percent} tone="brand" />
-        <StatCard label="Micro-Transaction Revenue" value={formatCurrencyINR(data.microTransactionRevenue)} icon={MessageSquareText} tone="brand" />
+        <StatCard label="Subscriptions" value={formatCurrencyINR(data.subscriptionRevenue)} icon={CreditCard} tone="brand" />
+        <StatCard label="Commission" value={formatCurrencyINR(data.commissionRevenue)} icon={Percent} tone="brand" />
+        <StatCard label="Micro-Txns" value={formatCurrencyINR(data.microTransactionRevenue)} icon={MessageSquareText} tone="brand" />
+        <StatCard label="Ad Revenue" value={formatCurrencyINR(data.adRevenue)} icon={Megaphone} tone="brand" />
+        <StatCard label="Cancellation Fees" value={formatCurrencyINR(data.cancellationRevenue)} icon={ReceiptText} tone="warning" />
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
@@ -88,7 +92,7 @@ export default function RevenueOverviewPage() {
             <BarChart data={data.revenueBySource} layout="vertical" margin={{ left: 8 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" horizontal={false} />
               <XAxis type="number" tick={{ fontSize: 11, fill: "#6B7280" }} axisLine={false} tickLine={false} tickFormatter={(v) => formatCurrencyINR(v)} />
-              <YAxis type="category" dataKey="source" tick={{ fontSize: 12, fill: "#374151" }} axisLine={false} tickLine={false} width={110} />
+              <YAxis type="category" dataKey="source" tick={{ fontSize: 12, fill: "#374151" }} axisLine={false} tickLine={false} width={120} />
               <Tooltip formatter={(v: number) => formatCurrencyINR(v)} />
               <Bar dataKey="value" fill="#1877BE" radius={[0, 6, 6, 0]} />
             </BarChart>
@@ -96,7 +100,7 @@ export default function RevenueOverviewPage() {
         </ChartCard>
       </div>
 
-      <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {STREAMS.map((s) => (
           <Link key={s.href} href={s.href} className="group flex flex-col justify-between rounded-2xl border border-ink-200 bg-white p-5 shadow-card transition-shadow hover:shadow-popover">
             <div>

@@ -38,7 +38,7 @@ export function KycDocumentViewer({
       open={open}
       onClose={onClose}
       title={`Document Preview: ${document.title}`}
-      size="lg"
+      size="xl"
       footer={
         <button
           onClick={onClose}
@@ -50,31 +50,31 @@ export function KycDocumentViewer({
     >
       <div className="space-y-4">
         {/* Specimen Disclaimer Banner */}
-        <div className="flex items-center justify-between rounded-lg bg-amber-50 border border-amber-200 px-3.5 py-2 text-xs text-amber-800">
+        <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-amber-50 border border-amber-200 px-3.5 py-2 text-xs text-amber-800">
           <div className="flex items-center gap-2">
             <Lock className="h-3.5 w-3.5 text-amber-600 shrink-0" />
             <span>
               <strong>Specimen Document Preview:</strong> Synthetic compliance data for admin evaluation.
             </span>
           </div>
-          <span className="rounded bg-amber-200/70 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-900">
+          <span className="rounded bg-amber-200/70 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-900 shrink-0">
             Internal Use Only
           </span>
         </div>
 
-        {/* Visual Document Mockup Card */}
-        <div className="relative overflow-hidden rounded-xl border border-ink-200 bg-ink-50/60 p-4 shadow-inner">
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.06] select-none">
-            <span className="rotate-[-25deg] text-4xl font-extrabold tracking-widest text-ink-900 uppercase">
+        {/* Visual Document Mockup Card Container */}
+        <div className="relative flex flex-col items-center justify-center overflow-hidden rounded-xl border border-ink-200 bg-ink-50/60 p-3 sm:p-5 shadow-inner">
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.05] select-none">
+            <span className="rotate-[-25deg] text-3xl sm:text-4xl font-extrabold tracking-widest text-ink-900 uppercase text-center">
               {preview?.watermarkText ?? "SPECIMEN COPY"}
             </span>
           </div>
 
           {document.type === "aadhaar" && (
-            <div className="relative rounded-xl border border-orange-200 bg-white p-5 shadow-sm">
+            <div className="relative w-full max-w-lg mx-auto rounded-xl border border-orange-200 bg-white p-4 sm:p-5 shadow-sm">
               <div className="flex items-start justify-between border-b border-ink-100 pb-3">
                 <div className="flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold text-xs">
+                  <div className="h-8 w-8 shrink-0 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold text-xs">
                     UIDAI
                   </div>
                   <div>
@@ -86,22 +86,22 @@ export function KycDocumentViewer({
                     </p>
                   </div>
                 </div>
-                <div className="h-1.5 w-16 rounded-full bg-gradient-to-r from-orange-400 via-white to-emerald-500 border border-ink-200" />
+                <div className="h-1.5 w-16 shrink-0 rounded-full bg-gradient-to-r from-orange-400 via-white to-emerald-500 border border-ink-200" />
               </div>
 
-              <div className="mt-4 grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
-                <div className="md:col-span-1 flex flex-col items-center justify-center rounded-lg border border-ink-200 bg-ink-50 p-3">
-                  <User className="h-16 w-16 text-ink-400" />
+              <div className="mt-4 grid grid-cols-1 sm:grid-cols-4 gap-4 items-center">
+                <div className="sm:col-span-1 flex flex-col items-center justify-center rounded-lg border border-ink-200 bg-ink-50 p-3 shrink-0">
+                  <User className="h-14 w-14 sm:h-16 sm:w-16 text-ink-400 shrink-0" />
                   <span className="mt-1 text-[10px] text-ink-400">Photo Proof</span>
                 </div>
-                <div className="md:col-span-2 space-y-1.5 text-xs text-ink-700">
+                <div className="sm:col-span-2 space-y-1.5 text-xs text-ink-700">
                   <p className="text-sm font-semibold text-ink-900">{entityName}</p>
                   <p><span className="text-ink-500">DOB:</span> 14/05/1991</p>
                   <p><span className="text-ink-500">Gender:</span> Male</p>
-                  <p><span className="text-ink-500">Address:</span> {preview?.details?.Address ?? "Bengaluru, Karnataka"}</p>
+                  <p className="break-words"><span className="text-ink-500">Address:</span> {preview?.details?.Address ?? "Bengaluru, Karnataka"}</p>
                 </div>
-                <div className="md:col-span-1 flex flex-col items-center justify-center border-l border-ink-100 pl-2">
-                  <QrCode className="h-16 w-16 text-ink-700" />
+                <div className="sm:col-span-1 flex flex-col items-center justify-center sm:border-l sm:border-ink-100 sm:pl-2 shrink-0">
+                  <QrCode className="h-14 w-14 sm:h-16 sm:w-16 text-ink-700 shrink-0" />
                   <span className="mt-1 text-[9px] text-ink-400">Digital Seal</span>
                 </div>
               </div>
@@ -116,7 +116,7 @@ export function KycDocumentViewer({
           )}
 
           {(document.type === "pan" || document.type === "business_pan") && (
-            <div className="relative rounded-xl border border-sky-200 bg-gradient-to-br from-white via-sky-50/20 to-white p-5 shadow-sm">
+            <div className="relative w-full max-w-lg mx-auto rounded-xl border border-sky-200 bg-gradient-to-br from-white via-sky-50/20 to-white p-4 sm:p-5 shadow-sm">
               <div className="flex items-center justify-between border-b border-sky-100 pb-3">
                 <div>
                   <p className="text-xs font-bold text-ink-900 uppercase">
@@ -124,7 +124,7 @@ export function KycDocumentViewer({
                   </p>
                   <p className="text-[11px] text-ink-500">Permanent Account Number Card (Specimen)</p>
                 </div>
-                <div className="h-7 w-7 rounded bg-sky-100 flex items-center justify-center text-sky-700 font-bold text-[10px]">
+                <div className="h-7 w-7 shrink-0 rounded bg-sky-100 flex items-center justify-center text-sky-700 font-bold text-[10px]">
                   ITD
                 </div>
               </div>
@@ -146,8 +146,8 @@ export function KycDocumentViewer({
                 </div>
 
                 <div className="col-span-1 flex flex-col items-end justify-between">
-                  <div className="h-16 w-14 rounded border border-ink-200 bg-ink-100 flex items-center justify-center">
-                    <User className="h-10 w-10 text-ink-400" />
+                  <div className="h-16 w-14 shrink-0 rounded border border-ink-200 bg-ink-100 flex items-center justify-center">
+                    <User className="h-10 w-10 text-ink-400 shrink-0" />
                   </div>
                   <div className="w-20 border-b border-ink-400 pt-3 text-center">
                     <span className="font-serif italic text-[11px] text-ink-600">Signature</span>
@@ -162,7 +162,7 @@ export function KycDocumentViewer({
                     {document.documentNumberMasked ?? "ABCDE1234F"}
                   </p>
                 </div>
-                <div className="h-8 w-8 rounded-full border border-sky-300 bg-white flex items-center justify-center">
+                <div className="h-8 w-8 shrink-0 rounded-full border border-sky-300 bg-white flex items-center justify-center">
                   <ShieldCheck className="h-5 w-5 text-sky-600" />
                 </div>
               </div>
@@ -170,9 +170,9 @@ export function KycDocumentViewer({
           )}
 
           {document.type === "rera_certificate" && (
-            <div className="relative rounded-xl border border-emerald-200 bg-white p-5 shadow-sm">
+            <div className="relative w-full max-w-lg mx-auto rounded-xl border border-emerald-200 bg-white p-4 sm:p-5 shadow-sm">
               <div className="text-center border-b border-ink-100 pb-3">
-                <div className="mx-auto mb-1 flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
+                <div className="mx-auto mb-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
                   <Building className="h-4 w-4" />
                 </div>
                 <p className="text-xs font-bold uppercase tracking-wider text-ink-900">
@@ -205,22 +205,54 @@ export function KycDocumentViewer({
             </div>
           )}
 
+          {document.type === "agency_license" && (
+            <div className="relative w-full max-w-lg mx-auto rounded-xl border border-indigo-200 bg-white p-4 sm:p-5 shadow-sm">
+              <div className="text-center border-b border-ink-100 pb-3">
+                <div className="mx-auto mb-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-700">
+                  <Building className="h-4 w-4" />
+                </div>
+                <p className="text-xs font-bold uppercase tracking-wider text-ink-900">
+                  Commercial Agency Trade License
+                </p>
+                <p className="text-[11px] text-ink-500">
+                  Certified Agency Operational Authorization
+                </p>
+              </div>
+
+              <div className="mt-4 space-y-3 text-xs text-ink-700">
+                <p>
+                  This certifies that <strong className="text-ink-900">{entityName}</strong> is authorized to operate as a licensed brokerage firm under regulatory compliance.
+                </p>
+                <div className="rounded-lg bg-indigo-50 border border-indigo-100 p-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-ink-600 font-medium">License Registration:</span>
+                    <span className="font-mono font-bold text-indigo-900">{document.documentNumberMasked ?? document.id}</span>
+                  </div>
+                  <div className="mt-1 flex items-center justify-between text-[11px]">
+                    <span className="text-ink-500">License Status:</span>
+                    <span className="text-indigo-800 font-medium">Verified & Active</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {document.type === "profile_photo" && (
-            <div className="relative rounded-xl border border-ink-200 bg-white p-6 shadow-sm text-center">
-              <div className="mx-auto flex h-28 w-28 items-center justify-center rounded-2xl border-2 border-dashed border-brand-400 bg-brand-50">
-                <User className="h-16 w-16 text-brand-600" />
+            <div className="relative w-full max-w-sm mx-auto rounded-xl border border-ink-200 bg-white p-6 shadow-sm text-center">
+              <div className="mx-auto flex h-24 w-24 sm:h-28 sm:w-28 items-center justify-center rounded-2xl border-2 border-dashed border-brand-400 bg-brand-50 shrink-0">
+                <User className="h-14 w-14 sm:h-16 sm:w-16 text-brand-600 shrink-0" />
               </div>
               <p className="mt-3 text-sm font-semibold text-ink-900">{entityName}</p>
               <p className="text-xs text-ink-500">Live Identity Capture · Anti-Spoofing Verification</p>
               <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-success-50 px-3 py-1 text-xs font-medium text-success-700 border border-success-200">
-                <CheckCircle className="h-3.5 w-3.5 text-success-600" />
+                <CheckCircle className="h-3.5 w-3.5 text-success-600 shrink-0" />
                 Liveness Check Passed (99.1% Confidence)
               </div>
             </div>
           )}
 
           {document.type === "other" && (
-            <div className="rounded-xl border border-ink-200 bg-white p-5 shadow-sm text-xs text-ink-700">
+            <div className="relative w-full max-w-lg mx-auto rounded-xl border border-ink-200 bg-white p-5 shadow-sm text-xs text-ink-700">
               <p className="font-semibold text-ink-900">{document.title}</p>
               <p className="mt-1 text-ink-500">Document reference: {document.documentNumberMasked ?? document.id}</p>
             </div>

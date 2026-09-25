@@ -1,9 +1,22 @@
 import { simulateNetwork } from "@/lib/api/client";
-import { DashboardStats, RecentActivityFeed, TrendPoint, DistributionSlice } from "@/types/dashboard";
 import {
-  getMockDashboardStats, getMockUserGrowthTrend, getMockPropertyGrowthTrend,
-  getMockRevenueTrend, getMockSubscriptionDistribution, getMockBrokerActivity,
+  DashboardStats,
+  RecentActivityFeed,
+  TrendPoint,
+  DistributionSlice,
+  DealPipelineStageCount,
+  RevenueStreamSummary,
+} from "@/types/dashboard";
+import {
+  getMockDashboardStats,
+  getMockUserGrowthTrend,
+  getMockPropertyGrowthTrend,
+  getMockRevenueTrend,
+  getMockSubscriptionDistribution,
+  getMockBrokerActivity,
   getMockRecentActivity,
+  getMockDealPipeline,
+  getMockRevenueStreams,
 } from "@/services/mock/dashboard.mock";
 
 /**
@@ -21,4 +34,7 @@ export const dashboardService = {
     simulateNetwork(() => getMockSubscriptionDistribution()),
   getBrokerActivity: (): Promise<TrendPoint[]> => simulateNetwork(() => getMockBrokerActivity()),
   getRecentActivity: (): Promise<RecentActivityFeed> => simulateNetwork(() => getMockRecentActivity()),
+  getDealPipeline: (): Promise<DealPipelineStageCount[]> => simulateNetwork(() => getMockDealPipeline()),
+  getRevenueStreams: (): Promise<RevenueStreamSummary[]> => simulateNetwork(() => getMockRevenueStreams()),
 };
+

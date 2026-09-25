@@ -4,8 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Users, UserCheck, Building2, Home, Briefcase, Trees, Sofa,
-  CalendarCheck, Wallet, ShieldAlert, BarChart3, Activity, Settings, ChevronLeft,
-  ChevronDown, Boxes, X,
+  CalendarCheck, Handshake, Wallet, ShieldAlert, BarChart3, Activity, Settings, ChevronLeft,
+  ChevronDown, Boxes, X, Megaphone,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils/cn";
@@ -40,6 +40,15 @@ const NAV: NavGroup[] = [
   },
   { label: "Visits", icon: CalendarCheck, href: "/admin/visits" },
   {
+    label: "Deals",
+    icon: Handshake,
+    children: [
+      { label: "All Deals", href: "/admin/deals" },
+      { label: "Agreement Review", href: "/admin/deals/agreements" },
+      { label: "Cancellations", href: "/admin/deals/cancellations" },
+    ],
+  },
+  {
     label: "Revenue",
     icon: Wallet,
     children: [
@@ -48,12 +57,22 @@ const NAV: NavGroup[] = [
       { label: "Commission", href: "/admin/revenue/commission" },
       { label: "Micro Transactions", href: "/admin/revenue/micro-transactions" },
       { label: "Transactions", href: "/admin/revenue/transactions" },
+      { label: "Ad Revenue", href: "/admin/revenue/ads" },
+      { label: "Cancellation Revenue", href: "/admin/revenue/cancellations" },
     ],
   },
+  { label: "Ad Campaigns", icon: Megaphone, href: "/admin/ad-campaigns" },
   { label: "Urgent Requirements", icon: ShieldAlert, href: "/admin/urgent-requirements" },
   { label: "Reports & Analytics", icon: BarChart3, href: "/admin/reports" },
   { label: "System Monitoring", icon: Activity, href: "/admin/monitoring" },
-  { label: "Settings", icon: Settings, href: "/admin/settings" },
+  {
+    label: "Settings",
+    icon: Settings,
+    children: [
+      { label: "General Settings", href: "/admin/settings" },
+      { label: "Deal & Cancellation Rules", href: "/admin/settings/rules" },
+    ],
+  },
 ];
 
 function isActive(pathname: string, href?: string, children?: NavLeaf[]) {
@@ -137,7 +156,7 @@ export function Sidebar() {
       <div className="flex h-16 shrink-0 items-center justify-between px-4">
         <Link href="/admin/dashboard" className="flex items-center gap-2.5 overflow-hidden">
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-600 text-sm font-bold text-white">
-            ZB
+            ZeB
           </div>
           {!sidebarCollapsed && (
             <div className="min-w-0">
