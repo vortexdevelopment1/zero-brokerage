@@ -1,11 +1,13 @@
-import Fastify from 'fastify';
+import Fastify from "fastify";
 
-import cors from '@fastify/cors';
-import helmet from '@fastify/helmet';
+import cors from "@fastify/cors";
+import helmet from "@fastify/helmet";
 
-import { registerHooks } from './register-hooks.js';
-import { registerModules } from './register-modules.js';
-import { registerRoutes } from './register-routes.js';
+import databasePlugin from "../plugins/database.js";
+
+import { registerHooks } from "./register-hooks.js";
+import { registerModules } from "./register-modules.js";
+import { registerRoutes } from "./register-routes.js";
 
 export async function buildApp() {
   const app = Fastify({
@@ -13,6 +15,8 @@ export async function buildApp() {
   });
 
   await app.register(helmet);
+
+  await app.register(databasePlugin);
 
   await app.register(cors, {
     origin: true,
