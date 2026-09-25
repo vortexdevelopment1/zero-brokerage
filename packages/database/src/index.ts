@@ -10,3 +10,8 @@ export { withTransaction } from "./transaction/index.js";
 export type { Migration } from "./migrations/index.js";
 
 export { runMigrations } from "./migrations/index.js";
+
+export {
+  checkDatabaseHealth,
+  type DatabaseHealth,
+} from "./health/index.js";
