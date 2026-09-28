@@ -1,8 +1,8 @@
-import 'dotenv/config';
+import "dotenv/config";
 
-import { buildApp } from './app/build-app.js';
-import { registerLifecycle } from './app/lifecycle.js';
-import { env } from './config/env.js';
+import { buildApp } from "./app/build-app.js";
+import { registerLifecycle } from "./app/lifecycle.js";
+import { env } from "./config/env.js";
 
 const app = await buildApp();
 
@@ -14,6 +14,6 @@ try {
     host: env.HOST,
   });
 } catch (error) {
-  app.log.error({ error }, 'Failed to start server');
+  app.log.error({ error }, "Failed to start server");
   process.exit(1);
 }
