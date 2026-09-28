@@ -10,15 +10,23 @@ export {
 
 export { useAuthStore } from "./auth-store";
 
+export {
+  logout,
+  normalizePhoneForApi,
+  refreshSession,
+  requestOtp,
+  resendOtp,
+  verifyOtp,
+} from "./auth-service";
+
 export type {
+  AuthChallenge,
   AuthState,
   AuthStatus,
   AuthUser,
 } from "./auth.types";
 
-export type {
-  AuthStore,
-} from "./auth-store";
+export type { AuthStore } from "./auth-store";
 
 export {
   hasAuthError,

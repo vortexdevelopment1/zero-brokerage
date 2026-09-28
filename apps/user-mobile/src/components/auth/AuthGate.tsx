@@ -1,15 +1,22 @@
-import { Text, View } from "react-native";
+import React from "react";
 
+import { AppContainer } from "@/components/AppContainer";
 import { AuthLoadingScreen } from "@/components/auth/AuthLoadingScreen";
+import { ErrorState } from "@/components/feedback/ErrorState";
 import { AuthEntryContainer } from "@/features/auth/screens/AuthEntryContainer";
+import { AuthenticatedShell } from "@/features/auth/screens/AuthenticatedShell";
+import { OnboardingContainer } from "@/features/auth/screens/OnboardingContainer";
+import { OtpVerificationContainer } from "@/features/auth/screens/OtpVerificationContainer";
 import { useAuthStore } from "@/services/auth";
 
 export function AuthGate() {
   const status = useAuthStore((state) => state.status);
+  const errorMessage = useAuthStore((state) => state.errorMessage);
 
   if (
     status === "INITIALIZING" ||
-    status === "RESTORING_SESSION"
+    status === "RESTORING_SESSION" ||
+    status === "LOGGING_OUT"
   ) {
     return <AuthLoadingScreen />;
   }
@@ -19,23 +26,11 @@ export function AuthGate() {
   }
 
   if (status === "ONBOARDING_REQUIRED") {
-    return (
-      <View className="flex-1">
-        <Text className="text-gray-900">
-          Onboarding will be connected here.
-        </Text>
-      </View>
-    );
+    return <OnboardingContainer />;
   }
 
   if (status === "AUTHENTICATED") {
-    return (
-      <View className="flex-1">
-        <Text className="text-gray-900">
-          User app will be connected here.
-        </Text>
-      </View>
-    );
+    return <AuthenticatedShell />;
   }
 
   if (
@@ -43,24 +38,17 @@ export function AuthGate() {
     status === "OTP_REQUIRED" ||
     status === "VERIFYING"
   ) {
-    return (
-      <View className="flex-1">
-        <Text className="text-gray-900">
-          Authentication verification will be connected here.
-        </Text>
-      </View>
-    );
-  }
-
-  if (status === "LOGGING_OUT") {
-    return <AuthLoadingScreen />;
+    return <OtpVerificationContainer />;
   }
 
   return (
-    <View className="flex-1">
-      <Text className="text-gray-900">
-        Something went wrong.
-      </Text>
-    </View>
+    <AppContainer>
+      <ErrorState
+        title="Authentication Issue"
+        message={errorMessage || "Unable to complete authentication."}
+        onRetry={() => useAuthStore.getState().restoreAsGuest()}
+        retryLabel="Return to Sign In"
+      />
+    </AppContainer>
   );
 }

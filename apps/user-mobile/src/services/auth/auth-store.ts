@@ -1,9 +1,6 @@
 import { create } from "zustand";
 
-import type {
-  AuthState,
-  AuthUser,
-} from "./auth.types";
+import type { AuthChallenge, AuthState, AuthUser } from "./auth.types";
 
 type AuthActions = {
   initialize: () => void;
@@ -13,9 +10,12 @@ type AuthActions = {
   requireOnboarding: (user: AuthUser) => void;
 
   startOtpRequest: (phoneNumber: string) => void;
-  otpRequired: () => void;
+  otpRequired: (challenge: AuthChallenge) => void;
   startVerification: () => void;
+  verificationFailed: (message: string) => void;
   authenticationSuccess: (user: AuthUser) => void;
+
+  changePhoneNumber: () => void;
 
   sessionExpired: () => void;
 
@@ -23,6 +23,7 @@ type AuthActions = {
   logoutComplete: () => void;
 
   setAuthError: (message: string) => void;
+  setErrorMessage: (message: string | null) => void;
 
   reset: () => void;
 };
@@ -33,6 +34,7 @@ const initialAuthState: AuthState = {
   status: "INITIALIZING",
   user: null,
   phoneNumber: null,
+  challenge: null,
   errorMessage: null,
 };
 
@@ -57,6 +59,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
     set({
       status: "GUEST",
       user: null,
+      challenge: null,
       errorMessage: null,
     });
   },
@@ -65,6 +68,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
     set({
       status: "AUTHENTICATED",
       user,
+      challenge: null,
       errorMessage: null,
     });
   },
@@ -73,6 +77,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
     set({
       status: "ONBOARDING_REQUIRED",
       user,
+      challenge: null,
       errorMessage: null,
     });
   },
@@ -85,9 +90,10 @@ export const useAuthStore = create<AuthStore>((set) => ({
     });
   },
 
-  otpRequired: () => {
+  otpRequired: (challenge) => {
     set({
       status: "OTP_REQUIRED",
+      challenge,
       errorMessage: null,
     });
   },
@@ -99,10 +105,26 @@ export const useAuthStore = create<AuthStore>((set) => ({
     });
   },
 
+  verificationFailed: (message) => {
+    set({
+      status: "OTP_REQUIRED",
+      errorMessage: message,
+    });
+  },
+
   authenticationSuccess: (user) => {
     set({
       status: "AUTHENTICATED",
       user,
+      challenge: null,
+      errorMessage: null,
+    });
+  },
+
+  changePhoneNumber: () => {
+    set({
+      status: "GUEST",
+      challenge: null,
       errorMessage: null,
     });
   },
@@ -111,7 +133,8 @@ export const useAuthStore = create<AuthStore>((set) => ({
     set({
       status: "SESSION_EXPIRED",
       user: null,
-      errorMessage: null,
+      challenge: null,
+      errorMessage: "Your session has expired. Please sign in again.",
     });
   },
 
@@ -127,6 +150,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
       status: "GUEST",
       user: null,
       phoneNumber: null,
+      challenge: null,
       errorMessage: null,
     });
   },
@@ -134,6 +158,12 @@ export const useAuthStore = create<AuthStore>((set) => ({
   setAuthError: (message) => {
     set({
       status: "AUTH_ERROR",
+      errorMessage: message,
+    });
+  },
+
+  setErrorMessage: (message) => {
+    set({
       errorMessage: message,
     });
   },

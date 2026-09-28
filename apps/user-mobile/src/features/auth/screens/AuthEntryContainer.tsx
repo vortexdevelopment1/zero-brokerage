@@ -1,34 +1,51 @@
-import { useState } from "react";
+import React, { useState } from "react";
 
-import { AuthEntryScreen } from "./AuthEntryScreen";
+import { requestOtp, useAuthStore } from "@/services/auth";
+
 import { validatePhoneNumber } from "../utils/phone-validation";
+import { AuthEntryScreen } from "./AuthEntryScreen";
 
 export function AuthEntryContainer() {
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const storedPhone = useAuthStore((state) => state.phoneNumber);
+  const status = useAuthStore((state) => state.status);
+  const storeError = useAuthStore((state) => state.errorMessage);
+  const setErrorMessage = useAuthStore((state) => state.setErrorMessage);
+
+  const [phoneNumber, setPhoneNumber] = useState(
+    storedPhone ? storedPhone.replace("+91", "") : "",
+  );
+  const [localError, setLocalError] = useState<string | null>(null);
+
+  const isLoading = status === "OTP_REQUESTING";
+  const errorMessage = localError || storeError;
 
   function handlePhoneNumberChange(value: string) {
     setPhoneNumber(value);
-
-    if (errorMessage) {
+    if (localError) {
+      setLocalError(null);
+    }
+    if (storeError) {
       setErrorMessage(null);
     }
   }
 
-  function handleContinue() {
-    const result = validatePhoneNumber(phoneNumber);
-
-    if (!result.valid) {
-      setErrorMessage(result.message);
+  async function handleContinue() {
+    if (isLoading) {
       return;
     }
 
-    setPhoneNumber(result.normalizedValue);
+    const validation = validatePhoneNumber(phoneNumber);
+    if (!validation.valid) {
+      setLocalError(validation.message);
+      return;
+    }
 
-    /**
-     * OTP request will be connected once the backend authentication
-     * contract is available.
-     */
+    setLocalError(null);
+    if (storeError) {
+      setErrorMessage(null);
+    }
+
+    await requestOtp(validation.normalizedValue);
   }
 
   return (
@@ -37,6 +54,7 @@ export function AuthEntryContainer() {
       errorMessage={errorMessage}
       onPhoneNumberChange={handlePhoneNumberChange}
       onContinue={handleContinue}
+      isLoading={isLoading}
     />
   );
 }

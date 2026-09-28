@@ -1,21 +1,16 @@
-import { ActivityIndicator, Text, View } from "react-native";
+import React from "react";
 
 import { AppContainer } from "@/components/AppContainer";
+import { LoadingState } from "@/components/feedback";
 
 export function AuthLoadingScreen() {
   return (
     <AppContainer>
-      <View className="flex-1 items-center justify-center px-6">
-        <ActivityIndicator size="large" />
-
-        <Text className="mt-4 text-base font-medium text-gray-900">
-          Loading your account...
-        </Text>
-
-        <Text className="mt-2 text-center text-sm text-gray-500">
-          Please wait while we restore your session.
-        </Text>
-      </View>
+      <LoadingState
+        message="Loading your account..."
+        description="Please wait while we secure and verify your session."
+        fullScreen
+      />
     </AppContainer>
   );
 }
