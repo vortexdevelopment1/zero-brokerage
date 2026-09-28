@@ -1,13 +1,26 @@
-import { ReactNode } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { type ReactNode } from "react";
+import { type StyleProp, type ViewStyle } from "react-native";
+import { type Edge, SafeAreaView } from "react-native-safe-area-context";
 
-type AppContainerProps = {
+export type AppContainerProps = {
   children: ReactNode;
+  className?: string;
+  style?: StyleProp<ViewStyle>;
+  edges?: Edge[];
 };
 
-export function AppContainer({ children }: AppContainerProps) {
+export function AppContainer({
+  children,
+  className = "",
+  style,
+  edges = ["top", "left", "right"],
+}: AppContainerProps) {
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView
+      edges={edges}
+      className={"flex-1 bg-canvas " + className}
+      style={style}
+    >
       {children}
     </SafeAreaView>
   );
