@@ -60,3 +60,18 @@ export {
 export { allMigrations } from "./migrations/registry.js";
 
 export { checkDatabaseHealth, type DatabaseHealth } from "./health/index.js";
+
+export {
+  GeospatialValidationError,
+  type GeoCoordinates,
+  type BoundingBox,
+  type ParameterizedSqlFragment,
+  validateCoordinates,
+  createGeoPoint,
+  validateBoundingBox,
+  buildRadiusCondition,
+  buildBoundingBoxCondition,
+  buildDistanceSelect,
+  formatPointWkt,
+  parsePointWkt,
+} from "./geospatial/index.js";
