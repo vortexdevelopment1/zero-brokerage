@@ -166,6 +166,7 @@ export function mapDatabaseError(error: unknown): DatabaseError | Error {
     case "23505":
       return new UniqueConstraintViolationError(safeDetails);
     case "23503":
+    case "23001":
       return new ForeignKeyViolationError(safeDetails);
     case "23502":
       return new NotNullConstraintViolationError(safeDetails);
