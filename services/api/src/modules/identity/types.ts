@@ -14,7 +14,12 @@ export type OtpPurpose =
 export type OtpStatus =
   "PENDING" | "VERIFIED" | "EXPIRED" | "FAILED" | "SUPERSEDED";
 
-export type AgencyMembershipRole = "ADMIN" | "MANAGER" | "BROKER" | "MEMBER";
+export type AgencyMembershipRole =
+  | "ADMIN"
+  | "MANAGER"
+  | "BROKER"
+  | "MEMBER"
+  | "AGENCY_OWNER";
 
 export type AgencyMembershipStatus =
   "ACTIVE" | "INVITED" | "SUSPENDED" | "TERMINATED";
