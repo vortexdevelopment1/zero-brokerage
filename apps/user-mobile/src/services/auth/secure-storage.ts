@@ -32,8 +32,5 @@ export async function deleteRefreshToken(): Promise<void> {
 }
 
 export async function clearAuthCredentials(): Promise<void> {
-  await Promise.all([
-    deleteAccessToken(),
-    deleteRefreshToken(),
-  ]);
+  await Promise.all([deleteAccessToken(), deleteRefreshToken()]);
 }

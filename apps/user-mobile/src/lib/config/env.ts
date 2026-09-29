@@ -1,7 +1,4 @@
-import type {
-  AppEnvironment,
-  PublicAppConfig,
-} from "@zero-brokerage/config";
+import type { AppEnvironment, PublicAppConfig } from "@zero-brokerage/config";
 
 const environment = process.env.EXPO_PUBLIC_APP_ENVIRONMENT;
 const apiBaseUrl = process.env.EXPO_PUBLIC_API_BASE_URL;

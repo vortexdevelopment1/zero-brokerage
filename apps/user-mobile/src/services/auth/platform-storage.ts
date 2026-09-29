@@ -6,10 +6,7 @@ async function getNativeItem(key: string): Promise<string | null> {
   return SecureStore.getItemAsync(key);
 }
 
-async function setNativeItem(
-  key: string,
-  value: string,
-): Promise<void> {
+async function setNativeItem(key: string, value: string): Promise<void> {
   await SecureStore.setItemAsync(key, value);
 }
 
@@ -38,9 +35,7 @@ export async function setPlatformSecureItem(
   await setNativeItem(key, value);
 }
 
-export async function deletePlatformSecureItem(
-  key: string,
-): Promise<void> {
+export async function deletePlatformSecureItem(key: string): Promise<void> {
   if (Platform.OS === "web") {
     return;
   }
