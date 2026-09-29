@@ -20,14 +20,14 @@ function ProtectedShell({ children }: { children: React.ReactNode }) {
 
   if (!isReady) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-ink-50">
+      <div className="flex min-h-screen items-center justify-center bg-ink-50 dark:bg-ink-950">
         <LoadingState label="Checking your session…" />
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-ink-50">
+    <div className="flex min-h-screen bg-ink-50 dark:bg-ink-950">
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <Navbar />

@@ -91,8 +91,8 @@ export default function CancellationsPage() {
       header: "Cancellation ID",
       render: (c) => (
         <div>
-          <span className="font-mono text-xs font-semibold text-danger-700">{c.id}</span>
-          <p className="text-[10px] text-ink-400">Deal: {c.dealId}</p>
+          <span className="font-mono text-xs font-semibold text-danger-700 dark:text-danger-400">{c.id}</span>
+          <p className="text-[10px] text-ink-400 dark:text-ink-500">Deal: {c.dealId}</p>
         </div>
       ),
     },
@@ -101,8 +101,8 @@ export default function CancellationsPage() {
       header: "Property",
       render: (c) => (
         <div className="max-w-[200px]">
-          <p className="truncate text-sm font-medium text-ink-900">{c.property.title}</p>
-          <p className="truncate text-xs text-ink-500">{c.property.locality}, {c.property.city}</p>
+          <p className="truncate text-sm font-medium text-ink-900 dark:text-white">{c.property.title}</p>
+          <p className="truncate text-xs text-ink-500 dark:text-ink-400">{c.property.locality}, {c.property.city}</p>
         </div>
       ),
     },
@@ -110,9 +110,9 @@ export default function CancellationsPage() {
       key: "buyer",
       header: "Buyer / User",
       render: (c) => (
-        <div>
-          <p className="text-sm font-medium text-ink-900">{c.buyer.name}</p>
-          <p className="text-xs text-ink-500">{c.buyer.phone}</p>
+        <div className="max-w-[160px]">
+          <p className="truncate text-sm font-medium text-ink-900 dark:text-white" title={c.buyer.name}>{c.buyer.name}</p>
+          <p className="truncate text-xs text-ink-500 dark:text-ink-400">{c.buyer.phone}</p>
         </div>
       ),
     },
@@ -120,9 +120,9 @@ export default function CancellationsPage() {
       key: "broker",
       header: "Broker / Agency",
       render: (c) => (
-        <div>
-          <p className="text-sm font-medium text-ink-900">{c.broker.name}</p>
-          <p className="text-xs text-ink-500">{c.agency?.name ?? "Broker Direct"}</p>
+        <div className="max-w-[160px]">
+          <p className="truncate text-sm font-medium text-ink-900 dark:text-white" title={c.broker.name}>{c.broker.name}</p>
+          <p className="truncate text-xs text-ink-500 dark:text-ink-400" title={c.agency?.name ?? "Broker Direct"}>{c.agency?.name ?? "Broker Direct"}</p>
         </div>
       ),
     },
@@ -130,7 +130,7 @@ export default function CancellationsPage() {
       key: "dealAmount",
       header: "Deal Amount",
       render: (c) => (
-        <span className="text-sm font-semibold text-ink-900">
+        <span className="text-sm font-semibold text-ink-900 dark:text-white">
           {formatCurrencyINR(c.dealAmount)}
         </span>
       ),
@@ -139,7 +139,7 @@ export default function CancellationsPage() {
       key: "reason",
       header: "Cancellation Reason",
       render: (c) => (
-        <p className="max-w-[220px] truncate text-xs text-ink-700" title={c.reason}>
+        <p className="max-w-[220px] truncate text-xs text-ink-700 dark:text-ink-300" title={c.reason}>
           {c.reason}
         </p>
       ),
@@ -149,10 +149,10 @@ export default function CancellationsPage() {
       header: "Cancellation Fee",
       render: (c) => (
         <div>
-          <span className="font-semibold text-danger-600">
+          <span className="font-semibold text-danger-600 dark:text-danger-400">
             {formatCurrencyINR(c.cancellationFeeAmount)}
           </span>
-          <p className="text-[10px] text-ink-400">Rate: {c.cancellationFeePercent}%</p>
+          <p className="text-[10px] text-ink-400 dark:text-ink-500">Rate: {c.cancellationFeePercent}%</p>
         </div>
       ),
     },
@@ -162,21 +162,21 @@ export default function CancellationsPage() {
       render: (c) => {
         if (c.refundPaymentStatus === "auto_deducted") {
           return (
-            <span className="inline-flex items-center gap-1 rounded-full bg-success-50 px-2 py-0.5 text-[11px] font-semibold text-success-700">
+            <span className="inline-flex items-center gap-1 rounded-full bg-success-50 px-2.5 py-0.5 text-[11px] font-semibold text-success-700 ring-1 ring-inset ring-success-200 dark:bg-success-950/70 dark:text-success-300 dark:ring-success-900/50">
               Auto-Deducted
             </span>
           );
         }
         if (c.refundPaymentStatus === "invoice_pending") {
           return (
-            <span className="inline-flex items-center gap-1 rounded-full bg-warning-50 px-2 py-0.5 text-[11px] font-semibold text-warning-700">
+            <span className="inline-flex items-center gap-1 rounded-full bg-warning-50 px-2.5 py-0.5 text-[11px] font-semibold text-warning-800 ring-1 ring-inset ring-warning-200 dark:bg-warning-950/70 dark:text-warning-300 dark:ring-warning-900/50">
               Invoice Pending
             </span>
           );
         }
         if (c.refundPaymentStatus === "invoice_paid") {
           return (
-            <span className="inline-flex items-center gap-1 rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-semibold text-brand-700">
+            <span className="inline-flex items-center gap-1 rounded-full bg-brand-50 px-2.5 py-0.5 text-[11px] font-semibold text-brand-700 ring-1 ring-inset ring-brand-200 dark:bg-brand-950/70 dark:text-brand-300 dark:ring-brand-900/50">
               Invoice Paid
             </span>
           );
@@ -192,7 +192,7 @@ export default function CancellationsPage() {
     {
       key: "requestedAt",
       header: "Requested Date",
-      render: (c) => <span className="text-xs text-ink-500">{formatDate(c.requestedAt)}</span>,
+      render: (c) => <span className="text-xs text-ink-500 dark:text-ink-400">{formatDate(c.requestedAt)}</span>,
     },
     {
       key: "actions",
@@ -205,7 +205,7 @@ export default function CancellationsPage() {
               e.stopPropagation();
               setSelectedRecord(c);
             }}
-            className="rounded-md p-1.5 text-ink-400 hover:bg-ink-100 hover:text-brand-600 transition-colors"
+            className="rounded-md p-1.5 text-ink-400 hover:bg-ink-100 hover:text-brand-600 transition-colors dark:text-ink-400 dark:hover:bg-ink-800 dark:hover:text-brand-400"
             title="View Cancellation Audit Record"
           >
             <Eye className="h-4 w-4" />
@@ -228,7 +228,7 @@ export default function CancellationsPage() {
         actions={
           <button
             onClick={() => push("Exporting cancellations ledger…", "info")}
-            className="flex items-center gap-1.5 rounded-lg border border-ink-200 px-3.5 py-2 text-sm font-medium text-ink-700 hover:bg-ink-50 transition-colors"
+            className="flex items-center gap-1.5 rounded-lg border border-ink-200 px-3.5 py-2 text-sm font-medium text-ink-700 hover:bg-ink-50 transition-colors dark:border-ink-700 dark:bg-ink-800 dark:text-ink-200 dark:hover:bg-ink-700"
           >
             <Download className="h-4 w-4" /> Export Ledger
           </button>

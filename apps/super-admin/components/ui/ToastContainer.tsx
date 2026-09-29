@@ -6,9 +6,9 @@ import { cn } from "@/lib/utils/cn";
 
 const ICONS = { success: CheckCircle2, error: XCircle, info: Info };
 const TONE_CLASSES = {
-  success: "border-success-100 text-success-600",
-  error: "border-danger-100 text-danger-600",
-  info: "border-brand-100 text-brand-600",
+  success: "border-success-100 text-success-600 dark:border-success-900/60 dark:text-success-400",
+  error: "border-danger-100 text-danger-600 dark:border-danger-900/60 dark:text-danger-400",
+  info: "border-brand-100 text-brand-600 dark:border-brand-900/60 dark:text-brand-400",
 };
 
 export function ToastContainer() {
@@ -24,13 +24,13 @@ export function ToastContainer() {
           <div
             key={t.id}
             className={cn(
-              "animate-slide-in flex items-start gap-3 rounded-xl border bg-white px-4 py-3 shadow-popover",
+              "animate-slide-in flex items-start gap-3 rounded-xl border bg-white px-4 py-3 shadow-popover dark:bg-ink-900",
               TONE_CLASSES[t.tone]
             )}
           >
             <Icon className="mt-0.5 h-4 w-4 shrink-0" />
-            <p className="flex-1 text-sm text-ink-700">{t.message}</p>
-            <button onClick={() => dismiss(t.id)} className="text-ink-400 hover:text-ink-600">
+            <p className="flex-1 text-sm text-ink-700 dark:text-ink-200">{t.message}</p>
+            <button onClick={() => dismiss(t.id)} className="text-ink-400 hover:text-ink-600 dark:hover:text-ink-200" aria-label="Dismiss toast">
               <X className="h-3.5 w-3.5" />
             </button>
           </div>

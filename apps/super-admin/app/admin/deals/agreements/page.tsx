@@ -90,15 +90,15 @@ export default function AgreementReviewPage() {
     {
       key: "id",
       header: "Deal ID",
-      render: (d) => <span className="font-mono text-xs font-semibold text-brand-600">{d.id}</span>,
+      render: (d) => <span className="font-mono text-xs font-semibold text-brand-600 dark:text-brand-400">{d.id}</span>,
     },
     {
       key: "property",
       header: "Property",
       render: (d) => (
         <div className="max-w-[200px]">
-          <p className="truncate text-sm font-medium text-ink-900">{d.property.title}</p>
-          <p className="truncate text-xs text-ink-500">{d.property.locality}, {d.property.city}</p>
+          <p className="truncate text-sm font-medium text-ink-900 dark:text-white">{d.property.title}</p>
+          <p className="truncate text-xs text-ink-500 dark:text-ink-400">{d.property.locality}, {d.property.city}</p>
         </div>
       ),
     },
@@ -106,9 +106,9 @@ export default function AgreementReviewPage() {
       key: "buyer",
       header: "Buyer / User",
       render: (d) => (
-        <div>
-          <p className="text-sm font-medium text-ink-900">{d.buyer.name}</p>
-          <p className="text-xs text-ink-500">ID: {d.buyer.id}</p>
+        <div className="max-w-[160px]">
+          <p className="truncate text-sm font-medium text-ink-900 dark:text-white" title={d.buyer.name}>{d.buyer.name}</p>
+          <p className="truncate text-xs text-ink-500 dark:text-ink-400 font-mono">ID: {d.buyer.id}</p>
         </div>
       ),
     },
@@ -116,9 +116,9 @@ export default function AgreementReviewPage() {
       key: "broker",
       header: "Broker / Agency",
       render: (d) => (
-        <div>
-          <p className="text-sm font-medium text-ink-900">{d.broker.name}</p>
-          <p className="text-xs text-ink-500">{d.agency?.name ?? "Independent Broker"}</p>
+        <div className="max-w-[160px]">
+          <p className="truncate text-sm font-medium text-ink-900 dark:text-white" title={d.broker.name}>{d.broker.name}</p>
+          <p className="truncate text-xs text-ink-500 dark:text-ink-400" title={d.agency?.name ?? "Independent Broker"}>{d.agency?.name ?? "Independent Broker"}</p>
         </div>
       ),
     },
@@ -130,26 +130,26 @@ export default function AgreementReviewPage() {
         const hasBroker = Boolean(d.brokerAgreement);
         if (hasUser && hasBroker) {
           return (
-            <span className="inline-flex items-center gap-1 rounded-full bg-success-50 px-2 py-0.5 text-xs font-medium text-success-700">
+            <span className="inline-flex items-center gap-1 rounded-full bg-success-50 px-2.5 py-0.5 text-xs font-medium text-success-700 ring-1 ring-inset ring-success-200 dark:bg-success-950/70 dark:text-success-300 dark:ring-success-900/50">
               <CheckCircle2 className="h-3 w-3" /> Both Uploaded
             </span>
           );
         }
         if (hasUser) {
           return (
-            <span className="inline-flex items-center gap-1 rounded-full bg-brand-50 px-2 py-0.5 text-xs font-medium text-brand-700">
+            <span className="inline-flex items-center gap-1 rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-medium text-brand-700 ring-1 ring-inset ring-brand-200 dark:bg-brand-950/70 dark:text-brand-300 dark:ring-brand-900/50">
               Buyer Only
             </span>
           );
         }
         if (hasBroker) {
           return (
-            <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700">
+            <span className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-700 ring-1 ring-inset ring-indigo-200 dark:bg-indigo-950/70 dark:text-indigo-300 dark:ring-indigo-900/50">
               Broker Only
             </span>
           );
         }
-        return <span className="text-xs text-ink-400 italic">None Uploaded</span>;
+        return <span className="text-xs text-ink-400 italic dark:text-ink-500">None Uploaded</span>;
       },
     },
     {
@@ -157,7 +157,7 @@ export default function AgreementReviewPage() {
       header: "Uploaded Date",
       render: (d) => {
         const date = d.brokerAgreement?.uploadedAt ?? d.userAgreement?.uploadedAt ?? d.updatedAt;
-        return <span className="text-xs text-ink-500">{formatDate(date)}</span>;
+        return <span className="text-xs text-ink-500 dark:text-ink-400">{formatDate(date)}</span>;
       },
     },
     {
@@ -166,8 +166,8 @@ export default function AgreementReviewPage() {
       render: (d) => {
         if (d.reviewStatus === "changes_requested" || d.agreementStatus === "mismatch_flagged") {
           return (
-            <span className="inline-flex items-center gap-1 rounded-full bg-warning-100 px-2 py-0.5 text-xs font-semibold text-warning-800">
-              <AlertTriangle className="h-3 w-3" /> Changes Requested
+            <span className="inline-flex items-center gap-1 rounded-full bg-warning-100 px-2.5 py-1 text-xs font-semibold text-warning-800 ring-1 ring-inset ring-warning-200 dark:bg-warning-950/70 dark:text-warning-300 dark:ring-warning-900/50">
+              <AlertTriangle className="h-3.5 w-3.5 text-warning-600 dark:text-warning-400" /> Changes Requested
             </span>
           );
         }
@@ -185,7 +185,7 @@ export default function AgreementReviewPage() {
               e.stopPropagation();
               setSelectedDeal(d);
             }}
-            className="flex items-center gap-1 rounded-lg border border-brand-300 bg-brand-50 px-3 py-1.5 text-xs font-medium text-brand-700 hover:bg-brand-100 transition-colors"
+            className="flex items-center gap-1 rounded-lg border border-brand-300 bg-brand-50 px-3 py-1.5 text-xs font-medium text-brand-700 hover:bg-brand-100 transition-colors dark:border-brand-800 dark:bg-brand-950/40 dark:text-brand-300 dark:hover:bg-brand-900/50"
           >
             <FileText className="h-3.5 w-3.5" /> Review
           </button>
@@ -207,10 +207,10 @@ export default function AgreementReviewPage() {
       />
 
       {/* Scope Disclaimer Alert */}
-      <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-ink-200 bg-white p-3.5 text-xs text-ink-600 shadow-sm">
+      <div className="mb-4 flex items-start gap-2.5 rounded-xl border border-ink-200 bg-white p-3.5 text-xs text-ink-600 shadow-sm dark:border-ink-800 dark:bg-ink-900 dark:text-ink-300">
         <ShieldCheck className="h-4 w-4 text-brand-600 shrink-0 mt-0.5" />
         <div className="leading-relaxed">
-          <strong className="text-ink-800">Administrative Verification Scope:</strong> This queue enables administrative checks for dual-party upload completion and valuation consistency. Legal execution and enforceability of external deeds rests between the buyer and broker/seller parties.
+          <strong className="text-ink-800 dark:text-white">Administrative Verification Scope:</strong> This queue enables administrative checks for dual-party upload completion and valuation consistency. Legal execution and enforceability of external deeds rests between the buyer and broker/seller parties.
         </div>
       </div>
 

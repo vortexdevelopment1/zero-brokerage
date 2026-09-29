@@ -10,10 +10,11 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { StatCard } from "@/components/ui/StatCard";
 import { ChartCard } from "@/components/ui/ChartCard";
 import { LoadingState, ErrorState } from "@/components/ui/States";
+import { PeriodSelector } from "@/components/ui/PeriodSelector";
 import { revenueService } from "@/services/revenueService";
 import { RevenueOverview } from "@/types/revenue";
 import { formatCurrencyINR } from "@/lib/utils/format";
-import { ApiStatus } from "@/types/common";
+import { ApiStatus, ChartPeriod } from "@/types/common";
 
 const STREAMS = [
   { label: "Subscriptions", href: "/admin/revenue/subscriptions", desc: "5 user tiers + 3 agency tiers" },
@@ -27,11 +28,12 @@ const STREAMS = [
 export default function RevenueOverviewPage() {
   const [status, setStatus] = useState<ApiStatus>("loading");
   const [data, setData] = useState<RevenueOverview | null>(null);
+  const [period, setPeriod] = useState<ChartPeriod>({ year: 2026 });
 
-  async function load() {
+  async function load(selectedPeriod = period) {
     setStatus("loading");
     try {
-      const res = await revenueService.getOverview();
+      const res = await revenueService.getOverview(selectedPeriod);
       setData(res);
       setStatus("success");
     } catch {
@@ -39,7 +41,7 @@ export default function RevenueOverviewPage() {
     }
   }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(period); }, [period]);
 
   if (status === "loading" || !data) return (
     <>
@@ -68,7 +70,15 @@ export default function RevenueOverviewPage() {
         <StatCard label="Cancellation Fees" value={formatCurrencyINR(data.cancellationRevenue)} icon={ReceiptText} tone="warning" />
       </div>
 
-      <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
+      <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <h2 className="text-sm font-semibold text-ink-900 dark:text-white">Revenue Analytics</h2>
+          <p className="text-xs text-ink-500 dark:text-ink-400">Monthly trend and distribution by monetization source</p>
+        </div>
+        <PeriodSelector value={period} onChange={setPeriod} />
+      </div>
+
+      <div className="mt-3 grid grid-cols-1 gap-4 lg:grid-cols-3">
         <ChartCard title="Revenue Trend" subtitle="Last 6 months" className="lg:col-span-2">
           <ResponsiveContainer width="100%" height={260}>
             <AreaChart data={data.revenueTrend}>
@@ -102,12 +112,16 @@ export default function RevenueOverviewPage() {
 
       <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {STREAMS.map((s) => (
-          <Link key={s.href} href={s.href} className="group flex flex-col justify-between rounded-2xl border border-ink-200 bg-white p-5 shadow-card transition-shadow hover:shadow-popover">
+          <Link
+            key={s.href}
+            href={s.href}
+            className="group flex flex-col justify-between rounded-2xl border border-ink-200 bg-white p-5 shadow-card transition-shadow hover:shadow-popover dark:border-ink-800 dark:bg-ink-900"
+          >
             <div>
-              <p className="text-sm font-semibold text-ink-900">{s.label}</p>
-              <p className="mt-1 text-xs text-ink-500">{s.desc}</p>
+              <p className="text-sm font-semibold text-ink-900 dark:text-white">{s.label}</p>
+              <p className="mt-1 text-xs text-ink-500 dark:text-ink-400">{s.desc}</p>
             </div>
-            <div className="mt-4 flex items-center gap-1 text-xs font-medium text-brand-600 group-hover:gap-1.5">
+            <div className="mt-4 flex items-center gap-1 text-xs font-medium text-brand-600 group-hover:gap-1.5 dark:text-brand-400">
               View details <ArrowRight className="h-3.5 w-3.5 transition-all" />
             </div>
           </Link>

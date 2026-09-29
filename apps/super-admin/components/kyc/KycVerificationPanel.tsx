@@ -143,9 +143,9 @@ export function KycVerificationPanel({
   if (loading) {
     return (
       <div className="space-y-4 animate-pulse">
-        <div className="h-28 rounded-2xl bg-ink-100/60" />
-        <div className="h-44 rounded-2xl bg-ink-100/60" />
-        <div className="h-64 rounded-2xl bg-ink-100/60" />
+        <div className="h-28 rounded-2xl bg-ink-100/60 dark:bg-ink-800/60" />
+        <div className="h-44 rounded-2xl bg-ink-100/60 dark:bg-ink-800/60" />
+        <div className="h-64 rounded-2xl bg-ink-100/60 dark:bg-ink-800/60" />
       </div>
     );
   }
@@ -158,19 +158,19 @@ export function KycVerificationPanel({
   return (
     <div className="space-y-5">
       {/* KYC Status & Action Banner */}
-      <div className="flex flex-col gap-4 rounded-2xl border border-ink-200 bg-white p-5 shadow-card sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-start gap-3.5">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-700 border border-brand-100">
+      <div className="flex flex-col gap-4 rounded-2xl border border-ink-200 bg-white dark:border-ink-800 dark:bg-ink-900 p-5 shadow-card sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-start gap-3.5 min-w-0 flex-1">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-700 border border-brand-100 dark:bg-brand-950/50 dark:text-brand-300 dark:border-brand-900/50">
             <ShieldCheck className="h-6 w-6" />
           </div>
-          <div>
-            <div className="flex items-center gap-2.5">
-              <h3 className="text-base font-semibold text-ink-900">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <h3 className="text-base font-semibold text-ink-900 dark:text-white">
                 KYC Verification Status
               </h3>
               <KycStatusBadge status={status} size="md" />
             </div>
-            <p className="mt-1 text-xs text-ink-500">
+            <p className="mt-1 text-xs text-ink-500 dark:text-ink-400">
               {status === "pending_review" && "Submitted documents are awaiting compliance review and approval."}
               {status === "verified" && `Verified by ${kycDetail?.reviewedBy ?? "Admin"}${kycDetail?.reviewedAt ? ` on ${formatDate(kycDetail.reviewedAt)}` : ""}.`}
               {status === "rejected" && `Rejected${kycDetail?.reviewedAt ? ` on ${formatDate(kycDetail.reviewedAt)}` : ""}: ${kycDetail?.rejectionReason ?? "Details incomplete"}.`}
@@ -180,7 +180,7 @@ export function KycVerificationPanel({
         </div>
 
         {/* Verification Action Buttons */}
-        <div className="flex flex-wrap items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
           {canApprove && (
             <button
               onClick={() => setIsApprovalOpen(true)}
@@ -194,7 +194,7 @@ export function KycVerificationPanel({
           {canReject && (
             <button
               onClick={() => setIsRejectionOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-danger-200 bg-white px-3.5 py-2 text-sm font-medium text-danger-700 shadow-sm transition-colors hover:bg-danger-50 focus:outline-none focus:ring-2 focus:ring-danger-500/20"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-danger-200 bg-white dark:border-danger-800 dark:bg-ink-900 dark:text-danger-400 px-3.5 py-2 text-sm font-medium text-danger-700 shadow-sm transition-colors hover:bg-danger-50 dark:hover:bg-danger-950/30 focus:outline-none focus:ring-2 focus:ring-danger-500/20"
             >
               <XCircle className="h-4 w-4" />
               Reject KYC
@@ -202,7 +202,7 @@ export function KycVerificationPanel({
           )}
 
           {status === "verified" && (
-            <span className="inline-flex items-center gap-1 text-xs font-medium text-success-700 bg-success-50 border border-success-200 px-3 py-1.5 rounded-lg">
+            <span className="inline-flex items-center gap-1 text-xs font-medium text-success-700 bg-success-50 border border-success-200 dark:bg-success-950/40 dark:text-success-300 dark:border-success-900/50 px-3 py-1.5 rounded-lg">
               <CheckCircle2 className="h-4 w-4" /> Verification Complete
             </span>
           )}
@@ -211,15 +211,15 @@ export function KycVerificationPanel({
 
       {/* Rejection Alert Box if Status is Rejected */}
       {status === "rejected" && kycDetail?.rejectionReason && (
-        <div className="rounded-xl border border-danger-200 bg-danger-50/70 p-4 text-xs text-danger-900">
+        <div className="rounded-xl border border-danger-200 bg-danger-50/70 dark:border-danger-900/50 dark:bg-danger-950/30 p-4 text-xs text-danger-900 dark:text-danger-200">
           <div className="flex items-start gap-2.5">
-            <AlertCircle className="h-4 w-4 text-danger-600 shrink-0 mt-0.5" />
+            <AlertCircle className="h-4 w-4 text-danger-600 dark:text-danger-400 shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold text-danger-800">
+              <p className="font-semibold text-danger-800 dark:text-danger-200">
                 Reason for KYC Rejection: {kycDetail.rejectionReason}
               </p>
               {kycDetail.rejectionComments && (
-                <p className="mt-1 text-danger-700">
+                <p className="mt-1 text-danger-700 dark:text-danger-300">
                   {kycDetail.rejectionComments}
                 </p>
               )}
@@ -229,45 +229,45 @@ export function KycVerificationPanel({
       )}
 
       {/* Personal / Verification Information */}
-      <div className="rounded-2xl border border-ink-200 bg-white p-5 shadow-card">
-        <div className="border-b border-ink-100 pb-3 mb-4">
-          <h4 className="text-sm font-semibold text-ink-900">
+      <div className="rounded-2xl border border-ink-200 bg-white dark:border-ink-800 dark:bg-ink-900 p-5 shadow-card">
+        <div className="border-b border-ink-100 dark:border-ink-800 pb-3 mb-4">
+          <h4 className="text-sm font-semibold text-ink-900 dark:text-white">
             Personal & Verification Information
           </h4>
-          <p className="text-xs text-ink-500">
+          <p className="text-xs text-ink-500 dark:text-ink-400">
             Profile credentials submitted by the {entityType === "user" ? "user" : "broker"}
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="flex items-start gap-2.5">
+        <div className="grid grid-cols-1 gap-y-4 gap-x-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="min-w-0 flex items-start gap-2.5">
             <User className="h-4 w-4 text-ink-400 shrink-0 mt-0.5" />
-            <div>
-              <p className="text-xs text-ink-400">Full Name</p>
-              <p className="text-sm font-medium text-ink-900">{entityName}</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs text-ink-400 dark:text-ink-500">Full Name</p>
+              <p className="text-sm font-medium text-ink-900 dark:text-ink-100 truncate" title={entityName}>{entityName}</p>
             </div>
           </div>
 
-          <div className="flex items-start gap-2.5">
+          <div className="min-w-0 flex items-start gap-2.5">
             <Mail className="h-4 w-4 text-ink-400 shrink-0 mt-0.5" />
-            <div>
-              <p className="text-xs text-ink-400">Email Address</p>
-              <p className="text-sm font-medium text-ink-900 truncate">{entityEmail}</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs text-ink-400 dark:text-ink-500">Email Address</p>
+              <p className="text-sm font-medium text-ink-900 dark:text-ink-100 truncate" title={entityEmail}>{entityEmail}</p>
             </div>
           </div>
 
-          <div className="flex items-start gap-2.5">
+          <div className="min-w-0 flex items-start gap-2.5">
             <Phone className="h-4 w-4 text-ink-400 shrink-0 mt-0.5" />
-            <div>
-              <p className="text-xs text-ink-400">Phone Number</p>
-              <p className="text-sm font-medium text-ink-900">{entityPhone}</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs text-ink-400 dark:text-ink-500">Phone Number</p>
+              <p className="text-sm font-medium text-ink-900 dark:text-ink-100 truncate">{entityPhone}</p>
             </div>
           </div>
 
-          <div className="flex items-start gap-2.5">
+          <div className="min-w-0 flex items-start gap-2.5">
             <ShieldCheck className="h-4 w-4 text-ink-400 shrink-0 mt-0.5" />
-            <div>
-              <p className="text-xs text-ink-400">Verification Status</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs text-ink-400 dark:text-ink-500">Verification Status</p>
               <div className="mt-0.5">
                 <KycStatusBadge status={status} size="sm" />
               </div>
@@ -275,31 +275,31 @@ export function KycVerificationPanel({
           </div>
 
           {entityCity && (
-            <div className="flex items-start gap-2.5">
+            <div className="min-w-0 flex items-start gap-2.5">
               <MapPin className="h-4 w-4 text-ink-400 shrink-0 mt-0.5" />
-              <div>
-                <p className="text-xs text-ink-400">Operating City</p>
-                <p className="text-sm font-medium text-ink-900">{entityCity}</p>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs text-ink-400 dark:text-ink-500">Operating City</p>
+                <p className="text-sm font-medium text-ink-900 dark:text-ink-100 truncate" title={entityCity}>{entityCity}</p>
               </div>
             </div>
           )}
 
           {agency && (
-            <div className="flex items-start gap-2.5">
+            <div className="min-w-0 flex items-start gap-2.5">
               <Building className="h-4 w-4 text-ink-400 shrink-0 mt-0.5" />
-              <div>
-                <p className="text-xs text-ink-400">Affiliated Agency</p>
-                <p className="text-sm font-medium text-ink-900">{agency}</p>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs text-ink-400 dark:text-ink-500">Affiliated Agency</p>
+                <p className="text-sm font-medium text-ink-900 dark:text-ink-100 truncate" title={agency}>{agency}</p>
               </div>
             </div>
           )}
 
           {kycDetail?.submittedAt && (
-            <div className="flex items-start gap-2.5">
+            <div className="min-w-0 flex items-start gap-2.5">
               <Calendar className="h-4 w-4 text-ink-400 shrink-0 mt-0.5" />
-              <div>
-                <p className="text-xs text-ink-400">Submitted Date</p>
-                <p className="text-sm font-medium text-ink-900">{formatDate(kycDetail.submittedAt)}</p>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs text-ink-400 dark:text-ink-500">Submitted Date</p>
+                <p className="text-sm font-medium text-ink-900 dark:text-ink-100 truncate">{formatDate(kycDetail.submittedAt)}</p>
               </div>
             </div>
           )}
@@ -307,33 +307,33 @@ export function KycVerificationPanel({
       </div>
 
       {/* Submitted Documents Section */}
-      <div className="rounded-2xl border border-ink-200 bg-white p-5 shadow-card">
-        <div className="flex items-center justify-between border-b border-ink-100 pb-3 mb-4">
+      <div className="rounded-2xl border border-ink-200 bg-white dark:border-ink-800 dark:bg-ink-900 p-5 shadow-card">
+        <div className="flex items-center justify-between border-b border-ink-100 dark:border-ink-800 pb-3 mb-4">
           <div>
-            <h4 className="text-sm font-semibold text-ink-900">
+            <h4 className="text-sm font-semibold text-ink-900 dark:text-white">
               Submitted Documents
             </h4>
-            <p className="text-xs text-ink-500">
+            <p className="text-xs text-ink-500 dark:text-ink-400">
               {entityType === "user"
                 ? "Identity documents uploaded for Aadhaar / PAN compliance verification"
                 : "Licensing and tax records submitted for broker verification"}
             </p>
           </div>
-          <span className="text-xs font-medium text-ink-500 bg-ink-100 px-2.5 py-1 rounded-full">
+          <span className="text-xs font-medium text-ink-500 dark:text-ink-400 bg-ink-100 dark:bg-ink-800 px-2.5 py-1 rounded-full">
             {documents.length} {documents.length === 1 ? "document" : "documents"}
           </span>
         </div>
 
         {documents.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-10 text-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-ink-100 text-ink-400 mb-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-ink-100 dark:bg-ink-800 text-ink-400 dark:text-ink-500 mb-3">
               <FileQuestion className="h-6 w-6" />
             </div>
-            <h5 className="text-sm font-medium text-ink-800">
+            <h5 className="text-sm font-medium text-ink-800 dark:text-ink-200">
               No documents submitted
             </h5>
-            <p className="mt-1 max-w-sm text-xs text-ink-500 leading-relaxed">
-              This {entityType === "user" ? "user" : "broker"} has not uploaded identity or licensing documents yet. Status is currently <strong className="font-semibold text-ink-700">Not Submitted</strong>.
+            <p className="mt-1 max-w-sm text-xs text-ink-500 dark:text-ink-400 leading-relaxed">
+              This {entityType === "user" ? "user" : "broker"} has not uploaded identity or licensing documents yet. Status is currently <strong className="font-semibold text-ink-700 dark:text-ink-200">Not Submitted</strong>.
             </p>
           </div>
         ) : (

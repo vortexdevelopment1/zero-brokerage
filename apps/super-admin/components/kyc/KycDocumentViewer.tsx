@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 
 interface KycDocumentViewerProps {
-  document: KycDocument | null;
+  document: (Omit<KycDocument, "type"> & { type: string }) | null;
   open: boolean;
   onClose: () => void;
   entityName: string;
@@ -42,7 +42,7 @@ export function KycDocumentViewer({
       footer={
         <button
           onClick={onClose}
-          className="rounded-lg bg-ink-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ink-800"
+          className="rounded-lg bg-ink-900 dark:bg-ink-800 dark:hover:bg-ink-700 dark:border dark:border-ink-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-ink-800"
         >
           Close Preview
         </button>
@@ -50,81 +50,81 @@ export function KycDocumentViewer({
     >
       <div className="space-y-4">
         {/* Specimen Disclaimer Banner */}
-        <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-amber-50 border border-amber-200 px-3.5 py-2 text-xs text-amber-800">
+        <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-amber-50 border border-amber-200 dark:bg-amber-950/40 dark:border-amber-900/50 dark:text-amber-300 px-3.5 py-2 text-xs text-amber-800">
           <div className="flex items-center gap-2">
-            <Lock className="h-3.5 w-3.5 text-amber-600 shrink-0" />
+            <Lock className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
             <span>
               <strong>Specimen Document Preview:</strong> Synthetic compliance data for admin evaluation.
             </span>
           </div>
-          <span className="rounded bg-amber-200/70 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-900 shrink-0">
+          <span className="rounded bg-amber-200/70 dark:bg-amber-900/60 dark:text-amber-200 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-900 shrink-0">
             Internal Use Only
           </span>
         </div>
 
         {/* Visual Document Mockup Card Container */}
-        <div className="relative flex flex-col items-center justify-center overflow-hidden rounded-xl border border-ink-200 bg-ink-50/60 p-3 sm:p-5 shadow-inner">
+        <div className="relative flex flex-col items-center justify-center overflow-hidden rounded-xl border border-ink-200 bg-ink-50/60 dark:border-ink-800 dark:bg-ink-950/50 p-3 sm:p-5 shadow-inner">
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.05] select-none">
-            <span className="rotate-[-25deg] text-3xl sm:text-4xl font-extrabold tracking-widest text-ink-900 uppercase text-center">
+            <span className="rotate-[-25deg] text-3xl sm:text-4xl font-extrabold tracking-widest text-ink-900 dark:text-white uppercase text-center">
               {preview?.watermarkText ?? "SPECIMEN COPY"}
             </span>
           </div>
 
           {document.type === "aadhaar" && (
-            <div className="relative w-full max-w-lg mx-auto rounded-xl border border-orange-200 bg-white p-4 sm:p-5 shadow-sm">
-              <div className="flex items-start justify-between border-b border-ink-100 pb-3">
+            <div className="relative w-full max-w-lg mx-auto rounded-xl border border-orange-200 bg-white dark:border-ink-700 dark:bg-ink-900 p-4 sm:p-5 shadow-sm">
+              <div className="flex items-start justify-between border-b border-ink-100 dark:border-ink-800 pb-3">
                 <div className="flex items-center gap-3">
-                  <div className="h-8 w-8 shrink-0 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold text-xs">
+                  <div className="h-8 w-8 shrink-0 rounded-full bg-orange-100 dark:bg-orange-950/60 dark:text-orange-400 flex items-center justify-center text-orange-600 font-bold text-xs">
                     UIDAI
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-ink-900 uppercase tracking-wide">
+                    <p className="text-xs font-bold text-ink-900 dark:text-white uppercase tracking-wide">
                       Government of India
                     </p>
-                    <p className="text-[11px] text-ink-500">
+                    <p className="text-[11px] text-ink-500 dark:text-ink-400">
                       Unique Identification Authority of India (Simulated)
                     </p>
                   </div>
                 </div>
-                <div className="h-1.5 w-16 shrink-0 rounded-full bg-gradient-to-r from-orange-400 via-white to-emerald-500 border border-ink-200" />
+                <div className="h-1.5 w-16 shrink-0 rounded-full bg-gradient-to-r from-orange-400 via-white to-emerald-500 border border-ink-200 dark:border-ink-700" />
               </div>
 
               <div className="mt-4 grid grid-cols-1 sm:grid-cols-4 gap-4 items-center">
-                <div className="sm:col-span-1 flex flex-col items-center justify-center rounded-lg border border-ink-200 bg-ink-50 p-3 shrink-0">
-                  <User className="h-14 w-14 sm:h-16 sm:w-16 text-ink-400 shrink-0" />
-                  <span className="mt-1 text-[10px] text-ink-400">Photo Proof</span>
+                <div className="sm:col-span-1 flex flex-col items-center justify-center rounded-lg border border-ink-200 bg-ink-50 dark:border-ink-700 dark:bg-ink-800 p-3 shrink-0">
+                  <User className="h-14 w-14 sm:h-16 sm:w-16 text-ink-400 dark:text-ink-500 shrink-0" />
+                  <span className="mt-1 text-[10px] text-ink-400 dark:text-ink-500">Photo Proof</span>
                 </div>
-                <div className="sm:col-span-2 space-y-1.5 text-xs text-ink-700">
-                  <p className="text-sm font-semibold text-ink-900">{entityName}</p>
-                  <p><span className="text-ink-500">DOB:</span> 14/05/1991</p>
-                  <p><span className="text-ink-500">Gender:</span> Male</p>
-                  <p className="break-words"><span className="text-ink-500">Address:</span> {preview?.details?.Address ?? "Bengaluru, Karnataka"}</p>
+                <div className="sm:col-span-2 space-y-1.5 text-xs text-ink-700 dark:text-ink-300">
+                  <p className="text-sm font-semibold text-ink-900 dark:text-white">{entityName}</p>
+                  <p><span className="text-ink-500 dark:text-ink-400">DOB:</span> 14/05/1991</p>
+                  <p><span className="text-ink-500 dark:text-ink-400">Gender:</span> Male</p>
+                  <p className="break-words"><span className="text-ink-500 dark:text-ink-400">Address:</span> {preview?.details?.Address ?? "Bengaluru, Karnataka"}</p>
                 </div>
-                <div className="sm:col-span-1 flex flex-col items-center justify-center sm:border-l sm:border-ink-100 sm:pl-2 shrink-0">
-                  <QrCode className="h-14 w-14 sm:h-16 sm:w-16 text-ink-700 shrink-0" />
-                  <span className="mt-1 text-[9px] text-ink-400">Digital Seal</span>
+                <div className="sm:col-span-1 flex flex-col items-center justify-center sm:border-l sm:border-ink-100 dark:sm:border-ink-800 sm:pl-2 shrink-0">
+                  <QrCode className="h-14 w-14 sm:h-16 sm:w-16 text-ink-700 dark:text-ink-300 shrink-0" />
+                  <span className="mt-1 text-[9px] text-ink-400 dark:text-ink-500">Digital Seal</span>
                 </div>
               </div>
 
-              <div className="mt-4 rounded-lg bg-orange-50 border border-orange-100 py-2 px-3 text-center">
-                <p className="font-mono text-base font-bold tracking-widest text-ink-900">
+              <div className="mt-4 rounded-lg bg-orange-50 border border-orange-100 dark:bg-orange-950/40 dark:border-orange-900/50 py-2 px-3 text-center">
+                <p className="font-mono text-base font-bold tracking-widest text-ink-900 dark:text-white">
                   {document.documentNumberMasked ?? "XXXX-XXXX-8910"}
                 </p>
-                <p className="text-[10px] text-ink-500">मेरा आधार, मेरी पहचान (Simulated)</p>
+                <p className="text-[10px] text-ink-500 dark:text-ink-400">मेरा आधार, मेरी पहचान (Simulated)</p>
               </div>
             </div>
           )}
 
           {(document.type === "pan" || document.type === "business_pan") && (
-            <div className="relative w-full max-w-lg mx-auto rounded-xl border border-sky-200 bg-gradient-to-br from-white via-sky-50/20 to-white p-4 sm:p-5 shadow-sm">
-              <div className="flex items-center justify-between border-b border-sky-100 pb-3">
+            <div className="relative w-full max-w-lg mx-auto rounded-xl border border-sky-200 bg-gradient-to-br from-white via-sky-50/20 to-white dark:from-ink-900 dark:via-sky-950/20 dark:to-ink-900 dark:border-ink-700 p-4 sm:p-5 shadow-sm">
+              <div className="flex items-center justify-between border-b border-sky-100 dark:border-sky-900/40 pb-3">
                 <div>
-                  <p className="text-xs font-bold text-ink-900 uppercase">
+                  <p className="text-xs font-bold text-ink-900 dark:text-white uppercase">
                     Income Tax Department · Govt of India
                   </p>
-                  <p className="text-[11px] text-ink-500">Permanent Account Number Card (Specimen)</p>
+                  <p className="text-[11px] text-ink-500 dark:text-ink-400">Permanent Account Number Card (Specimen)</p>
                 </div>
-                <div className="h-7 w-7 shrink-0 rounded bg-sky-100 flex items-center justify-center text-sky-700 font-bold text-[10px]">
+                <div className="h-7 w-7 shrink-0 rounded bg-sky-100 dark:bg-sky-950/60 flex items-center justify-center text-sky-700 dark:text-sky-300 font-bold text-[10px]">
                   ITD
                 </div>
               </div>
@@ -132,73 +132,73 @@ export function KycDocumentViewer({
               <div className="mt-4 grid grid-cols-3 gap-4">
                 <div className="col-span-2 space-y-2 text-xs">
                   <div>
-                    <p className="text-[10px] text-ink-400 uppercase">Cardholder Name</p>
-                    <p className="font-semibold text-ink-900">{entityName}</p>
+                    <p className="text-[10px] text-ink-400 dark:text-ink-500 uppercase">Cardholder Name</p>
+                    <p className="font-semibold text-ink-900 dark:text-white">{entityName}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] text-ink-400 uppercase">Father&apos;s Name</p>
-                    <p className="text-ink-800">S. Sharma (Simulated)</p>
+                    <p className="text-[10px] text-ink-400 dark:text-ink-500 uppercase">Father&apos;s Name</p>
+                    <p className="text-ink-800 dark:text-ink-200">S. Sharma (Simulated)</p>
                   </div>
                   <div>
-                    <p className="text-[10px] text-ink-400 uppercase">Date of Birth / Incorporation</p>
-                    <p className="text-ink-800">14/05/1991</p>
+                    <p className="text-[10px] text-ink-400 dark:text-ink-500 uppercase">Date of Birth / Incorporation</p>
+                    <p className="text-ink-800 dark:text-ink-200">14/05/1991</p>
                   </div>
                 </div>
 
                 <div className="col-span-1 flex flex-col items-end justify-between">
-                  <div className="h-16 w-14 shrink-0 rounded border border-ink-200 bg-ink-100 flex items-center justify-center">
-                    <User className="h-10 w-10 text-ink-400 shrink-0" />
+                  <div className="h-16 w-14 shrink-0 rounded border border-ink-200 bg-ink-100 dark:border-ink-700 dark:bg-ink-800 flex items-center justify-center">
+                    <User className="h-10 w-10 text-ink-400 dark:text-ink-500 shrink-0" />
                   </div>
-                  <div className="w-20 border-b border-ink-400 pt-3 text-center">
-                    <span className="font-serif italic text-[11px] text-ink-600">Signature</span>
+                  <div className="w-20 border-b border-ink-400 dark:border-ink-600 pt-3 text-center">
+                    <span className="font-serif italic text-[11px] text-ink-600 dark:text-ink-400">Signature</span>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-4 rounded-lg bg-sky-100/70 border border-sky-200 px-4 py-2 flex items-center justify-between">
+              <div className="mt-4 rounded-lg bg-sky-100/70 border border-sky-200 dark:bg-sky-950/60 dark:border-sky-900/50 px-4 py-2 flex items-center justify-between">
                 <div>
-                  <p className="text-[10px] uppercase tracking-wider text-sky-800">Permanent Account Number</p>
-                  <p className="font-mono text-base font-bold tracking-widest text-sky-950">
+                  <p className="text-[10px] uppercase tracking-wider text-sky-800 dark:text-sky-300">Permanent Account Number</p>
+                  <p className="font-mono text-base font-bold tracking-widest text-sky-950 dark:text-sky-100">
                     {document.documentNumberMasked ?? "ABCDE1234F"}
                   </p>
                 </div>
-                <div className="h-8 w-8 shrink-0 rounded-full border border-sky-300 bg-white flex items-center justify-center">
-                  <ShieldCheck className="h-5 w-5 text-sky-600" />
+                <div className="h-8 w-8 shrink-0 rounded-full border border-sky-300 bg-white dark:bg-ink-800 dark:border-sky-700 flex items-center justify-center">
+                  <ShieldCheck className="h-5 w-5 text-sky-600 dark:text-sky-400" />
                 </div>
               </div>
             </div>
           )}
 
           {document.type === "rera_certificate" && (
-            <div className="relative w-full max-w-lg mx-auto rounded-xl border border-emerald-200 bg-white p-4 sm:p-5 shadow-sm">
-              <div className="text-center border-b border-ink-100 pb-3">
-                <div className="mx-auto mb-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
+            <div className="relative w-full max-w-lg mx-auto rounded-xl border border-emerald-200 bg-white dark:border-ink-700 dark:bg-ink-900 p-4 sm:p-5 shadow-sm">
+              <div className="text-center border-b border-ink-100 dark:border-ink-800 pb-3">
+                <div className="mx-auto mb-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400">
                   <Building className="h-4 w-4" />
                 </div>
-                <p className="text-xs font-bold uppercase tracking-wider text-ink-900">
+                <p className="text-xs font-bold uppercase tracking-wider text-ink-900 dark:text-white">
                   Real Estate Regulatory Authority (RERA)
                 </p>
-                <p className="text-[11px] text-ink-500">
+                <p className="text-[11px] text-ink-500 dark:text-ink-400">
                   Certificate of Registration of Real Estate Agent (Specimen Demo)
                 </p>
               </div>
 
-              <div className="mt-4 space-y-3 text-xs text-ink-700">
+              <div className="mt-4 space-y-3 text-xs text-ink-700 dark:text-ink-300">
                 <p>
-                  This is to certify that <strong className="text-ink-900">{entityName}</strong> has been granted registration as a Real Estate Agent under Section 9 of the Real Estate (Regulation and Development) Act, 2016.
+                  This is to certify that <strong className="text-ink-900 dark:text-white">{entityName}</strong> has been granted registration as a Real Estate Agent under Section 9 of the Real Estate (Regulation and Development) Act, 2016.
                 </p>
-                <div className="rounded-lg bg-emerald-50 border border-emerald-100 p-3">
+                <div className="rounded-lg bg-emerald-50 border border-emerald-100 dark:bg-emerald-950/40 dark:border-emerald-900/50 p-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-ink-600 font-medium">Registration Number:</span>
-                    <span className="font-mono font-bold text-emerald-900">{document.documentNumberMasked}</span>
+                    <span className="text-ink-600 dark:text-ink-400 font-medium">Registration Number:</span>
+                    <span className="font-mono font-bold text-emerald-900 dark:text-emerald-300">{document.documentNumberMasked}</span>
                   </div>
                   <div className="mt-1 flex items-center justify-between text-[11px]">
-                    <span className="text-ink-500">Jurisdiction:</span>
-                    <span className="text-ink-800">Karnataka State Authority</span>
+                    <span className="text-ink-500 dark:text-ink-400">Jurisdiction:</span>
+                    <span className="text-ink-800 dark:text-ink-200">Karnataka State Authority</span>
                   </div>
                   <div className="mt-1 flex items-center justify-between text-[11px]">
-                    <span className="text-ink-500">Validity:</span>
-                    <span className="text-ink-800">31 Dec 2029 (Active)</span>
+                    <span className="text-ink-500 dark:text-ink-400">Validity:</span>
+                    <span className="text-ink-800 dark:text-ink-200">31 Dec 2029 (Active)</span>
                   </div>
                 </div>
               </div>
@@ -206,100 +206,146 @@ export function KycDocumentViewer({
           )}
 
           {document.type === "agency_license" && (
-            <div className="relative w-full max-w-lg mx-auto rounded-xl border border-indigo-200 bg-white p-4 sm:p-5 shadow-sm">
-              <div className="text-center border-b border-ink-100 pb-3">
-                <div className="mx-auto mb-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-700">
+            <div className="relative w-full max-w-lg mx-auto rounded-xl border border-indigo-200 bg-white dark:border-ink-700 dark:bg-ink-900 p-4 sm:p-5 shadow-sm">
+              <div className="text-center border-b border-ink-100 dark:border-ink-800 pb-3">
+                <div className="mx-auto mb-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400">
                   <Building className="h-4 w-4" />
                 </div>
-                <p className="text-xs font-bold uppercase tracking-wider text-ink-900">
+                <p className="text-xs font-bold uppercase tracking-wider text-ink-900 dark:text-white">
                   Commercial Agency Trade License
                 </p>
-                <p className="text-[11px] text-ink-500">
+                <p className="text-[11px] text-ink-500 dark:text-ink-400">
                   Certified Agency Operational Authorization
                 </p>
               </div>
 
-              <div className="mt-4 space-y-3 text-xs text-ink-700">
+              <div className="mt-4 space-y-3 text-xs text-ink-700 dark:text-ink-300">
                 <p>
-                  This certifies that <strong className="text-ink-900">{entityName}</strong> is authorized to operate as a licensed brokerage firm under regulatory compliance.
+                  This certifies that <strong className="text-ink-900 dark:text-white">{entityName}</strong> is authorized to operate as a licensed brokerage firm under regulatory compliance.
                 </p>
-                <div className="rounded-lg bg-indigo-50 border border-indigo-100 p-3">
+                <div className="rounded-lg bg-indigo-50 border border-indigo-100 dark:bg-indigo-950/40 dark:border-indigo-900/50 p-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-ink-600 font-medium">License Registration:</span>
-                    <span className="font-mono font-bold text-indigo-900">{document.documentNumberMasked ?? document.id}</span>
+                    <span className="text-ink-600 dark:text-ink-400 font-medium">License Registration:</span>
+                    <span className="font-mono font-bold text-indigo-900 dark:text-indigo-300">{document.documentNumberMasked ?? document.id}</span>
                   </div>
                   <div className="mt-1 flex items-center justify-between text-[11px]">
-                    <span className="text-ink-500">License Status:</span>
-                    <span className="text-indigo-800 font-medium">Verified & Active</span>
+                    <span className="text-ink-500 dark:text-ink-400">License Status:</span>
+                    <span className="text-indigo-800 dark:text-indigo-300 font-medium">Verified & Active</span>
                   </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {document.type === "gst_certificate" && (
+            <div className="relative w-full max-w-lg mx-auto rounded-xl border border-indigo-200 bg-white p-4 sm:p-5 shadow-sm dark:border-ink-700 dark:bg-ink-900">
+              <div className="text-center border-b border-ink-100 dark:border-ink-800 pb-3">
+                <div className="mx-auto mb-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-400">
+                  <Building className="h-4 w-4" />
+                </div>
+                <p className="text-xs font-bold uppercase tracking-wider text-ink-900 dark:text-white">
+                  Government of India · Goods and Services Tax
+                </p>
+                <p className="text-[11px] text-ink-500 dark:text-ink-400">
+                  Form GST REG-06 · Registration Certificate (Specimen Preview)
+                </p>
+              </div>
+
+              <div className="mt-4 space-y-3 text-xs text-ink-700 dark:text-ink-300">
+                <div className="rounded-lg bg-indigo-50 border border-indigo-100 p-3 dark:bg-indigo-950/40 dark:border-indigo-900/50">
+                  <div className="flex items-center justify-between">
+                    <span className="text-ink-600 dark:text-ink-400 font-medium">Registration Number (GSTIN):</span>
+                    <span className="font-mono font-bold text-indigo-900 dark:text-indigo-300">{document.documentNumberMasked ?? "29AABCZ1234F1Z5"}</span>
+                  </div>
+                  <div className="mt-1.5 flex items-center justify-between text-[11px]">
+                    <span className="text-ink-500 dark:text-ink-400">Legal Name:</span>
+                    <span className="text-ink-900 dark:text-white font-semibold">{entityName}</span>
+                  </div>
+                  <div className="mt-1 flex items-center justify-between text-[11px]">
+                    <span className="text-ink-500 dark:text-ink-400">Constitution of Business:</span>
+                    <span className="text-ink-800 dark:text-ink-200">Private Limited Company</span>
+                  </div>
+                  <div className="mt-1 flex items-center justify-between text-[11px]">
+                    <span className="text-ink-500 dark:text-ink-400">Principal Place of Business:</span>
+                    <span className="text-ink-800 dark:text-ink-200">{preview?.details?.Address ?? "Bengaluru, Karnataka, India"}</span>
+                  </div>
+                  <div className="mt-1 flex items-center justify-between text-[11px]">
+                    <span className="text-ink-500 dark:text-ink-400">Registration Type & Validity:</span>
+                    <span className="text-emerald-700 dark:text-emerald-400 font-medium">Regular · Active (Valid)</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between rounded-lg border border-ink-100 p-2 text-[10px] text-ink-400 dark:border-ink-800">
+                  <span>Jurisdiction: Centre & State Dual Control</span>
+                  <span>Digitally Verified by GSTN</span>
                 </div>
               </div>
             </div>
           )}
 
           {document.type === "profile_photo" && (
-            <div className="relative w-full max-w-sm mx-auto rounded-xl border border-ink-200 bg-white p-6 shadow-sm text-center">
-              <div className="mx-auto flex h-24 w-24 sm:h-28 sm:w-28 items-center justify-center rounded-2xl border-2 border-dashed border-brand-400 bg-brand-50 shrink-0">
-                <User className="h-14 w-14 sm:h-16 sm:w-16 text-brand-600 shrink-0" />
+            <div className="relative w-full max-w-sm mx-auto rounded-xl border border-ink-200 bg-white dark:border-ink-700 dark:bg-ink-900 p-6 shadow-sm text-center">
+              <div className="mx-auto flex h-24 w-24 sm:h-28 sm:w-28 items-center justify-center rounded-2xl border-2 border-dashed border-brand-400 bg-brand-50 dark:border-brand-600 dark:bg-brand-950/40 shrink-0">
+                <User className="h-14 w-14 sm:h-16 sm:w-16 text-brand-600 dark:text-brand-400 shrink-0" />
               </div>
-              <p className="mt-3 text-sm font-semibold text-ink-900">{entityName}</p>
-              <p className="text-xs text-ink-500">Live Identity Capture · Anti-Spoofing Verification</p>
-              <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-success-50 px-3 py-1 text-xs font-medium text-success-700 border border-success-200">
-                <CheckCircle className="h-3.5 w-3.5 text-success-600 shrink-0" />
+              <p className="mt-3 text-sm font-semibold text-ink-900 dark:text-white">{entityName}</p>
+              <p className="text-xs text-ink-500 dark:text-ink-400">Live Identity Capture · Anti-Spoofing Verification</p>
+              <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-success-50 dark:bg-success-950/50 border border-success-200 dark:border-success-900/50 px-3 py-1 text-xs font-medium text-success-700 dark:text-success-300">
+                <CheckCircle className="h-3.5 w-3.5 text-success-600 dark:text-success-400 shrink-0" />
                 Liveness Check Passed (99.1% Confidence)
               </div>
             </div>
           )}
 
           {document.type === "other" && (
-            <div className="relative w-full max-w-lg mx-auto rounded-xl border border-ink-200 bg-white p-5 shadow-sm text-xs text-ink-700">
-              <p className="font-semibold text-ink-900">{document.title}</p>
-              <p className="mt-1 text-ink-500">Document reference: {document.documentNumberMasked ?? document.id}</p>
+            <div className="relative w-full max-w-lg mx-auto rounded-xl border border-ink-200 bg-white dark:border-ink-700 dark:bg-ink-900 p-5 shadow-sm text-xs text-ink-700 dark:text-ink-300">
+              <p className="font-semibold text-ink-900 dark:text-white">{document.title}</p>
+              <p className="mt-1 text-ink-500 dark:text-ink-400">Document reference: {document.documentNumberMasked ?? document.id}</p>
             </div>
           )}
         </div>
 
         {/* Metadata Details Table */}
-        <div className="rounded-xl border border-ink-200 bg-white p-4 shadow-card">
-          <h4 className="text-xs font-semibold uppercase tracking-wider text-ink-400 mb-3">
+        <div className="rounded-xl border border-ink-200 bg-white dark:border-ink-800 dark:bg-ink-900 p-4 shadow-card">
+          <h4 className="text-xs font-semibold uppercase tracking-wider text-ink-400 dark:text-ink-500 mb-3">
             Verification Metadata & Audit Record
           </h4>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-            <div>
-              <p className="text-ink-400">Document Type</p>
-              <p className="font-medium text-ink-900 capitalize">{document.type.replace(/_/g, " ")}</p>
+            <div className="min-w-0">
+              <p className="text-ink-400 dark:text-ink-500">Document Type</p>
+              <p className="font-medium text-ink-900 dark:text-ink-100 capitalize truncate" title={document.type.replace(/_/g, " ")}>{document.type.replace(/_/g, " ")}</p>
             </div>
-            <div>
-              <p className="text-ink-400">Status</p>
+            <div className="min-w-0">
+              <p className="text-ink-400 dark:text-ink-500">Status</p>
               <div className="mt-0.5">
                 <StatusBadge status={document.status} />
               </div>
             </div>
-            <div>
-              <p className="text-ink-400">Submitted Date</p>
-              <p className="font-medium text-ink-900">{formatDate(document.submittedAt)}</p>
+            <div className="min-w-0">
+              <p className="text-ink-400 dark:text-ink-500">Submitted Date</p>
+              <p className="font-medium text-ink-900 dark:text-ink-100 truncate">{formatDate(document.submittedAt)}</p>
             </div>
-            <div>
-              <p className="text-ink-400">File Size</p>
-              <p className="font-medium text-ink-900">{document.fileSize ?? "1.5 MB"}</p>
+            <div className="min-w-0">
+              <p className="text-ink-400 dark:text-ink-500">File Size</p>
+              <p className="font-medium text-ink-900 dark:text-ink-100 truncate">{document.fileSize ?? "1.5 MB"}</p>
             </div>
           </div>
           {document.notes && (
-            <div className="mt-3 border-t border-ink-100 pt-2.5 text-xs text-ink-600">
-              <span className="font-medium text-ink-700">Compliance Notes: </span>
+            <div className="mt-3 border-t border-ink-100 dark:border-ink-800 pt-2.5 text-xs text-ink-600 dark:text-ink-300">
+              <span className="font-medium text-ink-700 dark:text-ink-200">Compliance Notes: </span>
               {document.notes}
             </div>
           )}
         </div>
 
         {/* Production Storage & Security Architectural Notice */}
-        <div className="flex items-start gap-2.5 rounded-lg border border-ink-200 bg-ink-50/70 p-3 text-[11px] text-ink-600">
+        <div className="flex items-start gap-2.5 rounded-lg border border-ink-200 bg-ink-50/70 dark:border-ink-800 dark:bg-ink-950/50 p-3 text-[11px] text-ink-600 dark:text-ink-400">
           <ShieldCheck className="h-4 w-4 text-brand-600 shrink-0 mt-0.5" />
           <div>
-            <p className="font-semibold text-ink-800">
+            <p className="font-semibold text-ink-800 dark:text-ink-200">
               Security Architecture (SOW / BRD Compliance)
             </p>
-            <p className="mt-0.5 text-ink-500 leading-relaxed">
+            <p className="mt-0.5 text-ink-500 dark:text-ink-400 leading-relaxed">
               In production, documents are encrypted at rest in isolated S3/GCS buckets. Previews are streamed via short-lived signed URLs with a strict 15-minute TTL. No permanent public URLs or unmasked Aadhaar identifiers are stored or exposed to client browsers.
             </p>
           </div>

@@ -48,9 +48,9 @@ export default function VisitsPage() {
   useEffect(() => setPage(1), [debouncedSearch, statusFilter]);
 
   const columns: TableColumn<Visit>[] = [
-    { key: "user", header: "Seeker" },
-    { key: "broker", header: "Broker" },
-    { key: "property", header: "Property", render: (v) => <span className="max-w-[220px] truncate text-ink-600">{v.property}</span> },
+    { key: "user", header: "Seeker", render: (v) => <span className="max-w-[160px] truncate inline-block text-ink-800 dark:text-ink-100" title={v.user}>{v.user}</span> },
+    { key: "broker", header: "Broker", render: (v) => <span className="max-w-[160px] truncate inline-block text-ink-800 dark:text-ink-100" title={v.broker}>{v.broker}</span> },
+    { key: "property", header: "Property", render: (v) => <span className="max-w-[220px] truncate inline-block text-ink-600 dark:text-ink-300" title={v.property}>{v.property}</span> },
     { key: "scheduledDate", header: "Date", render: (v) => formatDate(v.scheduledDate) },
     { key: "scheduledTime", header: "Time" },
     { key: "status", header: "Status", render: (v) => <StatusBadge status={v.status} /> },
@@ -61,9 +61,9 @@ export default function VisitsPage() {
       render: (v) =>
         v.status === "completed" ? (
           v.checkInVerified ? (
-            <span className="inline-flex items-center gap-1 text-xs font-medium text-success-600"><ShieldCheck className="h-3.5 w-3.5" /> Verified</span>
+            <span className="inline-flex items-center gap-1 text-xs font-medium text-success-600 dark:text-success-400"><ShieldCheck className="h-3.5 w-3.5" /> Verified</span>
           ) : (
-            <span className="inline-flex items-center gap-1 text-xs font-medium text-danger-600"><ShieldX className="h-3.5 w-3.5" /> Failed</span>
+            <span className="inline-flex items-center gap-1 text-xs font-medium text-danger-600 dark:text-danger-400"><ShieldX className="h-3.5 w-3.5" /> Failed</span>
           )
         ) : (
           <span className="text-xs text-ink-400">—</span>

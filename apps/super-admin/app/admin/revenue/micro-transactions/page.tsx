@@ -43,7 +43,7 @@ export default function MicroTransactionsPage() {
   useEffect(() => setPage(1), [debouncedSearch]);
 
   const columns: TableColumn<MicroTransactionEntry>[] = [
-    { key: "id", header: "Transaction ID", render: (m) => <span className="font-medium text-ink-800">{m.id}</span> },
+    { key: "id", header: "Transaction ID", render: (m) => <span className="font-medium text-ink-800 dark:text-ink-200">{m.id}</span> },
     { key: "user", header: "User" },
     { key: "alertType", header: "Alert Type", render: (m) => <StatusBadge status="info" label={m.alertType} tone="info" /> },
     { key: "amount", header: "Amount", render: (m) => formatCurrencyINR(m.amount) },

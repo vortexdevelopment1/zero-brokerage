@@ -95,11 +95,13 @@ function NavItem({ group, collapsed, pathname, onNavigate }: {
         onClick={onNavigate}
         className={cn(
           "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-          active ? "bg-brand-600 text-white" : "text-ink-300 hover:bg-white/5 hover:text-white"
+          active
+            ? "bg-brand-600 text-white"
+            : "text-ink-600 hover:bg-ink-100 hover:text-ink-900 dark:text-ink-300 dark:hover:bg-white/5 dark:hover:text-white"
         )}
         title={collapsed ? group.label : undefined}
       >
-        <Icon className={cn("h-[18px] w-[18px] shrink-0", active ? "text-white" : "text-ink-400 group-hover:text-white")} />
+        <Icon className={cn("h-[18px] w-[18px] shrink-0", active ? "text-white" : "text-ink-400 group-hover:text-ink-700 dark:text-ink-400 dark:group-hover:text-white")} />
         {!collapsed && <span className="truncate">{group.label}</span>}
       </Link>
     );
@@ -111,11 +113,13 @@ function NavItem({ group, collapsed, pathname, onNavigate }: {
         onClick={() => setOpen((o) => !o)}
         className={cn(
           "group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-          active ? "text-white" : "text-ink-300 hover:bg-white/5 hover:text-white"
+          active
+            ? "text-brand-600 font-semibold dark:text-white"
+            : "text-ink-600 hover:bg-ink-100 hover:text-ink-900 dark:text-ink-300 dark:hover:bg-white/5 dark:hover:text-white"
         )}
         title={collapsed ? group.label : undefined}
       >
-        <Icon className={cn("h-[18px] w-[18px] shrink-0", active ? "text-brand-300" : "text-ink-400 group-hover:text-white")} />
+        <Icon className={cn("h-[18px] w-[18px] shrink-0", active ? "text-brand-600 dark:text-brand-300" : "text-ink-400 group-hover:text-ink-700 dark:text-ink-400 dark:group-hover:text-white")} />
         {!collapsed && (
           <>
             <span className="flex-1 truncate text-left">{group.label}</span>
@@ -124,7 +128,7 @@ function NavItem({ group, collapsed, pathname, onNavigate }: {
         )}
       </button>
       {!collapsed && open && group.children && (
-        <div className="ml-[13px] mt-1 space-y-0.5 border-l border-white/10 pl-4">
+        <div className="ml-[13px] mt-1 space-y-0.5 border-l border-ink-200 pl-4 dark:border-white/10">
           {group.children.map((child) => {
             const childActive = pathname === child.href || pathname.startsWith(child.href);
             return (
@@ -134,7 +138,9 @@ function NavItem({ group, collapsed, pathname, onNavigate }: {
                 onClick={onNavigate}
                 className={cn(
                   "block rounded-md px-2.5 py-2 text-[13px] transition-colors",
-                  childActive ? "bg-brand-600/90 text-white font-medium" : "text-ink-400 hover:bg-white/5 hover:text-white"
+                  childActive
+                    ? "bg-brand-600/90 text-white font-medium"
+                    : "text-ink-500 hover:bg-ink-100 hover:text-ink-900 dark:text-ink-400 dark:hover:bg-white/5 dark:hover:text-white"
                 )}
               >
                 {child.label}
@@ -152,7 +158,7 @@ export function Sidebar() {
   const { sidebarCollapsed, toggleSidebar, mobileSidebarOpen, setMobileSidebarOpen } = useUiStore();
 
   const content = (
-    <div className="flex h-full flex-col bg-ink-950">
+    <div className="flex h-full flex-col border-r border-ink-200 bg-white dark:border-ink-800/80 dark:bg-ink-950">
       <div className="flex h-16 shrink-0 items-center justify-between px-4">
         <Link href="/admin/dashboard" className="flex items-center gap-2.5 overflow-hidden">
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-600 text-sm font-bold text-white">
@@ -160,14 +166,14 @@ export function Sidebar() {
           </div>
           {!sidebarCollapsed && (
             <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-white">ZeroBroker</p>
-              <p className="truncate text-[10px] uppercase tracking-wide text-ink-400">Super Admin</p>
+              <p className="truncate text-sm font-semibold text-ink-900 dark:text-white">ZeroBroker</p>
+              <p className="truncate text-[10px] uppercase tracking-wide text-ink-500 dark:text-ink-400">Super Admin</p>
             </div>
           )}
         </Link>
         <button
           onClick={() => setMobileSidebarOpen(false)}
-          className="rounded-md p-1 text-ink-400 hover:text-white lg:hidden"
+          className="rounded-md p-1 text-ink-400 hover:text-ink-700 dark:text-ink-400 dark:hover:text-white lg:hidden"
         >
           <X className="h-5 w-5" />
         </button>
@@ -179,10 +185,10 @@ export function Sidebar() {
         ))}
       </nav>
 
-      <div className="shrink-0 border-t border-white/10 p-3">
+      <div className="shrink-0 border-t border-ink-200 p-3 dark:border-white/10">
         <button
           onClick={toggleSidebar}
-          className="hidden w-full items-center justify-center gap-2 rounded-lg py-2 text-xs font-medium text-ink-400 transition-colors hover:bg-white/5 hover:text-white lg:flex"
+          className="hidden w-full items-center justify-center gap-2 rounded-lg py-2 text-xs font-medium text-ink-500 transition-colors hover:bg-ink-100 hover:text-ink-900 dark:text-ink-400 dark:hover:bg-white/5 dark:hover:text-white lg:flex"
         >
           <ChevronLeft className={cn("h-4 w-4 transition-transform", sidebarCollapsed && "rotate-180")} />
           {!sidebarCollapsed && "Collapse"}

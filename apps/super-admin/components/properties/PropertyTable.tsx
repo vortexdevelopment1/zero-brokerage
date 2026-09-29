@@ -91,54 +91,54 @@ export function PropertyTable({
       render: (p) => (
         <div>
           <div className="flex items-center gap-1.5">
-            <p className="max-w-xs truncate text-sm font-medium text-ink-800">{p.title}</p>
+            <p className="max-w-xs truncate text-sm font-medium text-ink-800 dark:text-ink-100">{p.title}</p>
             {p.isLuxury && <StatusBadge status="info" label="Luxury" tone="brand" />}
             {p.isPremium && !p.isLuxury && <StatusBadge status="info" label="Premium" tone="info" />}
           </div>
-          <p className="text-xs text-ink-500">{p.id} · {p.subtype}</p>
+          <p className="text-xs text-ink-500 dark:text-ink-400">{p.id} · {p.subtype}</p>
         </div>
       ),
     },
-    { key: "location", header: "Location", render: (p) => <span className="text-ink-600">{p.locality}, {p.city}</span> },
+    { key: "location", header: "Location", render: (p) => <span className="text-ink-600 dark:text-ink-300">{p.locality}, {p.city}</span> },
     {
       key: "price",
       header: "Price",
       render: (p) => (
-        <span className="text-ink-700">
+        <span className="text-ink-700 dark:text-ink-200">
           {formatCurrencyINR(p.price)}
-          {p.priceUnit === "rent-month" && <span className="text-ink-400"> /mo</span>}
+          {p.priceUnit === "rent-month" && <span className="text-ink-400 dark:text-ink-500"> /mo</span>}
         </span>
       ),
     },
-    { key: "broker", header: "Broker / Agency", render: (p) => <span className="text-ink-600">{p.broker ?? p.agency ?? "—"}</span> },
+    { key: "broker", header: "Broker / Agency", render: (p) => <span className="text-ink-600 dark:text-ink-300">{p.broker ?? p.agency ?? "—"}</span> },
     { key: "status", header: "Status", render: (p) => <StatusBadge status={p.status} /> },
-    { key: "createdAt", header: "Listed", render: (p) => <span className="text-ink-500">{formatDate(p.createdAt)}</span> },
+    { key: "createdAt", header: "Listed", render: (p) => <span className="text-ink-500 dark:text-ink-400">{formatDate(p.createdAt)}</span> },
     {
       key: "actions",
       header: "",
       align: "right",
       render: (p) => (
         <div className="flex items-center justify-end gap-1.5">
-          <button onClick={(e) => { e.stopPropagation(); router.push(`/admin/properties/${p.id}`); }} className="rounded-md p-1.5 text-ink-400 hover:bg-ink-100 hover:text-brand-600" aria-label="View">
+          <button onClick={(e) => { e.stopPropagation(); router.push(`/admin/properties/${p.id}`); }} className="rounded-md p-1.5 text-ink-400 hover:bg-ink-100 hover:text-brand-600 dark:hover:bg-ink-800 dark:hover:text-brand-400" aria-label="View">
             <Eye className="h-4 w-4" />
           </button>
           {p.status === "pending" && (
             <>
-              <button onClick={(e) => { e.stopPropagation(); setConfirmTarget({ property: p, action: "approve" }); }} className="rounded-md p-1.5 text-ink-400 hover:bg-success-100 hover:text-success-600" aria-label="Approve">
+              <button onClick={(e) => { e.stopPropagation(); setConfirmTarget({ property: p, action: "approve" }); }} className="rounded-md p-1.5 text-ink-400 hover:bg-success-100 hover:text-success-600 dark:hover:bg-success-950/40 dark:hover:text-success-400" aria-label="Approve">
                 <CheckCircle2 className="h-4 w-4" />
               </button>
-              <button onClick={(e) => { e.stopPropagation(); setConfirmTarget({ property: p, action: "reject" }); }} className="rounded-md p-1.5 text-ink-400 hover:bg-danger-100 hover:text-danger-600" aria-label="Reject">
+              <button onClick={(e) => { e.stopPropagation(); setConfirmTarget({ property: p, action: "reject" }); }} className="rounded-md p-1.5 text-ink-400 hover:bg-danger-100 hover:text-danger-600 dark:hover:bg-danger-950/40 dark:hover:text-danger-400" aria-label="Reject">
                 <XCircle className="h-4 w-4" />
               </button>
             </>
           )}
           {p.status !== "unavailable" && (
-            <button onClick={(e) => { e.stopPropagation(); setConfirmTarget({ property: p, action: "unavailable" }); }} className="rounded-md p-1.5 text-ink-400 hover:bg-warning-100 hover:text-warning-600" aria-label="Mark unavailable">
+            <button onClick={(e) => { e.stopPropagation(); setConfirmTarget({ property: p, action: "unavailable" }); }} className="rounded-md p-1.5 text-ink-400 hover:bg-warning-100 hover:text-warning-600 dark:hover:bg-warning-950/40 dark:hover:text-warning-400" aria-label="Mark unavailable">
               <Ban className="h-4 w-4" />
             </button>
           )}
           {p.status !== "hidden" && (
-            <button onClick={(e) => { e.stopPropagation(); setConfirmTarget({ property: p, action: "hidden" }); }} className="rounded-md p-1.5 text-ink-400 hover:bg-ink-200 hover:text-ink-700" aria-label="Hide">
+            <button onClick={(e) => { e.stopPropagation(); setConfirmTarget({ property: p, action: "hidden" }); }} className="rounded-md p-1.5 text-ink-400 hover:bg-ink-200 hover:text-ink-700 dark:hover:bg-ink-800 dark:hover:text-ink-200" aria-label="Hide">
               <EyeOff className="h-4 w-4" />
             </button>
           )}

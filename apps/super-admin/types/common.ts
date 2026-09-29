@@ -48,6 +48,17 @@ export interface SelectOption {
   value: string;
 }
 
+/**
+ * Chart period filter for analytics and time-series visualizations.
+ * PROVISIONAL: Contract prepared for future backend query parameters.
+ */
+export interface ChartPeriod {
+  year?: number;
+  month?: number; // 1-12
+  period?: "6m" | "1y" | "ytd" | "all";
+}
+
+
 // A simulated network/API error the mock service layer can throw,
 // so pages can be built against realistic error/loading/empty states
 // before the real Fastify backend exists.

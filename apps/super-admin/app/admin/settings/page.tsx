@@ -24,20 +24,22 @@ export default function SettingsPage() {
         actions={
           <Link
             href="/admin/settings/rules"
-            className="flex items-center gap-1.5 rounded-lg border border-brand-300 bg-brand-50 px-3.5 py-2 text-sm font-medium text-brand-700 hover:bg-brand-100 transition-colors"
+            className="flex items-center gap-1.5 rounded-lg border border-brand-300 bg-brand-50 px-3.5 py-2 text-sm font-medium text-brand-700 hover:bg-brand-100 transition-colors dark:border-brand-800 dark:bg-brand-950/40 dark:text-brand-300 dark:hover:bg-brand-900/50"
           >
             <Scale className="h-4 w-4" /> Deal & Cancellation Rules
           </Link>
         }
       />
 
-      <div className="mb-5 flex flex-wrap gap-1 border-b border-ink-200">
+      <div className="mb-5 flex flex-wrap gap-1 border-b border-ink-200 dark:border-ink-800">
         {TABS.map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
             className={`border-b-2 px-3.5 py-2.5 text-sm font-medium transition-colors ${
-              tab === t ? "border-brand-600 text-brand-600" : "border-transparent text-ink-500 hover:text-ink-700"
+              tab === t
+                ? "border-brand-600 text-brand-600 dark:border-brand-400 dark:text-brand-400"
+                : "border-transparent text-ink-500 hover:text-ink-700 dark:text-ink-400 dark:hover:text-ink-200"
             }`}
           >
             {t}
@@ -47,7 +49,7 @@ export default function SettingsPage() {
 
       <div className="max-w-2xl">
         {tab === "Profile" && (
-          <div className="space-y-4 rounded-2xl border border-ink-200 bg-white p-6 shadow-card">
+          <div className="space-y-4 rounded-2xl border border-ink-200 bg-white p-6 shadow-card dark:border-ink-800 dark:bg-ink-900">
             <Field label="Full name" defaultValue={session?.name ?? "Admin"} />
             <Field label="Email address" defaultValue={session?.email ?? "admin@vortexcubes.com"} />
             <Field label="Role" defaultValue={session?.role ?? "Super Admin"} disabled />
@@ -61,7 +63,7 @@ export default function SettingsPage() {
         )}
 
         {tab === "Security" && (
-          <div className="space-y-4 rounded-2xl border border-ink-200 bg-white p-6 shadow-card">
+          <div className="space-y-4 rounded-2xl border border-ink-200 bg-white p-6 shadow-card dark:border-ink-800 dark:bg-ink-900">
             <Field label="Current password" type="password" placeholder="••••••••" />
             <Field label="New password" type="password" placeholder="••••••••" />
             <Field label="Confirm new password" type="password" placeholder="••••••••" />
@@ -75,7 +77,7 @@ export default function SettingsPage() {
         )}
 
         {tab === "Notifications" && (
-          <div className="space-y-1 rounded-2xl border border-ink-200 bg-white p-6 shadow-card">
+          <div className="space-y-1 rounded-2xl border border-ink-200 bg-white p-6 shadow-card dark:border-ink-800 dark:bg-ink-900">
             {[
               "New broker/agency approval requests",
               "Urgent Requirement Engine flags",
@@ -83,17 +85,17 @@ export default function SettingsPage() {
               "System health degradation alerts",
               "Weekly revenue summary",
             ].map((label) => (
-              <label key={label} className="flex items-center justify-between border-b border-ink-100 py-3 text-sm text-ink-700 last:border-0">
+              <label key={label} className="flex items-center justify-between border-b border-ink-100 py-3 text-sm text-ink-700 last:border-0 dark:border-ink-800 dark:text-ink-200">
                 {label}
-                <input type="checkbox" defaultChecked className="h-4 w-4 rounded border-ink-300 text-brand-600 focus:ring-brand-400" />
+                <input type="checkbox" defaultChecked className="h-4 w-4 rounded border-ink-300 text-brand-600 focus:ring-brand-400 dark:border-ink-700 dark:bg-ink-800" />
               </label>
             ))}
           </div>
         )}
 
         {tab === "Roles & Permissions" && (
-          <div className="rounded-2xl border border-dashed border-ink-200 bg-ink-50/50 p-6 text-sm text-ink-500">
-            <p className="font-medium text-ink-700">Ready for role/permission APIs</p>
+          <div className="rounded-2xl border border-dashed border-ink-200 bg-ink-50/50 p-6 text-sm text-ink-500 dark:border-ink-800 dark:bg-ink-900/40 dark:text-ink-400">
+            <p className="font-medium text-ink-700 dark:text-ink-200">Ready for role/permission APIs</p>
             <p className="mt-1">
               The BRD/SOW do not define detailed RBAC rules yet. This placeholder is intentionally simple —
               it will connect to role and permission endpoints once those are specified by the backend team.
@@ -110,13 +112,13 @@ function Field({
 }: { label: string; defaultValue?: string; placeholder?: string; type?: string; disabled?: boolean }) {
   return (
     <div>
-      <label className="mb-1.5 block text-xs font-medium text-ink-600">{label}</label>
+      <label className="mb-1.5 block text-xs font-medium text-ink-600 dark:text-ink-300">{label}</label>
       <input
         type={type}
         defaultValue={defaultValue}
         placeholder={placeholder}
         disabled={disabled}
-        className="w-full rounded-lg border border-ink-200 bg-white px-3 py-2.5 text-sm outline-none transition-colors focus:border-brand-400 focus:ring-2 focus:ring-brand-100 disabled:bg-ink-50 disabled:text-ink-400"
+        className="w-full rounded-lg border border-ink-200 bg-white px-3 py-2.5 text-sm text-ink-900 outline-none transition-colors focus:border-brand-400 focus:ring-2 focus:ring-brand-100 disabled:bg-ink-50 disabled:text-ink-400 dark:border-ink-700 dark:bg-ink-900 dark:text-white dark:focus:border-brand-500 dark:focus:ring-brand-900/40 dark:disabled:bg-ink-800 dark:disabled:text-ink-500"
       />
     </div>
   );

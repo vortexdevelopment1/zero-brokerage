@@ -8,16 +8,16 @@ export interface Crumb {
 
 export function Breadcrumbs({ crumbs }: { crumbs: Crumb[] }) {
   return (
-    <nav className="flex items-center gap-1 text-xs text-ink-500">
+    <nav className="flex items-center gap-1 text-xs text-ink-500 dark:text-ink-400">
       {crumbs.map((c, i) => (
         <span key={i} className="flex items-center gap-1">
-          {i > 0 && <ChevronRight className="h-3 w-3 text-ink-300" />}
+          {i > 0 && <ChevronRight className="h-3 w-3 text-ink-300 dark:text-ink-600" />}
           {c.href ? (
-            <Link href={c.href} className="transition-colors hover:text-brand-600">
+            <Link href={c.href} className="transition-colors hover:text-brand-600 dark:hover:text-brand-400">
               {c.label}
             </Link>
           ) : (
-            <span className="text-ink-600">{c.label}</span>
+            <span className="text-ink-600 dark:text-ink-300">{c.label}</span>
           )}
         </span>
       ))}

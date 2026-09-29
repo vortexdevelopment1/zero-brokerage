@@ -51,8 +51,8 @@ export default function SubscriptionsPage() {
   const columns: TableColumn<SubscriptionEntry>[] = [
     { key: "subscriber", header: "Subscriber", render: (s) => (
       <div>
-        <p className="text-sm font-medium text-ink-800">{s.subscriber}</p>
-        <p className="text-xs text-ink-500">{s.id} · {s.audience === "agency" ? "Agency" : "User"}</p>
+        <p className="text-sm font-medium text-ink-800 dark:text-white">{s.subscriber}</p>
+        <p className="text-xs text-ink-500 dark:text-ink-400">{s.id} · {s.audience === "agency" ? "Agency" : "User"}</p>
       </div>
     ) },
     { key: "plan", header: "Plan", render: (s) => <StatusBadge status="info" label={s.plan} tone="info" /> },

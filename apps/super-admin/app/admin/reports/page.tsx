@@ -4,11 +4,12 @@ import { useEffect, useState } from "react";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { ChartCard } from "@/components/ui/ChartCard";
+import { PeriodSelector } from "@/components/ui/PeriodSelector";
 import { LoadingState, ErrorState } from "@/components/ui/States";
 import { reportService } from "@/services/reportService";
 import { TrendPoint } from "@/types/dashboard";
 import { formatCurrencyINR } from "@/lib/utils/format";
-import { ApiStatus } from "@/types/common";
+import { ApiStatus, ChartPeriod } from "@/types/common";
 
 interface ReportsData {
   userGrowth: TrendPoint[];
@@ -23,19 +24,20 @@ interface ReportsData {
 export default function ReportsPage() {
   const [status, setStatus] = useState<ApiStatus>("loading");
   const [data, setData] = useState<ReportsData | null>(null);
+  const [period, setPeriod] = useState<ChartPeriod>({ year: 2026 });
 
-  async function load() {
+  async function load(selectedPeriod = period) {
     setStatus("loading");
     try {
       const [userGrowth, brokerGrowth, agencyGrowth, propertyGrowth, revenue, subscriptionActivity, dealClosure] =
         await Promise.all([
-          reportService.getUserGrowthReport(),
-          reportService.getBrokerGrowthReport(),
-          reportService.getAgencyGrowthReport(),
-          reportService.getPropertyGrowthReport(),
-          reportService.getRevenueReport(),
-          reportService.getSubscriptionActivityReport(),
-          reportService.getDealClosureReport(),
+          reportService.getUserGrowthReport(selectedPeriod),
+          reportService.getBrokerGrowthReport(selectedPeriod),
+          reportService.getAgencyGrowthReport(selectedPeriod),
+          reportService.getPropertyGrowthReport(selectedPeriod),
+          reportService.getRevenueReport(selectedPeriod),
+          reportService.getSubscriptionActivityReport(selectedPeriod),
+          reportService.getDealClosureReport(selectedPeriod),
         ]);
       setData({ userGrowth, brokerGrowth, agencyGrowth, propertyGrowth, revenue, subscriptionActivity, dealClosure });
       setStatus("success");
@@ -44,19 +46,29 @@ export default function ReportsPage() {
     }
   }
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(period); }, [period]);
 
   if (status === "loading" || !data) return (
     <>
-      <PageHeader title="Reports & Analytics" description="Modular report categories across the ecosystem." crumbs={[{ label: "Dashboard", href: "/admin/dashboard" }, { label: "Reports" }]} />
+      <PageHeader
+        title="Reports & Analytics"
+        description="Modular report categories across the ecosystem."
+        crumbs={[{ label: "Dashboard", href: "/admin/dashboard" }, { label: "Reports" }]}
+        actions={<PeriodSelector value={period} onChange={setPeriod} compact={false} />}
+      />
       <LoadingState />
     </>
   );
 
   if (status === "error") return (
     <>
-      <PageHeader title="Reports & Analytics" description="Modular report categories across the ecosystem." crumbs={[{ label: "Dashboard", href: "/admin/dashboard" }, { label: "Reports" }]} />
-      <ErrorState onRetry={load} />
+      <PageHeader
+        title="Reports & Analytics"
+        description="Modular report categories across the ecosystem."
+        crumbs={[{ label: "Dashboard", href: "/admin/dashboard" }, { label: "Reports" }]}
+        actions={<PeriodSelector value={period} onChange={setPeriod} compact={false} />}
+      />
+      <ErrorState onRetry={() => load(period)} />
     </>
   );
 
@@ -66,6 +78,7 @@ export default function ReportsPage() {
         title="Reports & Analytics"
         description="Each category below is an independent module so new report definitions can be added without reshaping existing ones."
         crumbs={[{ label: "Dashboard", href: "/admin/dashboard" }, { label: "Reports" }]}
+        actions={<PeriodSelector value={period} onChange={setPeriod} compact={false} />}
       />
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">

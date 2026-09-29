@@ -1,5 +1,5 @@
 import { simulateNetwork } from "@/lib/api/client";
-import { PaginatedResult, PaginationParams } from "@/types/common";
+import { PaginatedResult, PaginationParams, ChartPeriod } from "@/types/common";
 import {
   CommissionEntry,
   SubscriptionEntry,
@@ -25,7 +25,8 @@ import { paginate, matchesSearch } from "@/services/mock/paginate";
  * Proposed contract: GET /api/admin/revenue/{overview,subscriptions,commission,micro-transactions,transactions,ads,cancellations}
  */
 export const revenueService = {
-  getOverview: (): Promise<RevenueOverview> =>
+  // PROVISIONAL: Accepts optional ChartPeriod. The backend does not yet support period filtering.
+  getOverview: (_period?: ChartPeriod): Promise<RevenueOverview> =>
     simulateNetwork(() => {
       const subscriptionRevenue = MOCK_SUBSCRIPTIONS.filter((s) => s.paymentStatus === "success").reduce(
         (a, b) => a + b.revenue,

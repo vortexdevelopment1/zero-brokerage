@@ -80,5 +80,14 @@ export const apiEndpoints = {
     monitoring: {
       snapshot: "/api/admin/monitoring",
     },
+    // PROVISIONAL: Proposed frontend contracts only.
+    // These routes are not confirmed backend contracts yet and must be verified
+    // against the backend contract before integration.
+    notifications: {
+      list: "/api/admin/notifications",
+      unreadCount: "/api/admin/notifications/unread-count",
+      markRead: (id: string) => `/api/admin/notifications/${id}/read`,
+      markAllRead: "/api/admin/notifications/read-all",
+    },
   },
 } as const;

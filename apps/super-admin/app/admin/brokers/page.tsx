@@ -75,13 +75,13 @@ export default function BrokersPage() {
       header: "Broker",
       render: (b) => (
         <div>
-          <p className="text-sm font-medium text-ink-800">{b.name}</p>
-          <p className="text-xs text-ink-500">{b.id} · {b.city}</p>
+          <p className="text-sm font-medium text-ink-800 dark:text-ink-100">{b.name}</p>
+          <p className="text-xs text-ink-500 dark:text-ink-400">{b.id} · {b.city}</p>
         </div>
       ),
     },
-    { key: "agency", header: "Agency", render: (b) => <span className="text-ink-600">{b.agency ?? "Independent"}</span> },
-    { key: "rating", header: "Rating", render: (b) => <span className="font-medium text-ink-700">★ {b.rating.toFixed(1)}</span> },
+    { key: "agency", header: "Agency", render: (b) => <span className="text-ink-600 dark:text-ink-300">{b.agency ?? "Independent"}</span> },
+    { key: "rating", header: "Rating", render: (b) => <span className="font-medium text-ink-700 dark:text-ink-200">★ {b.rating.toFixed(1)}</span> },
     { key: "propertiesListed", header: "Properties" },
     { key: "closures", header: "Closures" },
     { key: "verification", header: "Verification", render: (b) => <StatusBadge status={b.verification} /> },
@@ -92,25 +92,25 @@ export default function BrokersPage() {
       align: "right",
       render: (b) => (
         <div className="flex items-center justify-end gap-1.5">
-          <button onClick={(e) => { e.stopPropagation(); router.push(`/admin/brokers/${b.id}`); }} className="rounded-md p-1.5 text-ink-400 hover:bg-ink-100 hover:text-brand-600" aria-label="View">
+          <button onClick={(e) => { e.stopPropagation(); router.push(`/admin/brokers/${b.id}`); }} className="rounded-md p-1.5 text-ink-400 hover:bg-ink-100 hover:text-brand-600 dark:hover:bg-ink-800 dark:hover:text-brand-400" aria-label="View">
             <Eye className="h-4 w-4" />
           </button>
           {b.verification === "pending" && (
             <>
-              <button onClick={(e) => { e.stopPropagation(); setConfirmTarget({ broker: b, action: "approve" }); }} className="rounded-md p-1.5 text-ink-400 hover:bg-success-100 hover:text-success-600" aria-label="Approve">
+              <button onClick={(e) => { e.stopPropagation(); setConfirmTarget({ broker: b, action: "approve" }); }} className="rounded-md p-1.5 text-ink-400 hover:bg-success-100 hover:text-success-600 dark:hover:bg-success-950/40 dark:hover:text-success-400" aria-label="Approve">
                 <CheckCircle2 className="h-4 w-4" />
               </button>
-              <button onClick={(e) => { e.stopPropagation(); setConfirmTarget({ broker: b, action: "reject" }); }} className="rounded-md p-1.5 text-ink-400 hover:bg-danger-100 hover:text-danger-600" aria-label="Reject">
+              <button onClick={(e) => { e.stopPropagation(); setConfirmTarget({ broker: b, action: "reject" }); }} className="rounded-md p-1.5 text-ink-400 hover:bg-danger-100 hover:text-danger-600 dark:hover:bg-danger-950/40 dark:hover:text-danger-400" aria-label="Reject">
                 <XCircle className="h-4 w-4" />
               </button>
             </>
           )}
           {b.status === "active" ? (
-            <button onClick={(e) => { e.stopPropagation(); setConfirmTarget({ broker: b, action: "suspend" }); }} className="rounded-md p-1.5 text-ink-400 hover:bg-warning-100 hover:text-warning-600" aria-label="Suspend">
+            <button onClick={(e) => { e.stopPropagation(); setConfirmTarget({ broker: b, action: "suspend" }); }} className="rounded-md p-1.5 text-ink-400 hover:bg-warning-100 hover:text-warning-600 dark:hover:bg-warning-950/40 dark:hover:text-warning-400" aria-label="Suspend">
               <Ban className="h-4 w-4" />
             </button>
           ) : (
-            <button onClick={(e) => { e.stopPropagation(); setConfirmTarget({ broker: b, action: "activate" }); }} className="rounded-md p-1.5 text-ink-400 hover:bg-success-100 hover:text-success-600" aria-label="Activate">
+            <button onClick={(e) => { e.stopPropagation(); setConfirmTarget({ broker: b, action: "activate" }); }} className="rounded-md p-1.5 text-ink-400 hover:bg-success-100 hover:text-success-600 dark:hover:bg-success-950/40 dark:hover:text-success-400" aria-label="Activate">
               <PlayCircle className="h-4 w-4" />
             </button>
           )}

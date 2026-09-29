@@ -19,7 +19,7 @@ export function Modal({
   title: string;
   children: ReactNode;
   footer?: ReactNode;
-  size?: "sm" | "md" | "lg" | "xl" | "2xl";
+  size?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
   className?: string;
 }) {
   useEffect(() => {
@@ -36,30 +36,31 @@ export function Modal({
     sm: "max-w-sm",
     md: "max-w-lg",
     lg: "max-w-2xl",
-    xl: "max-w-3xl",
-    "2xl": "max-w-4xl",
+    xl: "max-w-4xl",
+    "2xl": "max-w-5xl",
+    "3xl": "max-w-6xl",
   };
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-hidden">
-      <div className="absolute inset-0 bg-ink-950/50 backdrop-blur-[2px] animate-fade-in" onClick={onClose} />
+      <div className="absolute inset-0 bg-ink-950/50 backdrop-blur-[2px] animate-fade-in dark:bg-ink-950/80" onClick={onClose} />
       <div
         className={cn(
           "relative flex flex-col w-full max-h-[calc(100dvh-1.5rem)] sm:max-h-[calc(100dvh-3rem)]",
           widths[size] || "max-w-lg",
-          "animate-fade-in rounded-2xl bg-white shadow-popover overflow-hidden",
+          "animate-fade-in rounded-2xl bg-white shadow-popover overflow-hidden border border-ink-100 dark:border-ink-800 dark:bg-ink-900",
           className
         )}
         role="dialog"
         aria-modal="true"
       >
         {/* Modal Header */}
-        <div className="flex shrink-0 items-center justify-between border-b border-ink-100 px-5 py-4 sm:px-6">
-          <h2 className="text-base font-semibold text-ink-900 truncate pr-2">{title}</h2>
+        <div className="flex shrink-0 items-center justify-between border-b border-ink-100 px-5 py-4 dark:border-ink-800 sm:px-6">
+          <h2 className="text-base font-semibold text-ink-900 truncate pr-2 dark:text-white">{title}</h2>
           <button
             onClick={onClose}
             aria-label="Close"
-            className="rounded-lg p-1.5 text-ink-400 transition-colors hover:bg-ink-100 hover:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+            className="rounded-lg p-1.5 text-ink-400 transition-colors hover:bg-ink-100 hover:text-ink-600 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:text-ink-400 dark:hover:bg-ink-800 dark:hover:text-ink-200"
           >
             <X className="h-4 w-4" />
           </button>
@@ -72,7 +73,7 @@ export function Modal({
 
         {/* Modal Footer */}
         {footer && (
-          <div className="flex shrink-0 justify-end gap-2 border-t border-ink-100 bg-ink-50/50 px-5 py-3.5 sm:px-6">
+          <div className="flex shrink-0 justify-end gap-2 border-t border-ink-100 bg-ink-50/50 px-5 py-3.5 dark:border-ink-800 dark:bg-ink-950/50 sm:px-6">
             {footer}
           </div>
         )}

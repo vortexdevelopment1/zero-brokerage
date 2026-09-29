@@ -56,11 +56,11 @@ export default function UrgentRequirementsPage() {
   }
 
   const columns: TableColumn<UrgentRequirement>[] = [
-    { key: "user", header: "User" },
-    { key: "location", header: "Location" },
-    { key: "requirementContext", header: "Requirement", render: (u) => <span className="max-w-[220px] truncate text-ink-600">{u.requirementContext}</span> },
+    { key: "user", header: "User", render: (u) => <span className="max-w-[150px] truncate inline-block text-ink-800 dark:text-ink-100" title={u.user}>{u.user}</span> },
+    { key: "location", header: "Location", render: (u) => <span className="max-w-[150px] truncate inline-block text-ink-600 dark:text-ink-300" title={u.location}>{u.location}</span> },
+    { key: "requirementContext", header: "Requirement", render: (u) => <span className="max-w-[220px] truncate inline-block text-ink-600 dark:text-ink-300" title={u.requirementContext}>{u.requirementContext}</span> },
     { key: "searchCount", header: "Searches", render: (u) => (
-      <span className="text-ink-700">{u.searchCount} in {u.windowHours}h</span>
+      <span className="text-ink-700 dark:text-ink-200">{u.searchCount} in {u.windowHours}h</span>
     ) },
     { key: "flaggedAt", header: "Flagged", render: (u) => formatDateTime(u.flaggedAt) },
     { key: "status", header: "Status", render: (u) => <StatusBadge status={u.status} /> },
@@ -72,7 +72,7 @@ export default function UrgentRequirementsPage() {
         u.status === "new" ? (
           <button
             onClick={(e) => { e.stopPropagation(); markContacted(u); }}
-            className="rounded-lg border border-ink-200 px-3 py-1.5 text-xs font-medium text-ink-700 transition-colors hover:bg-ink-50"
+            className="rounded-lg border border-ink-200 px-3 py-1.5 text-xs font-medium text-ink-700 transition-colors hover:bg-ink-50 dark:border-ink-700 dark:bg-ink-800 dark:text-ink-200 dark:hover:bg-ink-700 dark:hover:text-white"
           >
             Mark contacted
           </button>

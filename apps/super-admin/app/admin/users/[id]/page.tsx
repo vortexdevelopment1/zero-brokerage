@@ -109,15 +109,15 @@ export default function UserDetailPage() {
       />
 
       {/* Profile Tabs Navigation */}
-      <div className="mb-5 flex flex-wrap gap-1 border-b border-ink-200">
+      <div className="mb-5 flex flex-wrap gap-1 border-b border-ink-200 dark:border-ink-800">
         {USER_TABS.map((t) => (
           <button
             key={t}
             onClick={() => setActiveTab(t)}
             className={`border-b-2 px-3.5 py-2.5 text-sm font-medium transition-colors flex items-center gap-2 ${
               activeTab === t
-                ? "border-brand-600 text-brand-600"
-                : "border-transparent text-ink-500 hover:text-ink-700"
+                ? "border-brand-600 text-brand-600 dark:text-brand-400"
+                : "border-transparent text-ink-500 dark:text-ink-400 hover:text-ink-700 dark:hover:text-ink-200"
             }`}
           >
             {t}
@@ -130,14 +130,14 @@ export default function UserDetailPage() {
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
         {/* Left Column: Fixed User Summary Card */}
-        <div className="rounded-2xl border border-ink-200 bg-white p-5 shadow-card lg:col-span-1 h-fit">
+        <div className="rounded-2xl border border-ink-200 bg-white dark:border-ink-800 dark:bg-ink-900 p-5 shadow-card lg:col-span-1 h-fit">
           <div className="flex items-center gap-3">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-100 text-xl font-semibold text-brand-700">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-950/60 text-xl font-semibold text-brand-700 dark:text-brand-300">
               {user.name.charAt(0)}
             </div>
             <div>
-              <p className="font-semibold text-ink-900">{user.name}</p>
-              <p className="text-xs text-ink-500">{user.id}</p>
+              <p className="font-semibold text-ink-900 dark:text-white">{user.name}</p>
+              <p className="text-xs text-ink-500 dark:text-ink-400">{user.id}</p>
             </div>
           </div>
 
@@ -148,16 +148,16 @@ export default function UserDetailPage() {
             <InfoRow icon={Calendar} label={`Joined ${formatDate(user.createdAt)}`} />
           </div>
 
-          <div className="mt-5 flex flex-wrap gap-2 border-t border-ink-100 pt-4">
+          <div className="mt-5 flex flex-wrap gap-2 border-t border-ink-100 dark:border-ink-800 pt-4">
             <StatusBadge status={user.status} />
             <StatusBadge status={user.verification} label={`${user.verification} · KYC`} />
             <StatusBadge status="info" label={user.subscription} tone="info" />
           </div>
 
           {user.kycStatus && (
-            <div className="mt-4 rounded-xl bg-ink-50 p-3 border border-ink-100 text-xs">
+            <div className="mt-4 rounded-xl bg-ink-50 dark:bg-ink-800/40 p-3 border border-ink-100 dark:border-ink-800 text-xs">
               <div className="flex items-center justify-between">
-                <span className="text-ink-500 font-medium">KYC State:</span>
+                <span className="text-ink-500 dark:text-ink-400 font-medium">KYC State:</span>
                 <KycStatusBadge status={user.kycStatus} size="sm" />
               </div>
             </div>
@@ -173,40 +173,42 @@ export default function UserDetailPage() {
                 <MetricTile label="Saved Properties" value={user.activity.savedProperties} />
                 <MetricTile label="Owner Contacts Used" value={user.activity.ownerContactsUsed} />
               </div>
-              <p className="text-xs text-ink-400">Last active {formatDateTime(user.activity.lastActiveAt)}</p>
+              <p className="text-xs text-ink-400 dark:text-ink-500">Last active {formatDateTime(user.activity.lastActiveAt)}</p>
 
-              <div className="rounded-2xl border border-ink-200 bg-white shadow-card">
-                <div className="border-b border-ink-100 px-5 py-4">
-                  <h3 className="text-sm font-semibold text-ink-900">Visit History</h3>
+              <div className="rounded-2xl border border-ink-200 bg-white dark:border-ink-800 dark:bg-ink-900 shadow-card">
+                <div className="border-b border-ink-100 dark:border-ink-800 px-5 py-4">
+                  <h3 className="text-sm font-semibold text-ink-900 dark:text-white">Visit History</h3>
                 </div>
-                <div className="divide-y divide-ink-100">
-                  {user.visits.length === 0 && <p className="px-5 py-6 text-center text-sm text-ink-400">No visits scheduled yet.</p>}
+                <div className="divide-y divide-ink-100 dark:divide-ink-800">
+                  {user.visits.length === 0 && <p className="px-5 py-6 text-center text-sm text-ink-400 dark:text-ink-500">No visits scheduled yet.</p>}
                   {user.visits.map((v) => (
-                    <div key={v.id} className="flex items-center justify-between px-5 py-3">
-                      <div>
-                        <p className="text-sm font-medium text-ink-800">{v.property}</p>
-                        <p className="text-xs text-ink-500">{formatDateTime(v.scheduledAt)}</p>
+                    <div key={v.id} className="flex items-center justify-between px-5 py-3 gap-3">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-ink-800 dark:text-ink-200 truncate" title={v.property}>{v.property}</p>
+                        <p className="text-xs text-ink-500 dark:text-ink-400">{formatDateTime(v.scheduledAt)}</p>
                       </div>
-                      <StatusBadge status={v.status.toLowerCase()} />
+                      <div className="shrink-0">
+                        <StatusBadge status={v.status.toLowerCase()} />
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-ink-200 bg-white shadow-card">
-                <div className="border-b border-ink-100 px-5 py-4">
-                  <h3 className="text-sm font-semibold text-ink-900">Transaction History</h3>
+              <div className="rounded-2xl border border-ink-200 bg-white dark:border-ink-800 dark:bg-ink-900 shadow-card">
+                <div className="border-b border-ink-100 dark:border-ink-800 px-5 py-4">
+                  <h3 className="text-sm font-semibold text-ink-900 dark:text-white">Transaction History</h3>
                 </div>
-                <div className="divide-y divide-ink-100">
-                  {user.transactions.length === 0 && <p className="px-5 py-6 text-center text-sm text-ink-400">No transactions yet.</p>}
+                <div className="divide-y divide-ink-100 dark:divide-ink-800">
+                  {user.transactions.length === 0 && <p className="px-5 py-6 text-center text-sm text-ink-400 dark:text-ink-500">No transactions yet.</p>}
                   {user.transactions.map((t) => (
-                    <div key={t.id} className="flex items-center justify-between px-5 py-3">
-                      <div>
-                        <p className="text-sm font-medium text-ink-800">{t.type}</p>
-                        <p className="text-xs text-ink-500">{formatDate(t.date)}</p>
+                    <div key={t.id} className="flex items-center justify-between px-5 py-3 gap-3">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-ink-800 dark:text-ink-200 truncate" title={t.type}>{t.type}</p>
+                        <p className="text-xs text-ink-500 dark:text-ink-400">{formatDate(t.date)}</p>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <span className="text-sm font-medium text-ink-700">{formatCurrencyINR(t.amount)}</span>
+                      <div className="flex items-center gap-3 shrink-0">
+                        <span className="text-sm font-medium text-ink-700 dark:text-ink-200">{formatCurrencyINR(t.amount)}</span>
                         <StatusBadge status={t.status.toLowerCase()} />
                       </div>
                     </div>
@@ -229,39 +231,39 @@ export default function UserDetailPage() {
           )}
 
           {activeTab === "Subscription" && (
-            <div className="rounded-2xl border border-ink-200 bg-white p-6 shadow-card space-y-4">
-              <div className="flex items-center justify-between border-b border-ink-100 pb-4">
+            <div className="rounded-2xl border border-ink-200 bg-white dark:border-ink-800 dark:bg-ink-900 p-6 shadow-card space-y-4">
+              <div className="flex items-center justify-between border-b border-ink-100 dark:border-ink-800 pb-4">
                 <div>
-                  <h3 className="text-base font-semibold text-ink-900">Subscription Plan</h3>
-                  <p className="text-xs text-ink-500">Tier access and micro-pass entitlement</p>
+                  <h3 className="text-base font-semibold text-ink-900 dark:text-white">Subscription Plan</h3>
+                  <p className="text-xs text-ink-500 dark:text-ink-400">Tier access and micro-pass entitlement</p>
                 </div>
                 <StatusBadge status="info" label={user.subscription} tone="info" />
               </div>
               <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="rounded-xl bg-ink-50 p-4 border border-ink-100">
-                  <p className="text-xs text-ink-400">Current Tier</p>
-                  <p className="text-lg font-bold text-ink-900 mt-1">{user.subscription}</p>
+                <div className="rounded-xl bg-ink-50 dark:bg-ink-800/40 p-4 border border-ink-100 dark:border-ink-800">
+                  <p className="text-xs text-ink-400 dark:text-ink-500">Current Tier</p>
+                  <p className="text-lg font-bold text-ink-900 dark:text-white mt-1">{user.subscription}</p>
                 </div>
-                <div className="rounded-xl bg-ink-50 p-4 border border-ink-100">
-                  <p className="text-xs text-ink-400">Owner Contact Passes</p>
-                  <p className="text-lg font-bold text-ink-900 mt-1">{user.activity.ownerContactsUsed} used</p>
+                <div className="rounded-xl bg-ink-50 dark:bg-ink-800/40 p-4 border border-ink-100 dark:border-ink-800">
+                  <p className="text-xs text-ink-400 dark:text-ink-500">Owner Contact Passes</p>
+                  <p className="text-lg font-bold text-ink-900 dark:text-white mt-1">{user.activity.ownerContactsUsed} used</p>
                 </div>
               </div>
             </div>
           )}
 
           {activeTab === "Visits" && (
-            <div className="rounded-2xl border border-ink-200 bg-white shadow-card">
-              <div className="border-b border-ink-100 px-5 py-4">
-                <h3 className="text-sm font-semibold text-ink-900">Scheduled Property Visits</h3>
+            <div className="rounded-2xl border border-ink-200 bg-white dark:border-ink-800 dark:bg-ink-900 shadow-card">
+              <div className="border-b border-ink-100 dark:border-ink-800 px-5 py-4">
+                <h3 className="text-sm font-semibold text-ink-900 dark:text-white">Scheduled Property Visits</h3>
               </div>
-              <div className="divide-y divide-ink-100">
-                {user.visits.length === 0 && <p className="px-5 py-6 text-center text-sm text-ink-400">No visits scheduled yet.</p>}
+              <div className="divide-y divide-ink-100 dark:divide-ink-800">
+                {user.visits.length === 0 && <p className="px-5 py-6 text-center text-sm text-ink-400 dark:text-ink-500">No visits scheduled yet.</p>}
                 {user.visits.map((v) => (
                   <div key={v.id} className="flex items-center justify-between px-5 py-4">
                     <div>
-                      <p className="text-sm font-semibold text-ink-800">{v.property}</p>
-                      <p className="text-xs text-ink-500 mt-0.5">Scheduled on {formatDateTime(v.scheduledAt)}</p>
+                      <p className="text-sm font-semibold text-ink-800 dark:text-ink-200">{v.property}</p>
+                      <p className="text-xs text-ink-500 dark:text-ink-400 mt-0.5">Scheduled on {formatDateTime(v.scheduledAt)}</p>
                     </div>
                     <StatusBadge status={v.status.toLowerCase()} />
                   </div>
@@ -271,20 +273,20 @@ export default function UserDetailPage() {
           )}
 
           {activeTab === "Transactions" && (
-            <div className="rounded-2xl border border-ink-200 bg-white shadow-card">
-              <div className="border-b border-ink-100 px-5 py-4">
-                <h3 className="text-sm font-semibold text-ink-900">Payment & Transaction Records</h3>
+            <div className="rounded-2xl border border-ink-200 bg-white dark:border-ink-800 dark:bg-ink-900 shadow-card">
+              <div className="border-b border-ink-100 dark:border-ink-800 px-5 py-4">
+                <h3 className="text-sm font-semibold text-ink-900 dark:text-white">Payment & Transaction Records</h3>
               </div>
-              <div className="divide-y divide-ink-100">
-                {user.transactions.length === 0 && <p className="px-5 py-6 text-center text-sm text-ink-400">No transactions recorded.</p>}
+              <div className="divide-y divide-ink-100 dark:divide-ink-800">
+                {user.transactions.length === 0 && <p className="px-5 py-6 text-center text-sm text-ink-400 dark:text-ink-500">No transactions recorded.</p>}
                 {user.transactions.map((t) => (
                   <div key={t.id} className="flex items-center justify-between px-5 py-4">
                     <div>
-                      <p className="text-sm font-semibold text-ink-800">{t.type}</p>
-                      <p className="text-xs text-ink-500 mt-0.5">Date: {formatDate(t.date)} · ID: {t.id}</p>
+                      <p className="text-sm font-semibold text-ink-800 dark:text-ink-200">{t.type}</p>
+                      <p className="text-xs text-ink-500 dark:text-ink-400 mt-0.5">Date: {formatDate(t.date)} · ID: {t.id}</p>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-base font-semibold text-ink-900">{formatCurrencyINR(t.amount)}</span>
+                      <span className="text-base font-semibold text-ink-900 dark:text-white">{formatCurrencyINR(t.amount)}</span>
                       <StatusBadge status={t.status.toLowerCase()} />
                     </div>
                   </div>
@@ -300,9 +302,9 @@ export default function UserDetailPage() {
                 <MetricTile label="Saved Bookmarks" value={user.activity.savedProperties} />
                 <MetricTile label="Direct Owner Calls" value={user.activity.ownerContactsUsed} />
               </div>
-              <div className="rounded-2xl border border-ink-200 bg-white p-5 shadow-card">
-                <h3 className="text-sm font-semibold text-ink-900 mb-2">Audit & Session Activity</h3>
-                <p className="text-xs text-ink-500">
+              <div className="rounded-2xl border border-ink-200 bg-white dark:border-ink-800 dark:bg-ink-900 p-5 shadow-card">
+                <h3 className="text-sm font-semibold text-ink-900 dark:text-white mb-2">Audit & Session Activity</h3>
+                <p className="text-xs text-ink-500 dark:text-ink-400">
                   Last known active timestamp recorded on {formatDateTime(user.activity.lastActiveAt)}.
                 </p>
               </div>
@@ -326,18 +328,18 @@ export default function UserDetailPage() {
 
 function InfoRow({ icon: Icon, label }: { icon: React.ComponentType<{ className?: string }>; label: string }) {
   return (
-    <div className="flex items-center gap-2.5 text-ink-600">
-      <Icon className="h-4 w-4 shrink-0 text-ink-400" />
-      <span className="truncate">{label}</span>
+    <div className="flex items-center gap-2.5 text-ink-600 dark:text-ink-300 min-w-0">
+      <Icon className="h-4 w-4 shrink-0 text-ink-400 dark:text-ink-500" />
+      <span className="truncate" title={label}>{label}</span>
     </div>
   );
 }
 
 function MetricTile({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-2xl border border-ink-200 bg-white p-4 shadow-card">
-      <p className="text-xs text-ink-500">{label}</p>
-      <p className="mt-1 text-xl font-semibold text-ink-900">{value}</p>
+    <div className="rounded-2xl border border-ink-200 bg-white dark:border-ink-800 dark:bg-ink-900 p-4 shadow-card">
+      <p className="text-xs text-ink-500 dark:text-ink-400">{label}</p>
+      <p className="mt-1 text-xl font-semibold text-ink-900 dark:text-white">{value}</p>
     </div>
   );
 }

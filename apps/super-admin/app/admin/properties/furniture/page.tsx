@@ -149,15 +149,15 @@ export default function FurniturePropertiesPage() {
     {
       key: "id",
       header: "Package ID",
-      render: (p) => <span className="font-mono text-xs font-semibold text-brand-600">{p.id}</span>,
+      render: (p) => <span className="font-mono text-xs font-semibold text-brand-600 dark:text-brand-400">{p.id}</span>,
     },
     {
       key: "name",
       header: "Package Name",
       render: (p) => (
         <div>
-          <p className="text-sm font-medium text-ink-900">{p.name}</p>
-          <p className="text-xs text-ink-500 line-clamp-1">{p.description}</p>
+          <p className="text-sm font-medium text-ink-900 dark:text-white">{p.name}</p>
+          <p className="text-xs text-ink-500 dark:text-ink-400 line-clamp-1">{p.description}</p>
         </div>
       ),
     },
@@ -165,7 +165,7 @@ export default function FurniturePropertiesPage() {
       key: "category",
       header: "Category",
       render: (p) => (
-        <span className="inline-flex items-center rounded-md bg-ink-100 px-2 py-0.5 text-xs font-medium text-ink-700">
+        <span className="inline-flex items-center rounded-md bg-ink-100 px-2 py-0.5 text-xs font-medium text-ink-700 dark:bg-ink-800 dark:text-ink-300">
           {p.category}
         </span>
       ),
@@ -174,7 +174,7 @@ export default function FurniturePropertiesPage() {
       key: "assetCount",
       header: "Assets",
       render: (p) => (
-        <span className="text-xs font-medium text-ink-700">
+        <span className="text-xs font-medium text-ink-700 dark:text-ink-300">
           {p.assetCount} items
         </span>
       ),
@@ -184,8 +184,8 @@ export default function FurniturePropertiesPage() {
       header: "Package Price",
       render: (p) => (
         <div>
-          <span className="text-sm font-semibold text-ink-900">{formatCurrencyINR(p.price)}</span>
-          <p className="text-[10px] text-ink-400 capitalize">{p.priceType.replace(/_/g, " ")}</p>
+          <span className="text-sm font-semibold text-ink-900 dark:text-white">{formatCurrencyINR(p.price)}</span>
+          <p className="text-[10px] text-ink-400 dark:text-ink-500 capitalize">{p.priceType.replace(/_/g, " ")}</p>
         </div>
       ),
     },
@@ -196,10 +196,10 @@ export default function FurniturePropertiesPage() {
         <span
           className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
             p.availability === "In Stock"
-              ? "bg-success-50 text-success-700"
+              ? "bg-success-50 text-success-700 dark:bg-success-950/60 dark:text-success-400"
               : p.availability === "Limited Stock"
-              ? "bg-warning-50 text-warning-700"
-              : "bg-ink-100 text-ink-600"
+              ? "bg-warning-50 text-warning-700 dark:bg-warning-950/60 dark:text-warning-400"
+              : "bg-ink-100 text-ink-600 dark:bg-ink-800 dark:text-ink-400"
           }`}
         >
           {p.availability}
@@ -214,7 +214,7 @@ export default function FurniturePropertiesPage() {
     {
       key: "createdAt",
       header: "Created Date",
-      render: (p) => <span className="text-xs text-ink-500">{formatDate(p.createdAt)}</span>,
+      render: (p) => <span className="text-xs text-ink-500 dark:text-ink-400">{formatDate(p.createdAt)}</span>,
     },
     {
       key: "actions",
@@ -227,7 +227,7 @@ export default function FurniturePropertiesPage() {
               e.stopPropagation();
               setSelectedPackage(p);
             }}
-            className="rounded-md p-1.5 text-ink-400 hover:bg-ink-100 hover:text-brand-600"
+            className="rounded-md p-1.5 text-ink-400 hover:bg-ink-100 hover:text-brand-600 dark:hover:bg-ink-800 dark:hover:text-brand-400"
             title="View Package Breakdown"
           >
             <Eye className="h-4 w-4" />
@@ -243,7 +243,7 @@ export default function FurniturePropertiesPage() {
                   action: "deactivate",
                 });
               }}
-              className="rounded-md p-1.5 text-ink-400 hover:bg-warning-50 hover:text-warning-600"
+              className="rounded-md p-1.5 text-ink-400 hover:bg-warning-50 hover:text-warning-600 dark:hover:bg-warning-950/40 dark:hover:text-warning-400"
               title="Deactivate"
             >
               <XCircle className="h-4 w-4" />
@@ -259,7 +259,7 @@ export default function FurniturePropertiesPage() {
                   action: "activate",
                 });
               }}
-              className="rounded-md p-1.5 text-ink-400 hover:bg-success-50 hover:text-success-600"
+              className="rounded-md p-1.5 text-ink-400 hover:bg-success-50 hover:text-success-600 dark:hover:bg-success-950/40 dark:hover:text-success-400"
               title="Activate"
             >
               <CheckCircle2 className="h-4 w-4" />
@@ -275,7 +275,7 @@ export default function FurniturePropertiesPage() {
                 action: "delete",
               });
             }}
-            className="rounded-md p-1.5 text-ink-400 hover:bg-danger-50 hover:text-danger-600"
+            className="rounded-md p-1.5 text-ink-400 hover:bg-danger-50 hover:text-danger-600 dark:hover:bg-danger-950/40 dark:hover:text-danger-400"
             title="Delete Package"
           >
             <Trash2 className="h-4 w-4" />
@@ -290,15 +290,15 @@ export default function FurniturePropertiesPage() {
     {
       key: "id",
       header: "Asset ID",
-      render: (a) => <span className="font-mono text-xs font-semibold text-brand-600">{a.id}</span>,
+      render: (a) => <span className="font-mono text-xs font-semibold text-brand-600 dark:text-brand-400">{a.id}</span>,
     },
     {
       key: "name",
       header: "Asset Name",
       render: (a) => (
         <div>
-          <p className="text-sm font-medium text-ink-900">{a.name}</p>
-          <p className="text-xs text-ink-500">SKU: {a.sku}</p>
+          <p className="text-sm font-medium text-ink-900 dark:text-white">{a.name}</p>
+          <p className="text-xs text-ink-500 dark:text-ink-400">SKU: {a.sku}</p>
         </div>
       ),
     },
@@ -306,7 +306,7 @@ export default function FurniturePropertiesPage() {
       key: "category",
       header: "Category",
       render: (a) => (
-        <span className="inline-flex items-center rounded-md bg-ink-100 px-2 py-0.5 text-xs font-medium text-ink-700">
+        <span className="inline-flex items-center rounded-md bg-ink-100 px-2 py-0.5 text-xs font-medium text-ink-700 dark:bg-ink-800 dark:text-ink-300">
           {a.category}
         </span>
       ),
@@ -316,8 +316,8 @@ export default function FurniturePropertiesPage() {
       header: "Price",
       render: (a) => (
         <div>
-          <span className="text-sm font-semibold text-ink-900">{formatCurrencyINR(a.price)}</span>
-          <p className="text-[10px] text-ink-400 capitalize">{a.priceType.replace(/_/g, " ")}</p>
+          <span className="text-sm font-semibold text-ink-900 dark:text-white">{formatCurrencyINR(a.price)}</span>
+          <p className="text-[10px] text-ink-400 dark:text-ink-500 capitalize">{a.priceType.replace(/_/g, " ")}</p>
         </div>
       ),
     },
@@ -328,10 +328,10 @@ export default function FurniturePropertiesPage() {
         <span
           className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
             a.availability === "In Stock"
-              ? "bg-success-50 text-success-700"
+              ? "bg-success-50 text-success-700 dark:bg-success-950/60 dark:text-success-400"
               : a.availability === "Limited Stock"
-              ? "bg-warning-50 text-warning-700"
-              : "bg-ink-100 text-ink-600"
+              ? "bg-warning-50 text-warning-700 dark:bg-warning-950/60 dark:text-warning-400"
+              : "bg-ink-100 text-ink-600 dark:bg-ink-800 dark:text-ink-400"
           }`}
         >
           {a.availability}
@@ -346,7 +346,7 @@ export default function FurniturePropertiesPage() {
     {
       key: "createdAt",
       header: "Created Date",
-      render: (a) => <span className="text-xs text-ink-500">{formatDate(a.createdAt)}</span>,
+      render: (a) => <span className="text-xs text-ink-500 dark:text-ink-400">{formatDate(a.createdAt)}</span>,
     },
     {
       key: "actions",
@@ -359,7 +359,7 @@ export default function FurniturePropertiesPage() {
               e.stopPropagation();
               setSelectedAsset(a);
             }}
-            className="rounded-md p-1.5 text-ink-400 hover:bg-ink-100 hover:text-brand-600"
+            className="rounded-md p-1.5 text-ink-400 hover:bg-ink-100 hover:text-brand-600 dark:hover:bg-ink-800 dark:hover:text-brand-400"
             title="View Asset Details"
           >
             <Eye className="h-4 w-4" />
@@ -375,7 +375,7 @@ export default function FurniturePropertiesPage() {
                   action: "deactivate",
                 });
               }}
-              className="rounded-md p-1.5 text-ink-400 hover:bg-warning-50 hover:text-warning-600"
+              className="rounded-md p-1.5 text-ink-400 hover:bg-warning-50 hover:text-warning-600 dark:hover:bg-warning-950/40 dark:hover:text-warning-400"
               title="Deactivate"
             >
               <XCircle className="h-4 w-4" />
@@ -391,7 +391,7 @@ export default function FurniturePropertiesPage() {
                   action: "activate",
                 });
               }}
-              className="rounded-md p-1.5 text-ink-400 hover:bg-success-50 hover:text-success-600"
+              className="rounded-md p-1.5 text-ink-400 hover:bg-success-50 hover:text-success-600 dark:hover:bg-success-950/40 dark:hover:text-success-400"
               title="Activate"
             >
               <CheckCircle2 className="h-4 w-4" />
@@ -407,7 +407,7 @@ export default function FurniturePropertiesPage() {
                 action: "delete",
               });
             }}
-            className="rounded-md p-1.5 text-ink-400 hover:bg-danger-50 hover:text-danger-600"
+            className="rounded-md p-1.5 text-ink-400 hover:bg-danger-50 hover:text-danger-600 dark:hover:bg-danger-950/40 dark:hover:text-danger-400"
             title="Delete Asset"
           >
             <Trash2 className="h-4 w-4" />
@@ -443,26 +443,26 @@ export default function FurniturePropertiesPage() {
       />
 
       {/* Mandatory In-Page Furniture Type Switcher Dropdown & Controls */}
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-ink-200 bg-white p-4 shadow-card">
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-ink-200 bg-white p-4 shadow-card dark:border-ink-800 dark:bg-ink-900">
         <div className="flex items-center gap-3">
-          <label className="text-xs font-semibold uppercase tracking-wider text-ink-600">
+          <label className="text-xs font-semibold uppercase tracking-wider text-ink-600 dark:text-ink-400">
             Furniture Type
           </label>
           <div className="relative">
             <select
               value={furnitureType}
               onChange={(e) => handleTypeChange(e.target.value as FurnitureTypeSelection)}
-              className="appearance-none rounded-lg border border-ink-300 bg-white py-2 pl-3.5 pr-9 text-sm font-semibold text-ink-900 shadow-sm outline-none transition-colors hover:border-brand-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+              className="appearance-none rounded-lg border border-ink-300 bg-white py-2 pl-3.5 pr-9 text-sm font-semibold text-ink-900 shadow-sm outline-none transition-colors hover:border-brand-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:border-ink-700 dark:bg-ink-800 dark:text-ink-100 dark:focus:border-brand-500 dark:focus:ring-brand-900/40"
             >
               <option value="packages">Packages (Complete Setups)</option>
               <option value="assets">Individual Assets (Single Items)</option>
             </select>
-            <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-500" />
+            <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-500 dark:text-ink-400" />
           </div>
         </div>
 
         {/* Informative pill indicating current active scope */}
-        <div className="flex items-center gap-2 text-xs text-ink-500">
+        <div className="flex items-center gap-2 text-xs text-ink-500 dark:text-ink-400">
           <span className="h-2 w-2 rounded-full bg-brand-600" />
           {furnitureType === "packages"
             ? "Displaying turnkey packages (Office, Workspace, Residential, Custom)"

@@ -63,52 +63,52 @@ export default function AdminLoginPage() {
         <p className="relative text-xs text-ink-500">© {new Date().getFullYear()} VortexCubes. All rights reserved.</p>
       </div>
 
-      <div className="flex w-full flex-col items-center justify-center bg-ink-50 px-6 py-12 lg:w-1/2">
+      <div className="flex w-full flex-col items-center justify-center bg-ink-50 px-6 py-12 dark:bg-ink-950 lg:w-1/2">
         <div className="w-full max-w-sm">
           <div className="mb-8 flex items-center gap-2.5 lg:hidden">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600 text-sm font-bold text-white">VC</div>
-            <span className="text-sm font-semibold text-ink-900">VortexCubes</span>
+            <span className="text-sm font-semibold text-ink-900 dark:text-white">VortexCubes</span>
           </div>
 
-          <h2 className="text-xl font-semibold text-ink-900">Sign in to Super Admin</h2>
-          <p className="mt-1 text-sm text-ink-500">Enter your credentials to access the command center.</p>
+          <h2 className="text-xl font-semibold text-ink-900 dark:text-white">Sign in to Super Admin</h2>
+          <p className="mt-1 text-sm text-ink-500 dark:text-ink-400">Enter your credentials to access the command center.</p>
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-4">
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-ink-600">Email address</label>
+              <label className="mb-1.5 block text-xs font-medium text-ink-600 dark:text-ink-300">Email address</label>
               <div className="relative">
-                <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400" />
+                <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400 dark:text-ink-500" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@vortexcubes.com"
-                  className="w-full rounded-lg border border-ink-200 bg-white py-2.5 pl-9 pr-3 text-sm outline-none transition-colors focus:border-brand-400 focus:ring-2 focus:ring-brand-100"
+                  className="w-full rounded-lg border border-ink-200 bg-white py-2.5 pl-9 pr-3 text-sm text-ink-900 outline-none transition-colors placeholder:text-ink-400 focus:border-brand-400 focus:ring-2 focus:ring-brand-100 dark:border-ink-800 dark:bg-ink-900 dark:text-ink-100 dark:placeholder:text-ink-500 dark:focus:border-brand-500 dark:focus:ring-brand-900/40"
                 />
               </div>
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-ink-600">Password</label>
+              <label className="mb-1.5 block text-xs font-medium text-ink-600 dark:text-ink-300">Password</label>
               <div className="relative">
-                <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400" />
+                <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400 dark:text-ink-500" />
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full rounded-lg border border-ink-200 bg-white py-2.5 pl-9 pr-3 text-sm outline-none transition-colors focus:border-brand-400 focus:ring-2 focus:ring-brand-100"
+                  className="w-full rounded-lg border border-ink-200 bg-white py-2.5 pl-9 pr-3 text-sm text-ink-900 outline-none transition-colors placeholder:text-ink-400 focus:border-brand-400 focus:ring-2 focus:ring-brand-100 dark:border-ink-800 dark:bg-ink-900 dark:text-ink-100 dark:placeholder:text-ink-500 dark:focus:border-brand-500 dark:focus:ring-brand-900/40"
                 />
               </div>
             </div>
 
-            {error && <p className="text-xs font-medium text-danger-600">{error}</p>}
+            {error && <p className="text-xs font-medium text-danger-600 dark:text-danger-400">{error}</p>}
 
             <div className="flex items-center justify-between text-xs">
-              <label className="flex items-center gap-2 text-ink-500">
-                <input type="checkbox" className="rounded border-ink-300" defaultChecked />
+              <label className="flex items-center gap-2 text-ink-500 dark:text-ink-400">
+                <input type="checkbox" className="rounded border-ink-300 dark:border-ink-700" defaultChecked />
                 Keep me signed in
               </label>
-              <a href="#" className="font-medium text-brand-600 hover:text-brand-700">
+              <a href="#" className="font-medium text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300">
                 Forgot password?
               </a>
             </div>

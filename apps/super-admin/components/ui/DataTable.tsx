@@ -19,16 +19,16 @@ export function DataTable<T>({ columns, rows, rowKey, isLoading, emptyState, onR
   if (rows.length === 0 && emptyState) return <>{emptyState}</>;
 
   return (
-    <div className="overflow-x-auto rounded-2xl border border-ink-200 bg-white shadow-card">
+    <div className="overflow-x-auto rounded-2xl border border-ink-200 bg-white shadow-card dark:border-ink-800 dark:bg-ink-900">
       <table className="w-full min-w-[720px] text-left text-sm">
         <thead>
-          <tr className="border-b border-ink-100 bg-ink-50/60">
+          <tr className="border-b border-ink-100 bg-ink-50/60 dark:border-ink-800 dark:bg-ink-950/60">
             {columns.map((col) => (
               <th
                 key={col.key}
                 style={{ width: col.width }}
                 className={cn(
-                  "whitespace-nowrap px-5 py-3 text-xs font-semibold uppercase tracking-wide text-ink-500",
+                  "whitespace-nowrap px-5 py-3 text-xs font-semibold uppercase tracking-wide text-ink-500 dark:text-ink-400",
                   col.align === "right" && "text-right",
                   col.align === "center" && "text-center"
                 )}
@@ -38,13 +38,13 @@ export function DataTable<T>({ columns, rows, rowKey, isLoading, emptyState, onR
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-ink-100">
+        <tbody className="divide-y divide-ink-100 dark:divide-ink-800">
           {rows.map((row) => (
             <tr
               key={rowKey(row)}
               onClick={() => onRowClick?.(row)}
               className={cn(
-                "transition-colors hover:bg-brand-50/40",
+                "transition-colors hover:bg-brand-50/40 dark:hover:bg-brand-950/30",
                 onRowClick && "cursor-pointer"
               )}
             >
@@ -52,7 +52,7 @@ export function DataTable<T>({ columns, rows, rowKey, isLoading, emptyState, onR
                 <td
                   key={col.key}
                   className={cn(
-                    "px-5 py-3.5 align-middle text-ink-700",
+                    "px-5 py-3.5 align-middle text-ink-700 dark:text-ink-300",
                     col.align === "right" && "text-right",
                     col.align === "center" && "text-center"
                   )}

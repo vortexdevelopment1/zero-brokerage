@@ -49,24 +49,24 @@ export function DealStepper({
   const isCancelled = currentStage === "DEAL_CANCELLED";
 
   return (
-    <div className="rounded-2xl border border-ink-200 bg-white p-5 shadow-card">
-      <div className="flex items-center justify-between border-b border-ink-100 pb-3">
+    <div className="rounded-2xl border border-ink-200 bg-white dark:border-ink-800 dark:bg-ink-900 p-5 shadow-card">
+      <div className="flex items-center justify-between border-b border-ink-100 dark:border-ink-800 pb-3">
         <div>
-          <h3 className="text-sm font-semibold text-ink-900">Deal Progress & Lifecycle</h3>
-          <p className="mt-0.5 text-xs text-ink-500">
+          <h3 className="text-sm font-semibold text-ink-900 dark:text-white">Deal Progress & Lifecycle</h3>
+          <p className="mt-0.5 text-xs text-ink-500 dark:text-ink-400">
             End-to-end transaction state machine per platform compliance workflow.
           </p>
         </div>
         {isCancelled ? (
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-danger-100 px-3 py-1 text-xs font-semibold text-danger-700">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-danger-100 dark:bg-danger-950/70 dark:text-danger-300 dark:ring-1 dark:ring-danger-900/50 px-3 py-1 text-xs font-semibold text-danger-700">
             <XCircle className="h-4 w-4" /> Deal Cancelled
           </span>
         ) : hasMismatch ? (
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-warning-100 px-3 py-1 text-xs font-semibold text-warning-700">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-warning-100 dark:bg-warning-950/70 dark:text-warning-300 dark:ring-1 dark:ring-warning-900/50 px-3 py-1 text-xs font-semibold text-warning-800">
             <AlertTriangle className="h-4 w-4" /> Agreement Review Flagged
           </span>
         ) : (
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-success-100 px-3 py-1 text-xs font-medium text-success-700">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-success-100 dark:bg-success-950/70 dark:text-success-300 dark:ring-1 dark:ring-success-900/50 px-3 py-1 text-xs font-semibold text-success-700">
             <Clock className="h-4 w-4" /> Active Pipeline Stage
           </span>
         )}
@@ -76,7 +76,7 @@ export function DealStepper({
       <div className="mt-6 overflow-x-auto pb-2">
         <div className="flex min-w-[760px] items-start justify-between relative">
           {/* Connecting Line */}
-          <div className="absolute top-4 left-6 right-6 h-0.5 bg-ink-200 -z-0" />
+          <div className="absolute top-4 left-6 right-6 h-0.5 bg-ink-200 dark:bg-ink-800 -z-0" />
 
           {STAGES.map((step, idx) => {
             const isCompleted = !isCancelled && idx < currentIndex;
@@ -88,11 +88,11 @@ export function DealStepper({
                 <div
                   className={cn(
                     "flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-all shadow-sm",
-                    isCompleted && "bg-brand-600 text-white ring-4 ring-brand-100",
-                    isCurrent && !hasMismatch && "bg-brand-600 text-white ring-4 ring-brand-200 animate-pulse",
-                    isCurrent && hasMismatch && "bg-warning-500 text-white ring-4 ring-warning-200",
-                    isUpcoming && "bg-white text-ink-400 border-2 border-ink-300",
-                    isCancelled && "bg-ink-100 text-ink-400 border border-ink-200"
+                    isCompleted && "bg-brand-600 text-white ring-4 ring-brand-100 dark:ring-brand-900/40",
+                    isCurrent && !hasMismatch && "bg-brand-600 text-white ring-4 ring-brand-200 dark:ring-brand-800 animate-pulse",
+                    isCurrent && hasMismatch && "bg-warning-500 text-white ring-4 ring-warning-200 dark:ring-warning-900/40",
+                    isUpcoming && "bg-white dark:bg-ink-900 text-ink-400 dark:text-ink-500 border-2 border-ink-300 dark:border-ink-700",
+                    isCancelled && "bg-ink-100 dark:bg-ink-800 text-ink-400 dark:text-ink-500 border border-ink-200 dark:border-ink-700"
                   )}
                 >
                   {isCompleted ? (
@@ -106,12 +106,12 @@ export function DealStepper({
                 <p
                   className={cn(
                     "mt-2 text-xs font-semibold",
-                    isCurrent ? "text-brand-700" : isCompleted ? "text-ink-900" : "text-ink-500"
+                    isCurrent ? "text-brand-600 dark:text-brand-400" : isCompleted ? "text-ink-900 dark:text-white" : "text-ink-500 dark:text-ink-400"
                   )}
                 >
                   {step.label}
                 </p>
-                <p className="mt-0.5 text-[11px] text-ink-400 leading-tight max-w-[100px]">
+                <p className="mt-0.5 text-[11px] text-ink-400 dark:text-ink-500 leading-tight max-w-[100px]">
                   {step.desc}
                 </p>
               </div>
@@ -122,29 +122,29 @@ export function DealStepper({
 
       {/* Parallel Cancellation Path Warning Banner */}
       {isCancelled && (
-        <div className="mt-5 rounded-xl border border-danger-200 bg-danger-50/70 p-4">
+        <div className="mt-5 rounded-xl border border-danger-200 bg-danger-50/70 dark:border-danger-900/50 dark:bg-danger-950/30 p-4">
           <div className="flex items-start gap-3">
-            <XCircle className="h-5 w-5 text-danger-600 shrink-0 mt-0.5" />
+            <XCircle className="h-5 w-5 text-danger-600 dark:text-danger-400 shrink-0 mt-0.5" />
             <div className="flex-1">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-semibold text-danger-900">
+                <p className="text-sm font-semibold text-danger-900 dark:text-danger-200">
                   Parallel Cancellation Path Executed
                 </p>
                 {cancellationId && (
-                  <span className="text-xs font-mono font-medium text-danger-700 bg-danger-100 px-2 py-0.5 rounded">
+                  <span className="text-xs font-mono font-medium text-danger-700 dark:text-danger-300 bg-danger-100 dark:bg-danger-900/60 px-2 py-0.5 rounded">
                     Record: {cancellationId}
                   </span>
                 )}
               </div>
-              <p className="mt-1 text-xs text-danger-700 leading-relaxed">
+              <p className="mt-1 text-xs text-danger-700 dark:text-danger-300 leading-relaxed">
                 Deal terminated after amount confirmation prior to external agreement execution. Cancellation fee was calculated according to configured platform rules and an audit record was preserved.
               </p>
-              <div className="mt-3 flex items-center gap-2 text-[11px] font-medium text-danger-800">
-                <span className="rounded bg-danger-200/60 px-2 py-0.5">Cancellation Requested</span>
+              <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px] font-medium text-danger-800 dark:text-danger-300">
+                <span className="rounded bg-danger-200/60 text-danger-900 dark:bg-danger-950/80 dark:text-danger-300 dark:border dark:border-danger-900/60 px-2 py-0.5">Cancellation Requested</span>
                 <ArrowRight className="h-3 w-3" />
-                <span className="rounded bg-danger-200/60 px-2 py-0.5">Fee Calculated (1–2%)</span>
+                <span className="rounded bg-danger-200/60 text-danger-900 dark:bg-danger-950/80 dark:text-danger-300 dark:border dark:border-danger-900/60 px-2 py-0.5">Fee Calculated (1–2%)</span>
                 <ArrowRight className="h-3 w-3" />
-                <span className="rounded bg-danger-200/60 px-2 py-0.5">Fee Deducted / Invoiced</span>
+                <span className="rounded bg-danger-200/60 text-danger-900 dark:bg-danger-950/80 dark:text-danger-300 dark:border dark:border-danger-900/60 px-2 py-0.5">Fee Deducted / Invoiced</span>
                 <ArrowRight className="h-3 w-3" />
                 <span className="rounded bg-danger-600 text-white px-2 py-0.5">Deal Cancelled</span>
               </div>

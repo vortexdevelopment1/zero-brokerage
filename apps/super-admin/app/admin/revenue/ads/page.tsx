@@ -29,6 +29,7 @@ import {
 import { PageHeader } from "@/components/layout/PageHeader";
 import { StatCard } from "@/components/ui/StatCard";
 import { ChartCard } from "@/components/ui/ChartCard";
+import { PeriodSelector } from "@/components/ui/PeriodSelector";
 import { SearchBar } from "@/components/ui/SearchBar";
 import { FilterDropdown } from "@/components/ui/FilterDropdown";
 import { DataTable } from "@/components/ui/DataTable";
@@ -37,7 +38,7 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { EmptyState, ErrorState, LoadingState } from "@/components/ui/States";
 import { adRevenueService } from "@/services/adRevenueService";
 import { AdCampaign, AdRevenueOverview } from "@/types/adRevenue";
-import { TableColumn, ApiStatus } from "@/types/common";
+import { TableColumn, ApiStatus, ChartPeriod } from "@/types/common";
 import { useDebounce } from "@/hooks/useDebounce";
 import { formatCurrencyINR, formatDate } from "@/lib/utils/format";
 import { useToastStore } from "@/store/toastStore";
@@ -47,6 +48,7 @@ const PAGE_SIZE = 10;
 export default function AdRevenuePage() {
   const push = useToastStore((s) => s.push);
 
+  const [period, setPeriod] = useState<ChartPeriod>({ year: 2026 });
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 300);
   const [typeFilter, setTypeFilter] = useState("all");
@@ -63,7 +65,7 @@ export default function AdRevenuePage() {
     setStatus("loading");
     try {
       const [ov, campaignsRes] = await Promise.all([
-        adRevenueService.getOverview(),
+        adRevenueService.getOverview(period),
         adRevenueService.getCampaigns(
           {
             search: debouncedSearch || undefined,
@@ -81,7 +83,7 @@ export default function AdRevenuePage() {
     } catch {
       setStatus("error");
     }
-  }, [debouncedSearch, typeFilter, statusFilter, page]);
+  }, [debouncedSearch, typeFilter, statusFilter, page, period]);
 
   useEffect(() => {
     loadData();
@@ -117,8 +119,8 @@ export default function AdRevenuePage() {
       header: "Advertiser",
       render: (c) => (
         <div>
-          <p className="text-sm font-medium text-ink-900">{c.advertiser}</p>
-          <p className="text-xs text-ink-500">{c.advertiserContact}</p>
+          <p className="text-sm font-medium text-ink-900 dark:text-white">{c.advertiser}</p>
+          <p className="text-xs text-ink-500 dark:text-ink-400">{c.advertiserContact}</p>
         </div>
       ),
     },
@@ -127,8 +129,8 @@ export default function AdRevenuePage() {
       header: "Property / Campaign",
       render: (c) => (
         <div className="max-w-[220px]">
-          <p className="truncate text-sm font-medium text-ink-900" title={c.title}>{c.title}</p>
-          <p className="flex items-center gap-1 text-xs text-ink-500 truncate" title={c.targetLocation}>
+          <p className="truncate text-sm font-medium text-ink-900 dark:text-white" title={c.title}>{c.title}</p>
+          <p className="flex items-center gap-1 text-xs text-ink-500 dark:text-ink-400 truncate" title={c.targetLocation}>
             <MapPin className="h-3 w-3 text-ink-400 shrink-0" />
             {c.targetLocation}
           </p>
@@ -141,10 +143,10 @@ export default function AdRevenuePage() {
       render: (c) => {
         const badgeClass =
           c.type === "sponsored_listing"
-            ? "bg-brand-50 text-brand-700"
+            ? "bg-brand-50 text-brand-700 dark:bg-brand-950/60 dark:text-brand-300"
             : c.type === "homepage_banner"
-            ? "bg-purple-50 text-purple-700"
-            : "bg-emerald-50 text-emerald-700";
+            ? "bg-purple-50 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300"
+            : "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300";
         return (
           <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium capitalize ${badgeClass}`}>
             {c.type.replace(/_/g, " ")}
@@ -157,10 +159,10 @@ export default function AdRevenuePage() {
       header: "Impressions & CTR",
       render: (c) => (
         <div>
-          <span className="text-xs font-medium text-ink-800">
+          <span className="text-xs font-medium text-ink-800 dark:text-ink-200">
             {c.impressions.toLocaleString("en-IN")} impr
           </span>
-          <p className="text-[10px] text-ink-500">
+          <p className="text-[10px] text-ink-500 dark:text-ink-400">
             {c.clicks.toLocaleString("en-IN")} clicks ({c.ctr}%)
           </p>
         </div>
@@ -171,7 +173,7 @@ export default function AdRevenuePage() {
       header: "Revenue",
       render: (c) => (
         <div>
-          <span className="text-sm font-semibold text-ink-900">{formatCurrencyINR(c.amount)}</span>
+          <span className="text-sm font-semibold text-ink-900 dark:text-white">{formatCurrencyINR(c.amount)}</span>
           <p className="text-[10px] text-ink-400 capitalize">{c.paymentStatus}</p>
         </div>
       ),
@@ -180,7 +182,7 @@ export default function AdRevenuePage() {
       key: "dates",
       header: "Duration",
       render: (c) => (
-        <div className="text-xs text-ink-600">
+        <div className="text-xs text-ink-600 dark:text-ink-300">
           <p>{formatDate(c.startDate)}</p>
           <p className="text-ink-400">to {formatDate(c.endDate)}</p>
         </div>
@@ -199,7 +201,7 @@ export default function AdRevenuePage() {
         <div className="flex items-center justify-end gap-1.5">
           <button
             onClick={() => handleToggleStatus(c)}
-            className="rounded-md p-1.5 text-ink-400 hover:bg-ink-100 hover:text-ink-700 transition-colors"
+            className="rounded-md p-1.5 text-ink-400 hover:bg-ink-100 hover:text-ink-700 dark:hover:bg-ink-800 dark:hover:text-ink-200 transition-colors"
             title={c.status === "active" ? "Pause Campaign" : "Resume Campaign"}
           >
             {c.status === "active" ? <PauseCircle className="h-4 w-4" /> : <PlayCircle className="h-4 w-4" />}
@@ -222,7 +224,7 @@ export default function AdRevenuePage() {
         actions={
           <button
             onClick={() => push("Ad campaign report export queued.", "info")}
-            className="flex items-center gap-1.5 rounded-lg border border-ink-200 px-3.5 py-2 text-sm font-medium text-ink-700 hover:bg-ink-50 transition-colors"
+            className="flex items-center gap-1.5 rounded-lg border border-ink-200 px-3.5 py-2 text-sm font-medium text-ink-700 hover:bg-ink-50 dark:border-ink-700 dark:bg-ink-800 dark:text-ink-200 dark:hover:bg-ink-700 transition-colors"
           >
             <Download className="h-4 w-4" /> Export Report
           </button>
@@ -262,8 +264,17 @@ export default function AdRevenuePage() {
 
       {/* Revenue Trend Visual Chart */}
       {overview && (
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 mb-6">
-          <ChartCard title="Ad Revenue Trend by Stream" subtitle="Monthly distribution across ad formats" className="lg:col-span-2">
+        <div className="mb-6 space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <h2 className="text-sm font-semibold text-ink-900 dark:text-white">Ad Monetization Analytics</h2>
+              <p className="text-xs text-ink-500 dark:text-ink-400">Stream distribution and product breakdown</p>
+            </div>
+            <PeriodSelector value={period} onChange={setPeriod} />
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+            <ChartCard title="Ad Revenue Trend by Stream" subtitle="Monthly distribution across ad formats" className="lg:col-span-2">
             <ResponsiveContainer width="100%" height={260}>
               <AreaChart data={overview.revenueTrend}>
                 <defs>
@@ -323,6 +334,7 @@ export default function AdRevenuePage() {
             </ResponsiveContainer>
           </ChartCard>
         </div>
+      </div>
       )}
 
       {/* Filter and Search Bar */}
