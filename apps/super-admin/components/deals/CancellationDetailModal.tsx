@@ -94,13 +94,13 @@ export function CancellationDetailModal({
       open={open}
       onClose={onClose}
       title={`Cancellation Audit Record — ${record.id}`}
-      size="lg"
+      size="xl"
       footer={
         <div className="flex flex-wrap items-center justify-between gap-3 w-full">
           <div className="flex items-center gap-2">
             <StatusBadge status={record.status} />
-            <span className="text-xs text-ink-500">
-              Initiated by: <strong className="text-ink-800 capitalize">{record.initiatedBy}</strong>
+            <span className="text-xs text-ink-500 dark:text-ink-400">
+              Initiated by: <strong className="text-ink-800 dark:text-white capitalize">{record.initiatedBy}</strong>
             </span>
           </div>
 
@@ -108,7 +108,7 @@ export function CancellationDetailModal({
             <button
               onClick={onClose}
               disabled={submitting}
-              className="rounded-lg border border-ink-200 px-4 py-2 text-sm font-medium text-ink-700 hover:bg-ink-50 transition-colors"
+              className="rounded-lg border border-ink-200 px-4 py-2 text-sm font-medium text-ink-700 hover:bg-ink-50 transition-colors dark:border-ink-700 dark:text-ink-300 dark:hover:bg-ink-800"
             >
               Close
             </button>
@@ -150,12 +150,12 @@ export function CancellationDetailModal({
       <div className="space-y-4">
         {/* Rejection input pop-in */}
         {rejecting && (
-          <div className="rounded-xl border border-danger-200 bg-danger-50 p-4 space-y-2.5">
+          <div className="rounded-xl border border-danger-200 bg-danger-50 p-4 space-y-2.5 dark:border-danger-900/50 dark:bg-danger-950/40">
             <div className="flex items-center justify-between">
-              <p className="text-xs font-semibold text-danger-900">
+              <p className="text-xs font-semibold text-danger-900 dark:text-danger-300">
                 Reject Cancellation Request
               </p>
-              <button onClick={() => setRejecting(false)} className="text-xs text-danger-700 hover:underline">
+              <button onClick={() => setRejecting(false)} className="text-xs text-danger-700 hover:underline dark:text-danger-400">
                 Cancel
               </button>
             </div>
@@ -164,7 +164,7 @@ export function CancellationDetailModal({
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
               placeholder="Enter reason for rejecting this cancellation..."
-              className="w-full rounded-lg border border-danger-200 bg-white p-2 text-xs text-ink-900 outline-none focus:ring-1 focus:ring-danger-500"
+              className="w-full rounded-lg border border-danger-200 bg-white p-2 text-xs text-ink-900 outline-none focus:ring-1 focus:ring-danger-500 dark:border-danger-900/60 dark:bg-ink-900 dark:text-ink-100"
             />
             <div className="flex justify-end">
               <button
@@ -179,51 +179,51 @@ export function CancellationDetailModal({
         )}
 
         {/* Financial Settlement Card */}
-        <div className="rounded-xl border border-ink-200 bg-ink-50/50 p-4">
-          <div className="flex items-center justify-between border-b border-ink-200 pb-3">
+        <div className="rounded-xl border border-ink-200 bg-ink-50/50 p-4 dark:border-ink-800 dark:bg-ink-950/60">
+          <div className="flex items-center justify-between border-b border-ink-200 pb-3 dark:border-ink-800">
             <div>
-              <p className="text-xs text-ink-500">Confirmed Deal Value</p>
-              <p className="text-xl font-bold text-ink-900">{formatCurrencyINR(record.dealAmount)}</p>
+              <p className="text-xs text-ink-500 dark:text-ink-400">Confirmed Deal Value</p>
+              <p className="text-xl font-bold text-ink-900 dark:text-white">{formatCurrencyINR(record.dealAmount)}</p>
             </div>
             <div className="text-right">
-              <p className="text-xs text-ink-500">Applicable Cancellation Fee ({record.cancellationFeePercent}%)</p>
-              <p className="text-xl font-bold text-danger-600">{formatCurrencyINR(record.cancellationFeeAmount)}</p>
+              <p className="text-xs text-ink-500 dark:text-ink-400">Applicable Cancellation Fee ({record.cancellationFeePercent}%)</p>
+              <p className="text-xl font-bold text-danger-600 dark:text-danger-400">{formatCurrencyINR(record.cancellationFeeAmount)}</p>
             </div>
           </div>
 
           <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-            <div className="rounded-lg border border-ink-200 bg-white p-3">
-              <div className="flex items-center gap-1.5 font-semibold text-ink-700 mb-1">
-                <Wallet className="h-4 w-4 text-brand-600" />
+            <div className="rounded-lg border border-ink-200 bg-white p-3 dark:border-ink-700 dark:bg-ink-800">
+              <div className="flex items-center gap-1.5 font-semibold text-ink-700 dark:text-ink-200 mb-1">
+                <Wallet className="h-4 w-4 text-brand-600 dark:text-brand-400" />
                 Payment Mode & Execution Logic
               </div>
-              <p className="text-ink-600">
+              <p className="text-ink-600 dark:text-ink-300">
                 {isPlatformCollected
                   ? "Platform-collected: The cancellation fee is automatically deducted from the user's token deposit held on file."
                   : "External transaction: Platform generates a payable cancellation fee invoice to the user."}
               </p>
-              <div className="mt-2 text-[11px] font-medium text-brand-700 bg-brand-50 rounded px-2 py-1 inline-block">
+              <div className="mt-2 text-[11px] font-medium text-brand-700 bg-brand-50 rounded px-2 py-1 inline-block dark:bg-brand-950/60 dark:text-brand-300">
                 Mode: {isPlatformCollected ? "Auto-Deduct from Held Deposit" : "External Invoice Dispatch"}
               </div>
             </div>
 
-            <div className="rounded-lg border border-ink-200 bg-white p-3">
-              <div className="flex items-center gap-1.5 font-semibold text-ink-700 mb-1">
-                <Receipt className="h-4 w-4 text-brand-600" />
+            <div className="rounded-lg border border-ink-200 bg-white p-3 dark:border-ink-700 dark:bg-ink-800">
+              <div className="flex items-center gap-1.5 font-semibold text-ink-700 dark:text-ink-200 mb-1">
+                <Receipt className="h-4 w-4 text-brand-600 dark:text-brand-400" />
                 Settlement Status
               </div>
               <div className="space-y-1">
                 <div className="flex justify-between">
-                  <span className="text-ink-500">Deposit on file:</span>
-                  <span className="font-medium text-ink-800">{formatCurrencyINR(record.heldDepositAmount)}</span>
+                  <span className="text-ink-500 dark:text-ink-400">Deposit on file:</span>
+                  <span className="font-medium text-ink-800 dark:text-ink-200">{formatCurrencyINR(record.heldDepositAmount)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-ink-500">Fee charged:</span>
-                  <span className="font-medium text-danger-600">- {formatCurrencyINR(record.cancellationFeeAmount)}</span>
+                  <span className="text-ink-500 dark:text-ink-400">Fee charged:</span>
+                  <span className="font-medium text-danger-600 dark:text-danger-400">- {formatCurrencyINR(record.cancellationFeeAmount)}</span>
                 </div>
-                <div className="flex justify-between border-t border-ink-100 pt-1 font-semibold">
-                  <span className="text-ink-900">{isPlatformCollected ? "Net Refund to User:" : "Payable by User:"}</span>
-                  <span className="text-ink-900">{formatCurrencyINR(Math.abs(record.finalSettlementAmount))}</span>
+                <div className="flex justify-between border-t border-ink-100 dark:border-ink-700 pt-1 font-semibold">
+                  <span className="text-ink-900 dark:text-white">{isPlatformCollected ? "Net Refund to User:" : "Payable by User:"}</span>
+                  <span className="text-ink-900 dark:text-white">{formatCurrencyINR(Math.abs(record.finalSettlementAmount))}</span>
                 </div>
               </div>
             </div>
@@ -231,46 +231,46 @@ export function CancellationDetailModal({
         </div>
 
         {/* Cancellation Details Grid */}
-        <div className="rounded-xl border border-ink-200 bg-white p-4 shadow-sm">
-          <h4 className="text-xs font-semibold uppercase tracking-wider text-ink-400 mb-3">
+        <div className="rounded-xl border border-ink-200 bg-white dark:border-ink-800 dark:bg-ink-900 p-4 shadow-sm">
+          <h4 className="text-xs font-semibold uppercase tracking-wider text-ink-400 dark:text-ink-500 mb-3">
             Transaction & Entity References
           </h4>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-            <div>
-              <p className="text-ink-400">Deal ID</p>
-              <p className="font-mono font-medium text-ink-900">{record.dealId}</p>
+            <div className="min-w-0">
+              <p className="text-ink-400 dark:text-ink-500">Deal ID</p>
+              <p className="font-mono font-medium text-ink-900 dark:text-white truncate">{record.dealId}</p>
             </div>
-            <div>
-              <p className="text-ink-400">Requested Date</p>
-              <p className="font-medium text-ink-900">{formatDate(record.requestedAt)}</p>
+            <div className="min-w-0">
+              <p className="text-ink-400 dark:text-ink-500">Requested Date</p>
+              <p className="font-medium text-ink-900 dark:text-white truncate">{formatDate(record.requestedAt)}</p>
             </div>
-            <div>
-              <p className="text-ink-400">Buyer / User</p>
-              <p className="font-medium text-ink-900">{record.buyer.name}</p>
-              <p className="text-[10px] text-ink-400">{record.buyer.id}</p>
+            <div className="min-w-0">
+              <p className="text-ink-400 dark:text-ink-500">Buyer / User</p>
+              <p className="font-medium text-ink-900 dark:text-white truncate" title={record.buyer.name}>{record.buyer.name}</p>
+              <p className="text-[10px] text-ink-400 dark:text-ink-500 font-mono truncate">{record.buyer.id}</p>
             </div>
-            <div>
-              <p className="text-ink-400">Broker / Agency</p>
-              <p className="font-medium text-ink-900">{record.broker.name}</p>
-              <p className="text-[10px] text-ink-400">{record.agency?.name ?? record.broker.id}</p>
+            <div className="min-w-0">
+              <p className="text-ink-400 dark:text-ink-500">Broker / Agency</p>
+              <p className="font-medium text-ink-900 dark:text-white truncate" title={record.broker.name}>{record.broker.name}</p>
+              <p className="text-[10px] text-ink-400 dark:text-ink-500 font-mono truncate" title={record.agency?.name ?? record.broker.id}>{record.agency?.name ?? record.broker.id}</p>
             </div>
           </div>
 
-          <div className="mt-3 border-t border-ink-100 pt-3 text-xs">
-            <p className="text-ink-400">Property</p>
-            <p className="font-medium text-ink-900">{record.property.title} · {record.property.locality}, {record.property.city}</p>
+          <div className="mt-3 border-t border-ink-100 dark:border-ink-800 pt-3 text-xs">
+            <p className="text-ink-400 dark:text-ink-500">Property</p>
+            <p className="font-medium text-ink-900 dark:text-white">{record.property.title} · {record.property.locality}, {record.property.city}</p>
           </div>
 
-          <div className="mt-3 border-t border-ink-100 pt-3 text-xs">
-            <p className="text-ink-400">Reason for Cancellation</p>
-            <p className="mt-0.5 font-medium text-ink-800">{record.reason}</p>
+          <div className="mt-3 border-t border-ink-100 dark:border-ink-800 pt-3 text-xs">
+            <p className="text-ink-400 dark:text-ink-500">Reason for Cancellation</p>
+            <p className="mt-0.5 font-medium text-ink-800 dark:text-ink-200">{record.reason}</p>
           </div>
 
           {record.invoiceNumber && (
-            <div className="mt-3 border-t border-ink-100 pt-3 text-xs flex items-center justify-between">
+            <div className="mt-3 border-t border-ink-100 dark:border-ink-800 pt-3 text-xs flex items-center justify-between">
               <div>
-                <span className="text-ink-400">Invoice Reference: </span>
-                <span className="font-mono font-bold text-ink-900">{record.invoiceNumber}</span>
+                <span className="text-ink-400 dark:text-ink-500">Invoice Reference: </span>
+                <span className="font-mono font-bold text-ink-900 dark:text-white">{record.invoiceNumber}</span>
               </div>
               <StatusBadge status={record.refundPaymentStatus} />
             </div>
@@ -278,8 +278,8 @@ export function CancellationDetailModal({
         </div>
 
         {/* Audit Log Trail */}
-        <div className="rounded-xl border border-ink-200 bg-white p-4 shadow-sm">
-          <h4 className="text-xs font-semibold uppercase tracking-wider text-ink-400 mb-3">
+        <div className="rounded-xl border border-ink-200 bg-white dark:border-ink-800 dark:bg-ink-900 p-4 shadow-sm">
+          <h4 className="text-xs font-semibold uppercase tracking-wider text-ink-400 dark:text-ink-500 mb-3">
             Permanent Audit Trail
           </h4>
           <div className="space-y-3">
@@ -288,11 +288,11 @@ export function CancellationDetailModal({
                 <div className="mt-1 h-2 w-2 rounded-full bg-brand-600 shrink-0" />
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
-                    <span className="font-medium text-ink-900">{log.action}</span>
-                    <span className="text-[11px] text-ink-400">{formatDate(log.timestamp)}</span>
+                    <span className="font-medium text-ink-900 dark:text-white">{log.action}</span>
+                    <span className="text-[11px] text-ink-400 dark:text-ink-500">{formatDate(log.timestamp)}</span>
                   </div>
-                  <p className="text-ink-500 mt-0.5">{log.notes}</p>
-                  <span className="text-[10px] text-ink-400">Actor: {log.actor}</span>
+                  <p className="text-ink-500 dark:text-ink-400 mt-0.5">{log.notes}</p>
+                  <span className="text-[10px] text-ink-400 dark:text-ink-500">Actor: {log.actor}</span>
                 </div>
               </div>
             ))}

@@ -92,13 +92,13 @@ export default function AdCampaignsManagementPage() {
       header: "Campaign & Advertiser",
       render: (c) => (
         <div className="space-y-0.5">
-          <div className="flex items-center gap-1.5 font-medium text-ink-900">
+          <div className="flex items-center gap-1.5 font-medium text-ink-900 dark:text-white">
             <span>{c.title}</span>
           </div>
-          <p className="text-xs text-ink-500 font-mono">
-            {c.id} · <span className="font-sans font-semibold text-ink-700">{c.advertiser}</span>
+          <p className="text-xs text-ink-500 font-mono dark:text-ink-400">
+            {c.id} · <span className="font-sans font-semibold text-ink-700 dark:text-ink-200">{c.advertiser}</span>
           </p>
-          <div className="flex items-center gap-1 text-[11px] text-ink-400">
+          <div className="flex items-center gap-1 text-[11px] text-ink-400 dark:text-ink-500">
             <MapPin className="h-3 w-3" />
             <span>{c.targetLocation}</span>
           </div>
@@ -115,7 +115,7 @@ export default function AdCampaignsManagementPage() {
           geo_targeted: "Geo-Targeted Ad",
         };
         return (
-          <span className="inline-flex items-center gap-1 rounded bg-ink-100 px-2 py-0.5 text-xs font-medium text-ink-700">
+          <span className="inline-flex items-center gap-1 rounded bg-ink-100 px-2 py-0.5 text-xs font-medium text-ink-700 dark:bg-ink-800 dark:text-ink-300">
             {typeLabels[c.type] ?? c.type}
           </span>
         );
@@ -125,12 +125,12 @@ export default function AdCampaignsManagementPage() {
       key: "schedule",
       header: "Schedule",
       render: (c) => (
-        <div className="text-xs text-ink-700 space-y-0.5">
+        <div className="text-xs text-ink-700 space-y-0.5 dark:text-ink-300">
           <p>
-            <span className="text-ink-400">Start:</span> {formatDate(c.startDate)}
+            <span className="text-ink-400 dark:text-ink-500">Start:</span> {formatDate(c.startDate)}
           </p>
           <p>
-            <span className="text-ink-400">End:</span> {formatDate(c.endDate)}
+            <span className="text-ink-400 dark:text-ink-500">End:</span> {formatDate(c.endDate)}
           </p>
         </div>
       ),
@@ -140,11 +140,11 @@ export default function AdCampaignsManagementPage() {
       header: "Impressions & CTR",
       render: (c) => (
         <div className="space-y-0.5 text-xs">
-          <p className="font-semibold text-ink-900">
-            {formatCompactNumber(c.impressions)} <span className="text-[11px] font-normal text-ink-400">imps</span>
+          <p className="font-semibold text-ink-900 dark:text-white">
+            {formatCompactNumber(c.impressions)} <span className="text-[11px] font-normal text-ink-400 dark:text-ink-500">imps</span>
           </p>
-          <p className="text-ink-500">
-            {c.clicks.toLocaleString()} clicks · <span className="font-semibold text-brand-600">{c.ctr}% CTR</span>
+          <p className="text-ink-500 dark:text-ink-400">
+            {c.clicks.toLocaleString()} clicks · <span className="font-semibold text-brand-600 dark:text-brand-400">{c.ctr}% CTR</span>
           </p>
         </div>
       ),
@@ -154,8 +154,8 @@ export default function AdCampaignsManagementPage() {
       header: "Campaign Budget",
       render: (c) => (
         <div className="space-y-0.5">
-          <span className="text-sm font-semibold text-ink-900">{formatCurrencyINR(c.amount)}</span>
-          <p className="text-[11px] capitalize text-ink-400">Payment: {c.paymentStatus}</p>
+          <span className="text-sm font-semibold text-ink-900 dark:text-white">{formatCurrencyINR(c.amount)}</span>
+          <p className="text-[11px] capitalize text-ink-400 dark:text-ink-500">Payment: {c.paymentStatus}</p>
         </div>
       ),
     },
@@ -172,7 +172,7 @@ export default function AdCampaignsManagementPage() {
           {c.status === "active" ? (
             <button
               onClick={() => handleToggleStatus(c)}
-              className="inline-flex items-center gap-1 rounded-lg border border-warning-200 bg-warning-50 px-2.5 py-1 text-xs font-medium text-warning-700 hover:bg-warning-100 transition-colors"
+              className="inline-flex items-center gap-1 rounded-lg border border-warning-200 bg-warning-50 px-2.5 py-1 text-xs font-medium text-warning-700 hover:bg-warning-100 transition-colors dark:border-warning-900/60 dark:bg-warning-950/40 dark:text-warning-300 dark:hover:bg-warning-900/50"
               title="Pause delivery"
             >
               <PauseCircle className="h-3.5 w-3.5" /> Pause
@@ -180,13 +180,13 @@ export default function AdCampaignsManagementPage() {
           ) : c.status === "paused" ? (
             <button
               onClick={() => handleToggleStatus(c)}
-              className="inline-flex items-center gap-1 rounded-lg border border-success-200 bg-success-50 px-2.5 py-1 text-xs font-medium text-success-700 hover:bg-success-100 transition-colors"
+              className="inline-flex items-center gap-1 rounded-lg border border-success-200 bg-success-50 px-2.5 py-1 text-xs font-medium text-success-700 hover:bg-success-100 transition-colors dark:border-success-900/60 dark:bg-success-950/40 dark:text-success-300 dark:hover:bg-success-900/50"
               title="Resume delivery"
             >
               <PlayCircle className="h-3.5 w-3.5" /> Resume
             </button>
           ) : (
-            <span className="text-xs text-ink-400 italic">No action</span>
+            <span className="text-xs text-ink-400 italic dark:text-ink-500">No action</span>
           )}
         </div>
       ),
@@ -205,11 +205,11 @@ export default function AdCampaignsManagementPage() {
         actions={
           <Link
             href="/admin/revenue/ads"
-            className="flex items-center gap-1.5 rounded-lg border border-ink-200 bg-white px-3.5 py-2 text-xs font-medium text-ink-700 hover:bg-ink-50 shadow-sm transition-colors"
+            className="flex items-center gap-1.5 rounded-lg border border-ink-200 bg-white px-3.5 py-2 text-xs font-medium text-ink-700 hover:bg-ink-50 shadow-sm transition-colors dark:border-ink-700 dark:bg-ink-800 dark:text-ink-200 dark:hover:bg-ink-700"
           >
-            <Wallet className="h-3.5 w-3.5 text-brand-600" />
+            <Wallet className="h-3.5 w-3.5 text-brand-600 dark:text-brand-400" />
             <span>View Ad Revenue Financials</span>
-            <ArrowRight className="h-3.5 w-3.5 text-ink-400" />
+            <ArrowRight className="h-3.5 w-3.5 text-ink-400 dark:text-ink-500" />
           </Link>
         }
       />
@@ -243,7 +243,7 @@ export default function AdCampaignsManagementPage() {
       </div>
 
       {/* Filters and Campaign Table */}
-      <div className="mt-6 rounded-2xl border border-ink-200 bg-white p-5 shadow-card">
+      <div className="mt-6 rounded-2xl border border-ink-200 bg-white p-5 shadow-card dark:border-ink-800 dark:bg-ink-900">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="w-full sm:max-w-xs">
             <SearchBar

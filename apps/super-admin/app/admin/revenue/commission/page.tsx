@@ -50,12 +50,12 @@ export default function CommissionPage() {
   useEffect(() => setPage(1), [debouncedSearch, statusFilter]);
 
   const columns: TableColumn<CommissionEntry>[] = [
-    { key: "dealId", header: "Deal ID", render: (c) => <span className="font-medium text-ink-800">{c.dealId}</span> },
-    { key: "property", header: "Property", render: (c) => <span className="max-w-[200px] truncate text-ink-600">{c.property}</span> },
+    { key: "dealId", header: "Deal ID", render: (c) => <span className="font-medium text-ink-800 dark:text-ink-200">{c.dealId}</span> },
+    { key: "property", header: "Property", render: (c) => <span className="max-w-[200px] truncate text-ink-600 dark:text-ink-300">{c.property}</span> },
     { key: "broker", header: "Broker" },
     { key: "dealValue", header: "Deal Value", render: (c) => formatCurrencyINR(c.dealValue) },
     { key: "commissionRate", header: "Rate", render: (c) => (c.isLuxury ? <StatusBadge status="info" label="0% · Luxury" tone="brand" /> : `${c.commissionRate}%`) },
-    { key: "platformCommission", header: "Platform Commission", render: (c) => <span className="font-medium text-ink-800">{formatCurrencyINR(c.platformCommission)}</span> },
+    { key: "platformCommission", header: "Platform Commission", render: (c) => <span className="font-medium text-ink-800 dark:text-ink-100">{formatCurrencyINR(c.platformCommission)}</span> },
     { key: "dealStatus", header: "Deal", render: (c) => <StatusBadge status={c.dealStatus} /> },
     { key: "payoutStatus", header: "Payout", render: (c) => <StatusBadge status={c.payoutStatus} /> },
     { key: "date", header: "Date", render: (c) => formatDate(c.date) },
@@ -70,7 +70,7 @@ export default function CommissionPage() {
         actions={
           <button
             onClick={() => push("Export is a UI placeholder — wire to a backend export endpoint when available.", "info")}
-            className="flex items-center gap-1.5 rounded-lg border border-ink-200 px-3.5 py-2 text-sm font-medium text-ink-700 transition-colors hover:bg-ink-50"
+            className="flex items-center gap-1.5 rounded-lg border border-ink-200 px-3.5 py-2 text-sm font-medium text-ink-700 transition-colors hover:bg-ink-50 dark:border-ink-700 dark:bg-ink-800 dark:text-ink-200 dark:hover:bg-ink-700"
           >
             <Download className="h-4 w-4" /> Export
           </button>
@@ -93,7 +93,7 @@ export default function CommissionPage() {
         />
       </div>
 
-      <div className="mb-4 rounded-xl border border-warning-100 bg-warning-100/40 px-4 py-3 text-xs text-ink-600">
+      <div className="mb-4 rounded-xl border border-warning-100 bg-warning-100/40 px-4 py-3 text-xs text-ink-600 dark:border-warning-900/50 dark:bg-warning-950/40 dark:text-warning-300">
         The exact broker payout split, payout timing and calculation rules are not defined in the BRD/SOW yet — these fields are wired for backend-driven values and no business logic is hardcoded here.
       </div>
 

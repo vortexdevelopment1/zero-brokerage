@@ -132,7 +132,7 @@ export default function DealCancellationRulesPage() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setConfirmResetOpen(true)}
-              className="flex items-center gap-1.5 rounded-lg border border-ink-200 px-3.5 py-2 text-sm font-medium text-ink-700 hover:bg-ink-50 transition-colors"
+              className="flex items-center gap-1.5 rounded-lg border border-ink-200 px-3.5 py-2 text-sm font-medium text-ink-700 hover:bg-ink-50 transition-colors dark:border-ink-700 dark:bg-ink-800 dark:text-ink-200 dark:hover:bg-ink-700"
             >
               <RotateCcw className="h-4 w-4" /> Reset to Defaults
             </button>
@@ -148,26 +148,26 @@ export default function DealCancellationRulesPage() {
 
       <div className="space-y-6 max-w-5xl">
         {/* Info Banner */}
-        <div className="rounded-xl border border-brand-200 bg-brand-50/70 p-4 text-xs text-brand-900 flex items-start gap-3">
+        <div className="rounded-xl border border-brand-200 bg-brand-50/70 p-4 text-xs text-brand-900 flex items-start gap-3 dark:border-brand-900/60 dark:bg-brand-950/40 dark:text-brand-200">
           <ShieldCheck className="h-5 w-5 text-brand-600 shrink-0 mt-0.5" />
           <div className="leading-relaxed">
             <p className="font-semibold text-sm">Centralized Policy Engine</p>
-            <p className="mt-0.5 text-brand-800">
+            <p className="mt-0.5 text-brand-800 dark:text-brand-300">
               Changes applied here dynamically govern the Deal lifecycle state machine, the cancellation fee percentage (configurable between 1–2%), payment invoice generation, and listing search visibility delisting upon deal completion.
             </p>
-            <p className="mt-1 text-[11px] text-brand-600">
+            <p className="mt-1 text-[11px] text-brand-600 dark:text-brand-400">
               Last saved: {formatDate(editedConfig.updatedAt)} by {editedConfig.updatedBy}
             </p>
           </div>
         </div>
 
         {/* Section 1: Cancellation Fee & Policy Rules */}
-        <div className="rounded-2xl border border-ink-200 bg-white p-6 shadow-card">
-          <div className="border-b border-ink-100 pb-4">
-            <h3 className="text-base font-bold text-ink-900 flex items-center gap-2">
+        <div className="rounded-2xl border border-ink-200 bg-white p-6 shadow-card dark:border-ink-800 dark:bg-ink-900">
+          <div className="border-b border-ink-100 pb-4 dark:border-ink-800">
+            <h3 className="text-base font-bold text-ink-900 flex items-center gap-2 dark:text-white">
               <Percent className="h-5 w-5 text-brand-600" /> User Cancellation Fee Configuration
             </h3>
-            <p className="mt-1 text-xs text-ink-500">
+            <p className="mt-1 text-xs text-ink-500 dark:text-ink-400">
               Chargeable if the user cancels after final deal amount confirmation but before external legal agreement is uploaded. (Discussed requirement: 1–2%).
             </p>
           </div>
@@ -176,10 +176,10 @@ export default function DealCancellationRulesPage() {
             <div className="space-y-4">
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-ink-700">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-ink-700 dark:text-ink-300">
                     Platform Cancellation Fee Percentage
                   </label>
-                  <span className="font-mono text-sm font-bold text-brand-600 bg-brand-50 px-2.5 py-0.5 rounded">
+                  <span className="font-mono text-sm font-bold text-brand-600 bg-brand-50 px-2.5 py-0.5 rounded dark:bg-brand-950/60 dark:text-brand-400">
                     {canRules.userCancellationFeePercent.toFixed(2)}%
                   </span>
                 </div>
@@ -192,75 +192,75 @@ export default function DealCancellationRulesPage() {
                   onChange={(e) => updateCanRule("userCancellationFeePercent", parseFloat(e.target.value))}
                   className="w-full accent-brand-600 cursor-pointer"
                 />
-                <div className="flex justify-between text-[11px] text-ink-400 mt-1">
+                <div className="flex justify-between text-[11px] text-ink-400 mt-1 dark:text-ink-500">
                   <span>0.5%</span>
-                  <span className="font-semibold text-brand-700">Recommended: 1.0% – 2.0%</span>
+                  <span className="font-semibold text-brand-700 dark:text-brand-400">Recommended: 1.0% – 2.0%</span>
                   <span>3.0%</span>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3 pt-2">
                 <div>
-                  <label className="block text-xs font-medium text-ink-600 mb-1">
+                  <label className="block text-xs font-medium text-ink-600 mb-1 dark:text-ink-300">
                     Minimum Floor Fee (₹)
                   </label>
                   <input
                     type="number"
                     value={canRules.userFeeMinAmount}
                     onChange={(e) => updateCanRule("userFeeMinAmount", parseInt(e.target.value) || 0)}
-                    className="w-full rounded-lg border border-ink-200 p-2 text-xs text-ink-900 outline-none focus:border-brand-500"
+                    className="w-full rounded-lg border border-ink-200 p-2 text-xs text-ink-900 outline-none focus:border-brand-500 dark:border-ink-700 dark:bg-ink-800 dark:text-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-ink-600 mb-1">
+                  <label className="block text-xs font-medium text-ink-600 mb-1 dark:text-ink-300">
                     Maximum Cap Fee (₹)
                   </label>
                   <input
                     type="number"
                     value={canRules.userFeeMaxAmount}
                     onChange={(e) => updateCanRule("userFeeMaxAmount", parseInt(e.target.value) || 0)}
-                    className="w-full rounded-lg border border-ink-200 p-2 text-xs text-ink-900 outline-none focus:border-brand-500"
+                    className="w-full rounded-lg border border-ink-200 p-2 text-xs text-ink-900 outline-none focus:border-brand-500 dark:border-ink-700 dark:bg-ink-800 dark:text-white"
                   />
                 </div>
               </div>
 
               {/* Payment Mode Execution Rules */}
-              <div className="rounded-xl border border-ink-200 bg-ink-50/60 p-3.5 space-y-2.5">
-                <p className="text-xs font-bold text-ink-900">Payment Deduction Logic</p>
-                <label className="flex items-center justify-between text-xs text-ink-700">
+              <div className="rounded-xl border border-ink-200 bg-ink-50/60 p-3.5 space-y-2.5 dark:border-ink-800 dark:bg-ink-950/50">
+                <p className="text-xs font-bold text-ink-900 dark:text-white">Payment Deduction Logic</p>
+                <label className="flex items-center justify-between text-xs text-ink-700 dark:text-ink-300">
                   <span>Platform-collected deposit: Automatically deduct fee</span>
                   <input
                     type="checkbox"
                     checked={canRules.autoDeductPlatformCollected}
                     onChange={(e) => updateCanRule("autoDeductPlatformCollected", e.target.checked)}
-                    className="h-4 w-4 rounded border-ink-300 text-brand-600"
+                    className="h-4 w-4 rounded border-ink-300 text-brand-600 dark:border-ink-700 dark:bg-ink-800"
                   />
                 </label>
-                <label className="flex items-center justify-between text-xs text-ink-700">
+                <label className="flex items-center justify-between text-xs text-ink-700 dark:text-ink-300">
                   <span>External transaction: Automatically generate payable invoice</span>
                   <input
                     type="checkbox"
                     checked={canRules.autoGenerateExternalInvoice}
                     onChange={(e) => updateCanRule("autoGenerateExternalInvoice", e.target.checked)}
-                    className="h-4 w-4 rounded border-ink-300 text-brand-600"
+                    className="h-4 w-4 rounded border-ink-300 text-brand-600 dark:border-ink-700 dark:bg-ink-800"
                   />
                 </label>
               </div>
             </div>
 
             {/* Interactive Live Calculation Simulator (from Q&A document example) */}
-            <div className="rounded-xl border border-brand-200 bg-brand-50/40 p-5 space-y-4">
+            <div className="rounded-xl border border-brand-200 bg-brand-50/40 p-5 space-y-4 dark:border-brand-900/60 dark:bg-brand-950/30">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-brand-900 uppercase tracking-wide">
+                <span className="text-xs font-bold text-brand-900 uppercase tracking-wide dark:text-brand-200">
                   Live Fee Calculation Simulator
                 </span>
-                <span className="text-[10px] text-brand-600 bg-brand-100 px-2 py-0.5 rounded font-medium">
+                <span className="text-[10px] text-brand-600 bg-brand-100 px-2 py-0.5 rounded font-medium dark:bg-brand-900/50 dark:text-brand-300">
                   Matches SOW §7 Example
                 </span>
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-ink-600 mb-1">
+                <label className="block text-xs font-medium text-ink-600 mb-1 dark:text-ink-300">
                   Simulate Confirmed Deal Amount (₹):
                 </label>
                 <input
@@ -268,26 +268,26 @@ export default function DealCancellationRulesPage() {
                   step="500000"
                   value={simulationAmount}
                   onChange={(e) => setSimulationAmount(parseInt(e.target.value) || 0)}
-                  className="w-full rounded-lg border border-ink-200 bg-white p-2.5 text-sm font-semibold text-ink-900 outline-none"
+                  className="w-full rounded-lg border border-ink-200 bg-white p-2.5 text-sm font-semibold text-ink-900 outline-none dark:border-ink-700 dark:bg-ink-800 dark:text-white"
                 />
               </div>
 
-              <div className="rounded-lg bg-white p-3.5 border border-ink-200 space-y-2 text-xs">
-                <div className="flex justify-between text-ink-600">
+              <div className="rounded-lg bg-white p-3.5 border border-ink-200 space-y-2 text-xs dark:border-ink-800 dark:bg-ink-900">
+                <div className="flex justify-between text-ink-600 dark:text-ink-400">
                   <span>Confirmed Deal Amount:</span>
-                  <span className="font-semibold text-ink-900">{formatCurrencyINR(simulationAmount)}</span>
+                  <span className="font-semibold text-ink-900 dark:text-white">{formatCurrencyINR(simulationAmount)}</span>
                 </div>
-                <div className="flex justify-between text-ink-600">
+                <div className="flex justify-between text-ink-600 dark:text-ink-400">
                   <span>Platform Fee Percentage:</span>
-                  <span className="font-semibold text-brand-600">{canRules.userCancellationFeePercent}%</span>
+                  <span className="font-semibold text-brand-600 dark:text-brand-400">{canRules.userCancellationFeePercent}%</span>
                 </div>
-                <div className="flex justify-between border-t border-ink-100 pt-2 text-sm font-bold">
-                  <span className="text-ink-900">Calculated Cancellation Fee:</span>
-                  <span className="text-danger-600">{formatCurrencyINR(calculatedFee)}</span>
+                <div className="flex justify-between border-t border-ink-100 pt-2 text-sm font-bold dark:border-ink-800">
+                  <span className="text-ink-900 dark:text-white">Calculated Cancellation Fee:</span>
+                  <span className="text-danger-600 dark:text-danger-400">{formatCurrencyINR(calculatedFee)}</span>
                 </div>
               </div>
 
-              <p className="text-[11px] text-ink-500 italic">
+              <p className="text-[11px] text-ink-500 italic dark:text-ink-400">
                 * Example: A ₹50 Lakhs deal with a 1.0% fee results in ₹50,000 fee. With a 1.5% fee, it results in ₹75,000 fee.
               </p>
             </div>
@@ -295,25 +295,25 @@ export default function DealCancellationRulesPage() {
         </div>
 
         {/* Section 2: Broker/Agency Cancellation Penalty (Separately Configurable) */}
-        <div className="rounded-2xl border border-ink-200 bg-white p-6 shadow-card">
-          <div className="border-b border-ink-100 pb-4">
-            <h3 className="text-base font-bold text-ink-900 flex items-center gap-2">
+        <div className="rounded-2xl border border-ink-200 bg-white p-6 shadow-card dark:border-ink-800 dark:bg-ink-900">
+          <div className="border-b border-ink-100 pb-4 dark:border-ink-800">
+            <h3 className="text-base font-bold text-ink-900 flex items-center gap-2 dark:text-white">
               <Scale className="h-5 w-5 text-brand-600" /> Broker & Agency Cancellation Penalty
             </h3>
-            <p className="mt-1 text-xs text-ink-500">
+            <p className="mt-1 text-xs text-ink-500 dark:text-ink-400">
               Separately configurable from user cancellation fees. Applies when a broker or agency unilaterally retracts from a confirmed deal.
             </p>
           </div>
 
           <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs font-medium text-ink-600 mb-1">
+              <label className="block text-xs font-medium text-ink-600 mb-1 dark:text-ink-300">
                 Penalty Structure Type
               </label>
               <select
                 value={canRules.brokerCancellationPenaltyType}
                 onChange={(e) => updateCanRule("brokerCancellationPenaltyType", e.target.value as any)}
-                className="w-full rounded-lg border border-ink-200 p-2 text-xs font-semibold text-ink-800 outline-none"
+                className="w-full rounded-lg border border-ink-200 p-2 text-xs font-semibold text-ink-800 outline-none dark:border-ink-700 dark:bg-ink-800 dark:text-ink-100"
               >
                 <option value="fixed">Fixed Penalty Fee (₹)</option>
                 <option value="percentage">Percentage of Confirmed Deal (%)</option>
@@ -321,104 +321,104 @@ export default function DealCancellationRulesPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-ink-600 mb-1">
+              <label className="block text-xs font-medium text-ink-600 mb-1 dark:text-ink-300">
                 Penalty Amount / Percentage
               </label>
               <input
                 type="number"
                 value={canRules.brokerCancellationPenaltyValue}
                 onChange={(e) => updateCanRule("brokerCancellationPenaltyValue", parseInt(e.target.value) || 0)}
-                className="w-full rounded-lg border border-ink-200 p-2 text-xs text-ink-900 outline-none"
+                className="w-full rounded-lg border border-ink-200 p-2 text-xs text-ink-900 outline-none dark:border-ink-700 dark:bg-ink-800 dark:text-white"
               />
-              <p className="mt-1 text-[10px] text-ink-400">
+              <p className="mt-1 text-[10px] text-ink-400 dark:text-ink-500">
                 {canRules.brokerCancellationPenaltyType === "fixed" ? "Fixed INR penalty fine" : "Percentage fee"}
               </p>
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-ink-600 mb-1">
+              <label className="block text-xs font-medium text-ink-600 mb-1 dark:text-ink-300">
                 Disciplinary Strike Points
               </label>
               <input
                 type="number"
                 value={canRules.brokerDisciplinaryStrikePoints}
                 onChange={(e) => updateCanRule("brokerDisciplinaryStrikePoints", parseInt(e.target.value) || 0)}
-                className="w-full rounded-lg border border-ink-200 p-2 text-xs text-ink-900 outline-none"
+                className="w-full rounded-lg border border-ink-200 p-2 text-xs text-ink-900 outline-none dark:border-ink-700 dark:bg-ink-800 dark:text-white"
               />
-              <p className="mt-1 text-[10px] text-ink-400">3 strikes triggers automated account suspension review</p>
+              <p className="mt-1 text-[10px] text-ink-400 dark:text-ink-500">3 strikes triggers automated account suspension review</p>
             </div>
           </div>
         </div>
 
         {/* Section 3: Deal Workflow & Completion Conditions */}
-        <div className="rounded-2xl border border-ink-200 bg-white p-6 shadow-card">
-          <div className="border-b border-ink-100 pb-4">
-            <h3 className="text-base font-bold text-ink-900 flex items-center gap-2">
+        <div className="rounded-2xl border border-ink-200 bg-white p-6 shadow-card dark:border-ink-800 dark:bg-ink-900">
+          <div className="border-b border-ink-100 pb-4 dark:border-ink-800">
+            <h3 className="text-base font-bold text-ink-900 flex items-center gap-2 dark:text-white">
               <Clock className="h-5 w-5 text-brand-600" /> Deal Lifecycle & Agreement Rules
             </h3>
-            <p className="mt-1 text-xs text-ink-500">
+            <p className="mt-1 text-xs text-ink-500 dark:text-ink-400">
               State machine progression gates, document upload mandates, and listing delisting triggers.
             </p>
           </div>
 
           <div className="mt-6 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="rounded-xl border border-ink-200 p-4 space-y-3">
-                <label className="flex items-center justify-between text-xs font-medium text-ink-800">
+              <div className="rounded-xl border border-ink-200 p-4 space-y-3 dark:border-ink-800 dark:bg-ink-950/40">
+                <label className="flex items-center justify-between text-xs font-medium text-ink-800 dark:text-ink-200">
                   <span>Require dual-party final amount confirmation</span>
                   <input
                     type="checkbox"
                     checked={dealRules.requireDualPartyAmountConfirmation}
                     onChange={(e) => updateDealRule("requireDualPartyAmountConfirmation", e.target.checked)}
-                    className="h-4 w-4 rounded border-ink-300 text-brand-600"
+                    className="h-4 w-4 rounded border-ink-300 text-brand-600 dark:border-ink-700 dark:bg-ink-800"
                   />
                 </label>
-                <p className="text-[11px] text-ink-500">
+                <p className="text-[11px] text-ink-500 dark:text-ink-400">
                   Both buyer and broker must mutually enter and confirm the agreed deal amount before proceeding to the agreement phase.
                 </p>
               </div>
 
-              <div className="rounded-xl border border-ink-200 p-4 space-y-3">
-                <label className="flex items-center justify-between text-xs font-medium text-ink-800">
+              <div className="rounded-xl border border-ink-200 p-4 space-y-3 dark:border-ink-800 dark:bg-ink-950/40">
+                <label className="flex items-center justify-between text-xs font-medium text-ink-800 dark:text-ink-200">
                   <span>Require dual agreement document upload</span>
                   <input
                     type="checkbox"
                     checked={dealRules.requireDualAgreementUpload}
                     onChange={(e) => updateDealRule("requireDualAgreementUpload", e.target.checked)}
-                    className="h-4 w-4 rounded border-ink-300 text-brand-600"
+                    className="h-4 w-4 rounded border-ink-300 text-brand-600 dark:border-ink-700 dark:bg-ink-800"
                   />
                 </label>
-                <p className="text-[11px] text-ink-500">
+                <p className="text-[11px] text-ink-500 dark:text-ink-400">
                   Both parties must independently upload their externally signed copy to the platform.
                 </p>
               </div>
 
-              <div className="rounded-xl border border-ink-200 p-4 space-y-3">
-                <label className="flex items-center justify-between text-xs font-medium text-ink-800">
+              <div className="rounded-xl border border-ink-200 p-4 space-y-3 dark:border-ink-800 dark:bg-ink-950/40">
+                <label className="flex items-center justify-between text-xs font-medium text-ink-800 dark:text-ink-200">
                   <span>Auto-flag document discrepancies for admin review</span>
                   <input
                     type="checkbox"
                     checked={dealRules.autoFlagDiscrepancy}
                     onChange={(e) => updateDealRule("autoFlagDiscrepancy", e.target.checked)}
-                    className="h-4 w-4 rounded border-ink-300 text-brand-600"
+                    className="h-4 w-4 rounded border-ink-300 text-brand-600 dark:border-ink-700 dark:bg-ink-800"
                   />
                 </label>
-                <p className="text-[11px] text-ink-500">
+                <p className="text-[11px] text-ink-500 dark:text-ink-400">
                   If uploaded agreements differ in valuation, terms, or signatures, flag for Super Admin review instead of auto-completing.
                 </p>
               </div>
 
-              <div className="rounded-xl border border-ink-200 p-4 space-y-3">
-                <label className="flex items-center justify-between text-xs font-medium text-ink-800">
+              <div className="rounded-xl border border-ink-200 p-4 space-y-3 dark:border-ink-800 dark:bg-ink-950/40">
+                <label className="flex items-center justify-between text-xs font-medium text-ink-800 dark:text-ink-200">
                   <span>Auto-remove listing from search upon Deal Done</span>
                   <input
                     type="checkbox"
                     checked={dealRules.autoRemoveListingOnDealDone}
                     onChange={(e) => updateDealRule("autoRemoveListingOnDealDone", e.target.checked)}
-                    className="h-4 w-4 rounded border-ink-300 text-brand-600"
+                    className="h-4 w-4 rounded border-ink-300 text-brand-600 dark:border-ink-700 dark:bg-ink-800"
                   />
                 </label>
-                <p className="text-[11px] text-ink-500">
+                <p className="text-[11px] text-ink-500 dark:text-ink-400">
                   Per SOW: Setting deal status to Deal Done immediately removes property visibility from active marketplace search.
                 </p>
               </div>
@@ -427,26 +427,26 @@ export default function DealCancellationRulesPage() {
             {/* Time Limits */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
               <div>
-                <label className="block text-xs font-medium text-ink-600 mb-1">
+                <label className="block text-xs font-medium text-ink-600 mb-1 dark:text-ink-300">
                   Amount Confirmation Window (Hours)
                 </label>
                 <input
                   type="number"
                   value={dealRules.amountConfirmationWindowHours}
                   onChange={(e) => updateDealRule("amountConfirmationWindowHours", parseInt(e.target.value) || 24)}
-                  className="w-full rounded-lg border border-ink-200 p-2 text-xs text-ink-900 outline-none"
+                  className="w-full rounded-lg border border-ink-200 p-2 text-xs text-ink-900 outline-none dark:border-ink-700 dark:bg-ink-800 dark:text-white"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-ink-600 mb-1">
+                <label className="block text-xs font-medium text-ink-600 mb-1 dark:text-ink-300">
                   Agreement Upload Grace Period (Days)
                 </label>
                 <input
                   type="number"
                   value={dealRules.agreementUploadGracePeriodDays}
                   onChange={(e) => updateDealRule("agreementUploadGracePeriodDays", parseInt(e.target.value) || 7)}
-                  className="w-full rounded-lg border border-ink-200 p-2 text-xs text-ink-900 outline-none"
+                  className="w-full rounded-lg border border-ink-200 p-2 text-xs text-ink-900 outline-none dark:border-ink-700 dark:bg-ink-800 dark:text-white"
                 />
               </div>
             </div>

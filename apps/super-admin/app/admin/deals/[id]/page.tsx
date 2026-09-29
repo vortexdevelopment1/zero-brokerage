@@ -112,7 +112,7 @@ export default function DealDetailPage() {
             {(deal.userAgreement || deal.brokerAgreement) && (
               <button
                 onClick={() => setReviewModalOpen(true)}
-                className="flex items-center gap-1.5 rounded-lg border border-brand-300 bg-brand-50 px-3.5 py-2 text-sm font-medium text-brand-700 hover:bg-brand-100 transition-colors"
+                className="flex items-center gap-1.5 rounded-lg border border-brand-300 bg-brand-50 px-3.5 py-2 text-sm font-medium text-brand-700 hover:bg-brand-100 transition-colors dark:border-brand-800 dark:bg-brand-950/40 dark:text-brand-300 dark:hover:bg-brand-900/50"
               >
                 <FileText className="h-4 w-4" /> Review Agreements
               </button>
@@ -143,13 +143,13 @@ export default function DealDetailPage() {
           {/* Main Column: Agreements & Financial Breakdown */}
           <div className="lg:col-span-2 space-y-6">
             {/* Agreement Verification Status Card */}
-            <div className="rounded-2xl border border-ink-200 bg-white p-5 shadow-card">
-              <div className="flex items-start justify-between border-b border-ink-100 pb-4">
+            <div className="rounded-2xl border border-ink-200 bg-white p-5 shadow-card dark:border-ink-800 dark:bg-ink-900">
+              <div className="flex items-start justify-between border-b border-ink-100 pb-4 dark:border-ink-800">
                 <div>
-                  <h3 className="text-sm font-semibold text-ink-900">
+                  <h3 className="text-sm font-semibold text-ink-900 dark:text-white">
                     Agreement Verification & Upload Records
                   </h3>
-                  <p className="mt-0.5 text-xs text-ink-500">
+                  <p className="mt-0.5 text-xs text-ink-500 dark:text-ink-400">
                     Separate upload records are maintained for both parties per platform policy.
                   </p>
                 </div>
@@ -160,63 +160,63 @@ export default function DealDetailPage() {
               </div>
 
               {deal.mismatchReason && (
-                <div className="mt-4 rounded-xl border border-warning-200 bg-warning-50 p-3.5 text-xs text-warning-900 flex items-start gap-2.5">
+                <div className="mt-4 rounded-xl border border-warning-200 bg-warning-50 p-3.5 text-xs text-warning-900 flex items-start gap-2.5 dark:border-warning-900/50 dark:bg-warning-950/40 dark:text-warning-200">
                   <AlertTriangle className="h-4 w-4 text-warning-600 shrink-0 mt-0.5" />
                   <div>
                     <span className="font-bold">Flagged Mismatch / Discrepancy:</span>
-                    <p className="mt-0.5 text-warning-800">{deal.mismatchReason}</p>
+                    <p className="mt-0.5 text-warning-800 dark:text-warning-300">{deal.mismatchReason}</p>
                   </div>
                 </div>
               )}
 
               <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* User Upload Record */}
-                <div className="rounded-xl border border-ink-200 bg-ink-50/50 p-4">
+                <div className="rounded-xl border border-ink-200 bg-ink-50/50 p-4 dark:border-ink-800 dark:bg-ink-950/50">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-ink-900">Buyer Uploaded Agreement</span>
-                    {userDoc ? <StatusBadge status={userDoc.status} /> : <span className="text-xs text-ink-400">Pending</span>}
+                    <span className="text-xs font-bold text-ink-900 dark:text-white">Buyer Uploaded Agreement</span>
+                    {userDoc ? <StatusBadge status={userDoc.status} /> : <span className="text-xs text-ink-400 dark:text-ink-500">Pending</span>}
                   </div>
                   {userDoc ? (
                     <div className="mt-3 space-y-2 text-xs">
-                      <p className="text-ink-700 font-medium">{userDoc.title}</p>
-                      <p className="text-ink-500">Ref: {userDoc.documentNumberMasked}</p>
-                      <p className="text-ink-500">Uploaded: {formatDate(userDoc.uploadedAt)}</p>
-                      <p className="text-ink-500">File size: {userDoc.fileSize}</p>
+                      <p className="text-ink-700 font-medium dark:text-ink-200">{userDoc.title}</p>
+                      <p className="text-ink-500 dark:text-ink-400">Ref: {userDoc.documentNumberMasked}</p>
+                      <p className="text-ink-500 dark:text-ink-400">Uploaded: {formatDate(userDoc.uploadedAt)}</p>
+                      <p className="text-ink-500 dark:text-ink-400">File size: {userDoc.fileSize}</p>
                       <button
                         onClick={() => setReviewModalOpen(true)}
-                        className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-brand-600 hover:text-brand-800"
+                        className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-brand-600 hover:text-brand-800 dark:text-brand-400 dark:hover:text-brand-300"
                       >
                         <Eye className="h-3.5 w-3.5" /> View Buyer Specimen
                       </button>
                     </div>
                   ) : (
-                    <div className="mt-4 text-center py-6 text-xs text-ink-400">
+                    <div className="mt-4 text-center py-6 text-xs text-ink-400 dark:text-ink-500">
                       Waiting for buyer to upload signed legal deed.
                     </div>
                   )}
                 </div>
 
                 {/* Broker Upload Record */}
-                <div className="rounded-xl border border-ink-200 bg-ink-50/50 p-4">
+                <div className="rounded-xl border border-ink-200 bg-ink-50/50 p-4 dark:border-ink-800 dark:bg-ink-950/50">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-ink-900">Broker Uploaded Agreement</span>
-                    {brokerDoc ? <StatusBadge status={brokerDoc.status} /> : <span className="text-xs text-ink-400">Pending</span>}
+                    <span className="text-xs font-bold text-ink-900 dark:text-white">Broker Uploaded Agreement</span>
+                    {brokerDoc ? <StatusBadge status={brokerDoc.status} /> : <span className="text-xs text-ink-400 dark:text-ink-500">Pending</span>}
                   </div>
                   {brokerDoc ? (
                     <div className="mt-3 space-y-2 text-xs">
-                      <p className="text-ink-700 font-medium">{brokerDoc.title}</p>
-                      <p className="text-ink-500">Ref: {brokerDoc.documentNumberMasked}</p>
-                      <p className="text-ink-500">Uploaded: {formatDate(brokerDoc.uploadedAt)}</p>
-                      <p className="text-ink-500">File size: {brokerDoc.fileSize}</p>
+                      <p className="text-ink-700 font-medium dark:text-ink-200">{brokerDoc.title}</p>
+                      <p className="text-ink-500 dark:text-ink-400">Ref: {brokerDoc.documentNumberMasked}</p>
+                      <p className="text-ink-500 dark:text-ink-400">Uploaded: {formatDate(brokerDoc.uploadedAt)}</p>
+                      <p className="text-ink-500 dark:text-ink-400">File size: {brokerDoc.fileSize}</p>
                       <button
                         onClick={() => setReviewModalOpen(true)}
-                        className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-brand-600 hover:text-brand-800"
+                        className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-brand-600 hover:text-brand-800 dark:text-brand-400 dark:hover:text-brand-300"
                       >
                         <Eye className="h-3.5 w-3.5" /> View Broker Specimen
                       </button>
                     </div>
                   ) : (
-                    <div className="mt-4 text-center py-6 text-xs text-ink-400">
+                    <div className="mt-4 text-center py-6 text-xs text-ink-400 dark:text-ink-500">
                       Waiting for broker to upload counter-signed copy.
                     </div>
                   )}
@@ -224,15 +224,15 @@ export default function DealDetailPage() {
               </div>
 
               {/* Action row */}
-              <div className="mt-4 flex items-center justify-between border-t border-ink-100 pt-3">
-                <div className="flex items-center gap-2 text-xs text-ink-500">
+              <div className="mt-4 flex items-center justify-between border-t border-ink-100 pt-3 dark:border-ink-800">
+                <div className="flex items-center gap-2 text-xs text-ink-500 dark:text-ink-400">
                   <ShieldCheck className="h-4 w-4 text-brand-600" />
                   <span>Administrative document consistency check enabled.</span>
                 </div>
                 {(userDoc || brokerDoc) && (
                   <button
                     onClick={() => setReviewModalOpen(true)}
-                    className="rounded-lg bg-ink-900 px-3.5 py-1.5 text-xs font-medium text-white hover:bg-ink-800"
+                    className="rounded-lg bg-ink-900 px-3.5 py-1.5 text-xs font-medium text-white hover:bg-ink-800 dark:bg-ink-800 dark:hover:bg-ink-700"
                   >
                     Open Agreement Review Modal
                   </button>
@@ -241,24 +241,24 @@ export default function DealDetailPage() {
             </div>
 
             {/* Audit History Timeline */}
-            <div className="rounded-2xl border border-ink-200 bg-white p-5 shadow-card">
-              <h3 className="text-sm font-semibold text-ink-900 mb-4 flex items-center gap-2">
+            <div className="rounded-2xl border border-ink-200 bg-white p-5 shadow-card dark:border-ink-800 dark:bg-ink-900">
+              <h3 className="text-sm font-semibold text-ink-900 mb-4 flex items-center gap-2 dark:text-white">
                 <History className="h-4 w-4 text-brand-600" /> Activity & Audit History
               </h3>
               <div className="space-y-4">
                 {deal.auditTimeline.map((item) => (
                   <div key={item.id} className="flex items-start gap-3 text-xs">
-                    <div className="mt-1 h-2.5 w-2.5 rounded-full bg-brand-600 ring-4 ring-brand-100 shrink-0" />
-                    <div className="flex-1 rounded-xl border border-ink-100 bg-ink-50/50 p-3">
+                    <div className="mt-1 h-2.5 w-2.5 rounded-full bg-brand-600 ring-4 ring-brand-100 shrink-0 dark:ring-brand-950" />
+                    <div className="flex-1 rounded-xl border border-ink-100 bg-ink-50/50 p-3 dark:border-ink-800 dark:bg-ink-950/40">
                       <div className="flex items-center justify-between">
-                        <span className="font-semibold text-ink-900 capitalize">
+                        <span className="font-semibold text-ink-900 capitalize dark:text-white">
                           {item.stage.toLowerCase().replace(/_/g, " ")}
                         </span>
-                        <span className="text-[11px] text-ink-400">{formatDate(item.timestamp)}</span>
+                        <span className="text-[11px] text-ink-400 dark:text-ink-500">{formatDate(item.timestamp)}</span>
                       </div>
-                      <p className="mt-1 text-ink-700 leading-relaxed">{item.description}</p>
-                      <div className="mt-2 flex items-center gap-2 text-[10px] text-ink-400">
-                        <span>Actor: <strong className="text-ink-600">{item.actor}</strong> ({item.role})</span>
+                      <p className="mt-1 text-ink-700 leading-relaxed dark:text-ink-300">{item.description}</p>
+                      <div className="mt-2 flex items-center gap-2 text-[10px] text-ink-400 dark:text-ink-500">
+                        <span>Actor: <strong className="text-ink-600 dark:text-ink-300">{item.actor}</strong> ({item.role})</span>
                       </div>
                     </div>
                   </div>
@@ -270,19 +270,19 @@ export default function DealDetailPage() {
           {/* Right Sidebar: Financial, Parties, Property */}
           <div className="space-y-6">
             {/* Financial & Payment Logic Card */}
-            <div className="rounded-2xl border border-ink-200 bg-white p-5 shadow-card">
-              <h3 className="text-sm font-semibold text-ink-900 border-b border-ink-100 pb-3 flex items-center gap-2">
+            <div className="rounded-2xl border border-ink-200 bg-white p-5 shadow-card dark:border-ink-800 dark:bg-ink-900">
+              <h3 className="text-sm font-semibold text-ink-900 border-b border-ink-100 pb-3 flex items-center gap-2 dark:text-white dark:border-ink-800">
                 <Wallet className="h-4 w-4 text-brand-600" /> Financial & Consideration
               </h3>
               <div className="mt-4 space-y-3 text-xs">
                 <div>
-                  <span className="text-ink-500">Confirmed Deal Value:</span>
-                  <p className="text-xl font-bold text-ink-900">{formatCurrencyINR(deal.dealAmount)}</p>
+                  <span className="text-ink-500 dark:text-ink-400">Confirmed Deal Value:</span>
+                  <p className="text-xl font-bold text-ink-900 dark:text-white">{formatCurrencyINR(deal.dealAmount)}</p>
                 </div>
 
-                <div className="border-t border-ink-100 pt-2.5">
-                  <span className="text-ink-500">Transaction Mode:</span>
-                  <p className="font-medium text-ink-800 capitalize mt-0.5">
+                <div className="border-t border-ink-100 pt-2.5 dark:border-ink-800">
+                  <span className="text-ink-500 dark:text-ink-400">Transaction Mode:</span>
+                  <p className="font-medium text-ink-800 capitalize mt-0.5 dark:text-ink-200">
                     {deal.paymentMode === "platform_collected"
                       ? "Platform Collected (Escrow Held)"
                       : "External Transaction (Direct Settlement)"}
@@ -290,87 +290,87 @@ export default function DealDetailPage() {
                 </div>
 
                 {deal.heldDepositAmount > 0 && (
-                  <div className="flex justify-between border-t border-ink-100 pt-2 text-ink-700">
+                  <div className="flex justify-between border-t border-ink-100 pt-2 text-ink-700 dark:border-ink-800 dark:text-ink-300">
                     <span>Token Deposit Held:</span>
-                    <span className="font-semibold text-ink-900">{formatCurrencyINR(deal.heldDepositAmount)}</span>
+                    <span className="font-semibold text-ink-900 dark:text-white">{formatCurrencyINR(deal.heldDepositAmount)}</span>
                   </div>
                 )}
 
-                <div className="rounded-lg bg-ink-50 p-3 text-[11px] text-ink-600 leading-relaxed border border-ink-100">
+                <div className="rounded-lg bg-ink-50 p-3 text-[11px] text-ink-600 leading-relaxed border border-ink-100 dark:bg-ink-950/40 dark:text-ink-400 dark:border-ink-800">
                   <strong>Cancellation Fee Exposure:</strong> If cancelled prior to agreement execution, 1–2% cancellation fee ({formatCurrencyINR((deal.dealAmount * 1.5) / 100)}) is {deal.paymentMode === "platform_collected" ? "auto-deducted from held deposit" : "invoiced directly to user"}.
                 </div>
               </div>
             </div>
 
             {/* Buyer Info Card */}
-            <div className="rounded-2xl border border-ink-200 bg-white p-5 shadow-card">
-              <div className="flex items-center justify-between border-b border-ink-100 pb-3">
-                <h3 className="text-sm font-semibold text-ink-900 flex items-center gap-2">
+            <div className="rounded-2xl border border-ink-200 bg-white p-5 shadow-card dark:border-ink-800 dark:bg-ink-900">
+              <div className="flex items-center justify-between border-b border-ink-100 pb-3 dark:border-ink-800">
+                <h3 className="text-sm font-semibold text-ink-900 flex items-center gap-2 dark:text-white">
                   <User className="h-4 w-4 text-brand-600" /> Buyer / User
                 </h3>
                 <Link
                   href={`/admin/users/${deal.buyer.id}`}
-                  className="text-xs font-medium text-brand-600 hover:underline"
+                  className="text-xs font-medium text-brand-600 hover:underline dark:text-brand-400"
                 >
                   View Profile
                 </Link>
               </div>
-              <div className="mt-3 space-y-1.5 text-xs text-ink-700">
-                <p className="text-sm font-medium text-ink-900">{deal.buyer.name}</p>
-                <p><span className="text-ink-400">ID:</span> {deal.buyer.id}</p>
-                <p><span className="text-ink-400">Email:</span> {deal.buyer.email}</p>
-                <p><span className="text-ink-400">Phone:</span> {deal.buyer.phone}</p>
+              <div className="mt-3 space-y-1.5 text-xs text-ink-700 dark:text-ink-300">
+                <p className="text-sm font-medium text-ink-900 dark:text-white truncate" title={deal.buyer.name}>{deal.buyer.name}</p>
+                <p><span className="text-ink-400 dark:text-ink-500">ID:</span> {deal.buyer.id}</p>
+                <p className="truncate" title={deal.buyer.email}><span className="text-ink-400 dark:text-ink-500">Email:</span> {deal.buyer.email}</p>
+                <p><span className="text-ink-400 dark:text-ink-500">Phone:</span> {deal.buyer.phone}</p>
               </div>
             </div>
 
             {/* Broker & Agency Info Card */}
-            <div className="rounded-2xl border border-ink-200 bg-white p-5 shadow-card">
-              <div className="flex items-center justify-between border-b border-ink-100 pb-3">
-                <h3 className="text-sm font-semibold text-ink-900 flex items-center gap-2">
+            <div className="rounded-2xl border border-ink-200 bg-white p-5 shadow-card dark:border-ink-800 dark:bg-ink-900">
+              <div className="flex items-center justify-between border-b border-ink-100 pb-3 dark:border-ink-800">
+                <h3 className="text-sm font-semibold text-ink-900 flex items-center gap-2 dark:text-white">
                   <Building2 className="h-4 w-4 text-brand-600" /> Broker & Agency
                 </h3>
                 <Link
                   href={`/admin/brokers/${deal.broker.id}`}
-                  className="text-xs font-medium text-brand-600 hover:underline"
+                  className="text-xs font-medium text-brand-600 hover:underline dark:text-brand-400"
                 >
                   View Broker
                 </Link>
               </div>
-              <div className="mt-3 space-y-1.5 text-xs text-ink-700">
-                <p className="text-sm font-medium text-ink-900">{deal.broker.name}</p>
-                <p><span className="text-ink-400">ID:</span> {deal.broker.id}</p>
-                <p><span className="text-ink-400">Phone:</span> {deal.broker.phone}</p>
-                <p><span className="text-ink-400">License:</span> {deal.broker.license}</p>
+              <div className="mt-3 space-y-1.5 text-xs text-ink-700 dark:text-ink-300">
+                <p className="text-sm font-medium text-ink-900 dark:text-white truncate" title={deal.broker.name}>{deal.broker.name}</p>
+                <p><span className="text-ink-400 dark:text-ink-500">ID:</span> {deal.broker.id}</p>
+                <p><span className="text-ink-400 dark:text-ink-500">Phone:</span> {deal.broker.phone}</p>
+                <p><span className="text-ink-400 dark:text-ink-500">License:</span> {deal.broker.license}</p>
                 {deal.agency && (
-                  <div className="mt-2 border-t border-ink-100 pt-2">
-                    <span className="text-ink-400">Agency Affiliation:</span>
-                    <p className="font-semibold text-ink-900 mt-0.5">{deal.agency.name}</p>
+                  <div className="mt-2 border-t border-ink-100 pt-2 dark:border-ink-800">
+                    <span className="text-ink-400 dark:text-ink-500">Agency Affiliation:</span>
+                    <p className="font-semibold text-ink-900 mt-0.5 dark:text-white truncate" title={deal.agency.name}>{deal.agency.name}</p>
                   </div>
                 )}
               </div>
             </div>
 
             {/* Property Card */}
-            <div className="rounded-2xl border border-ink-200 bg-white p-5 shadow-card">
-              <div className="flex items-center justify-between border-b border-ink-100 pb-3">
-                <h3 className="text-sm font-semibold text-ink-900 flex items-center gap-2">
+            <div className="rounded-2xl border border-ink-200 bg-white p-5 shadow-card dark:border-ink-800 dark:bg-ink-900">
+              <div className="flex items-center justify-between border-b border-ink-100 pb-3 dark:border-ink-800">
+                <h3 className="text-sm font-semibold text-ink-900 flex items-center gap-2 dark:text-white">
                   <Building className="h-4 w-4 text-brand-600" /> Property
                 </h3>
                 <Link
                   href={`/admin/properties/${deal.property.id}`}
-                  className="text-xs font-medium text-brand-600 hover:underline"
+                  className="text-xs font-medium text-brand-600 hover:underline dark:text-brand-400"
                 >
                   View Property
                 </Link>
               </div>
-              <div className="mt-3 space-y-1.5 text-xs text-ink-700">
-                <p className="text-sm font-medium text-ink-900">{deal.property.title}</p>
-                <p className="flex items-center gap-1 text-ink-500">
-                  <MapPin className="h-3.5 w-3.5 text-ink-400" />
-                  {deal.property.locality}, {deal.property.city}
+              <div className="mt-3 space-y-1.5 text-xs text-ink-700 dark:text-ink-300">
+                <p className="text-sm font-medium text-ink-900 dark:text-white truncate" title={deal.property.title}>{deal.property.title}</p>
+                <p className="flex items-center gap-1 text-ink-500 dark:text-ink-400 truncate">
+                  <MapPin className="h-3.5 w-3.5 text-ink-400 dark:text-ink-500 shrink-0" />
+                  <span className="truncate">{deal.property.locality}, {deal.property.city}</span>
                 </p>
-                <p><span className="text-ink-400">Category:</span> {deal.property.subtype} ({deal.property.category})</p>
-                <p><span className="text-ink-400">Listed Price:</span> {formatCurrencyINR(deal.property.price)}</p>
+                <p><span className="text-ink-400 dark:text-ink-500">Category:</span> {deal.property.subtype} ({deal.property.category})</p>
+                <p><span className="text-ink-400 dark:text-ink-500">Listed Price:</span> {formatCurrencyINR(deal.property.price)}</p>
               </div>
             </div>
           </div>

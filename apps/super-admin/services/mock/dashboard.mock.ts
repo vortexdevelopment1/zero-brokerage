@@ -31,6 +31,7 @@ export function getMockDashboardStats(): DashboardStats {
   const userKycApprovals = MOCK_USERS.filter(
     (u) => u.kycStatus === "pending_review" || u.verification === "pending"
   ).length;
+  const agencyApprovals = MOCK_AGENCIES.filter((a) => a.status === "pending").length;
 
   const subscriptionRev = MOCK_SUBSCRIPTIONS.filter((s) => s.paymentStatus === "success").reduce(
     (a, b) => a + b.revenue,
@@ -80,7 +81,7 @@ export function getMockDashboardStats(): DashboardStats {
     totalBrokers: MOCK_BROKERS.length * 9,
     totalAgencies: MOCK_AGENCIES.length * 6,
     totalProperties: MOCK_PROPERTIES.length * 12,
-    pendingApprovals: propertyApprovals + brokerKycApprovals + userKycApprovals,
+    pendingApprovals: propertyApprovals + brokerKycApprovals + userKycApprovals + agencyApprovals,
     activeSubscriptions: MOCK_SUBSCRIPTIONS.filter((s) => s.status === "active").length * 8,
     totalRevenue: totalPlatformRevenue,
     urgentRequirements: MOCK_URGENT_REQUIREMENTS.filter((u) => u.status === "new").length * 3,
@@ -105,10 +106,12 @@ export function getMockDashboardStats(): DashboardStats {
       properties: propertyApprovals,
       brokerKyc: brokerKycApprovals,
       userKyc: userKycApprovals,
+      agencies: agencyApprovals,
     },
     // Agreements
     pendingAgreements,
     agreementMismatches,
+    pendingAgencyReviews: agencyApprovals,
     // Cancellations
     cancelledDealsCount,
     cancellationRevenue: cancellationRev,

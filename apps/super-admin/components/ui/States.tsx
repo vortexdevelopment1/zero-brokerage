@@ -2,25 +2,25 @@ import { AlertTriangle, Inbox, Loader2, LucideIcon, ShieldAlert } from "lucide-r
 
 export function LoadingState({ label = "Loading data…" }: { label?: string }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-ink-200 bg-white py-16 text-center">
+    <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-ink-200 bg-white py-16 text-center dark:border-ink-800 dark:bg-ink-900">
       <Loader2 className="h-6 w-6 animate-spin text-brand-500" />
-      <p className="text-sm text-ink-500">{label}</p>
+      <p className="text-sm text-ink-500 dark:text-ink-400">{label}</p>
     </div>
   );
 }
 
 export function TableSkeleton({ rows = 6 }: { rows?: number }) {
   return (
-    <div className="divide-y divide-ink-100 overflow-hidden rounded-2xl border border-ink-200 bg-white">
+    <div className="divide-y divide-ink-100 overflow-hidden rounded-2xl border border-ink-200 bg-white dark:divide-ink-800 dark:border-ink-800 dark:bg-ink-900">
       {Array.from({ length: rows }).map((_, i) => (
         <div key={i} className="flex items-center gap-4 px-5 py-4">
-          <div className="h-9 w-9 shrink-0 animate-pulse rounded-full bg-ink-100" />
+          <div className="h-9 w-9 shrink-0 animate-pulse rounded-full bg-ink-100 dark:bg-ink-800" />
           <div className="flex-1 space-y-2">
-            <div className="h-3 w-1/3 animate-pulse rounded bg-ink-100" />
-            <div className="h-2.5 w-1/5 animate-pulse rounded bg-ink-100" />
+            <div className="h-3 w-1/3 animate-pulse rounded bg-ink-100 dark:bg-ink-800" />
+            <div className="h-2.5 w-1/5 animate-pulse rounded bg-ink-100 dark:bg-ink-800" />
           </div>
-          <div className="h-6 w-16 animate-pulse rounded-full bg-ink-100" />
-          <div className="h-6 w-20 animate-pulse rounded-full bg-ink-100" />
+          <div className="h-6 w-16 animate-pulse rounded-full bg-ink-100 dark:bg-ink-800" />
+          <div className="h-6 w-20 animate-pulse rounded-full bg-ink-100 dark:bg-ink-800" />
         </div>
       ))}
     </div>
@@ -39,13 +39,13 @@ export function EmptyState({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-ink-200 bg-ink-50/50 py-16 text-center">
-      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-white shadow-card">
-        <Icon className="h-5 w-5 text-ink-400" />
+    <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-ink-200 bg-ink-50/50 py-16 text-center dark:border-ink-800 dark:bg-ink-900/50">
+      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-white shadow-card dark:bg-ink-800">
+        <Icon className="h-5 w-5 text-ink-400 dark:text-ink-500" />
       </div>
       <div>
-        <p className="text-sm font-medium text-ink-800">{title}</p>
-        <p className="mt-1 max-w-sm text-sm text-ink-500">{description}</p>
+        <p className="text-sm font-medium text-ink-800 dark:text-ink-200">{title}</p>
+        <p className="mt-1 max-w-sm text-sm text-ink-500 dark:text-ink-400">{description}</p>
       </div>
       {action}
     </div>
@@ -62,13 +62,13 @@ export function ErrorState({
   onRetry?: () => void;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-danger-100 bg-danger-100/40 py-16 text-center">
-      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-white shadow-card">
-        <AlertTriangle className="h-5 w-5 text-danger-600" />
+    <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-danger-100 bg-danger-100/40 py-16 text-center dark:border-danger-900/40 dark:bg-danger-950/40">
+      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-white shadow-card dark:bg-ink-900">
+        <AlertTriangle className="h-5 w-5 text-danger-600 dark:text-danger-400" />
       </div>
       <div>
-        <p className="text-sm font-medium text-ink-800">{title}</p>
-        <p className="mt-1 max-w-sm text-sm text-ink-500">{description}</p>
+        <p className="text-sm font-medium text-ink-800 dark:text-ink-200">{title}</p>
+        <p className="mt-1 max-w-sm text-sm text-ink-500 dark:text-ink-400">{description}</p>
       </div>
       {onRetry && (
         <button
@@ -84,13 +84,13 @@ export function ErrorState({
 
 export function UnauthorizedState() {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-warning-100 bg-warning-100/40 py-16 text-center">
-      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-white shadow-card">
-        <ShieldAlert className="h-5 w-5 text-warning-600" />
+    <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-warning-100 bg-warning-100/40 py-16 text-center dark:border-warning-900/40 dark:bg-warning-950/40">
+      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-white shadow-card dark:bg-ink-900">
+        <ShieldAlert className="h-5 w-5 text-warning-600 dark:text-warning-400" />
       </div>
       <div>
-        <p className="text-sm font-medium text-ink-800">Session expired</p>
-        <p className="mt-1 max-w-sm text-sm text-ink-500">Your admin session is no longer valid. Please sign in again.</p>
+        <p className="text-sm font-medium text-ink-800 dark:text-ink-200">Session expired</p>
+        <p className="mt-1 max-w-sm text-sm text-ink-500 dark:text-ink-400">Your admin session is no longer valid. Please sign in again.</p>
       </div>
     </div>
   );

@@ -7,23 +7,23 @@ const KYC_STATUS_CONFIG: Record<
 > = {
   not_submitted: {
     label: "Not Submitted",
-    toneClass: "bg-ink-100 text-ink-700 ring-ink-200",
-    dotClass: "bg-ink-400",
+    toneClass: "bg-ink-100 text-ink-700 ring-ink-200 dark:bg-ink-800 dark:text-ink-200 dark:ring-ink-700",
+    dotClass: "bg-ink-400 dark:bg-ink-400",
   },
   pending_review: {
     label: "Pending Review",
-    toneClass: "bg-warning-100 text-warning-700 ring-warning-200",
-    dotClass: "bg-warning-500",
+    toneClass: "bg-warning-100 text-warning-800 ring-warning-200 dark:bg-warning-950/70 dark:text-warning-300 dark:ring-warning-900/50",
+    dotClass: "bg-warning-500 dark:bg-warning-400",
   },
   verified: {
     label: "Verified",
-    toneClass: "bg-success-100 text-success-700 ring-success-200",
-    dotClass: "bg-success-500",
+    toneClass: "bg-success-100 text-success-700 ring-success-200 dark:bg-success-950/70 dark:text-success-300 dark:ring-success-900/50",
+    dotClass: "bg-success-500 dark:bg-success-400",
   },
   rejected: {
     label: "Rejected",
-    toneClass: "bg-danger-100 text-danger-700 ring-danger-200",
-    dotClass: "bg-danger-500",
+    toneClass: "bg-danger-100 text-danger-700 ring-danger-200 dark:bg-danger-950/70 dark:text-danger-300 dark:ring-danger-900/50",
+    dotClass: "bg-danger-500 dark:bg-danger-400",
   },
 };
 

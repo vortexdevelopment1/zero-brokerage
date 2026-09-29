@@ -48,7 +48,7 @@ export default function TransactionsPage() {
   useEffect(() => setPage(1), [debouncedSearch, typeFilter]);
 
   const columns: TableColumn<TransactionEntry>[] = [
-    { key: "id", header: "Transaction ID", render: (t) => <span className="font-medium text-ink-800">{t.id}</span> },
+    { key: "id", header: "Transaction ID", render: (t) => <span className="font-medium text-ink-800 dark:text-ink-200">{t.id}</span> },
     { key: "entity", header: "Entity / User" },
     { key: "type", header: "Type", render: (t) => <StatusBadge status="info" label={titleCase(t.type)} tone="info" /> },
     { key: "amount", header: "Amount", render: (t) => formatCurrencyINR(t.amount) },

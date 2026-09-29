@@ -1,5 +1,6 @@
 import { simulateNetwork } from "@/lib/api/client";
 import { TrendPoint } from "@/types/dashboard";
+import { ChartPeriod } from "@/types/common";
 import {
   getMockUserGrowthTrend, getMockPropertyGrowthTrend, getMockRevenueTrend, getMockBrokerActivity,
 } from "@/services/mock/dashboard.mock";
@@ -38,11 +39,12 @@ function subscriptionActivityTrend(): TrendPoint[] {
 }
 
 export const reportService = {
-  getUserGrowthReport: (): Promise<TrendPoint[]> => simulateNetwork(() => getMockUserGrowthTrend()),
-  getBrokerGrowthReport: (): Promise<TrendPoint[]> => simulateNetwork(() => getMockBrokerActivity()),
-  getAgencyGrowthReport: (): Promise<TrendPoint[]> => simulateNetwork(() => agencyGrowthTrend()),
-  getPropertyGrowthReport: (): Promise<TrendPoint[]> => simulateNetwork(() => getMockPropertyGrowthTrend()),
-  getRevenueReport: (): Promise<TrendPoint[]> => simulateNetwork(() => getMockRevenueTrend()),
-  getSubscriptionActivityReport: (): Promise<TrendPoint[]> => simulateNetwork(() => subscriptionActivityTrend()),
-  getDealClosureReport: (): Promise<TrendPoint[]> => simulateNetwork(() => dealClosureActivity()),
+  // PROVISIONAL: Accepts optional ChartPeriod. The backend does not yet support period filtering.
+  getUserGrowthReport: (_period?: ChartPeriod): Promise<TrendPoint[]> => simulateNetwork(() => getMockUserGrowthTrend()),
+  getBrokerGrowthReport: (_period?: ChartPeriod): Promise<TrendPoint[]> => simulateNetwork(() => getMockBrokerActivity()),
+  getAgencyGrowthReport: (_period?: ChartPeriod): Promise<TrendPoint[]> => simulateNetwork(() => agencyGrowthTrend()),
+  getPropertyGrowthReport: (_period?: ChartPeriod): Promise<TrendPoint[]> => simulateNetwork(() => getMockPropertyGrowthTrend()),
+  getRevenueReport: (_period?: ChartPeriod): Promise<TrendPoint[]> => simulateNetwork(() => getMockRevenueTrend()),
+  getSubscriptionActivityReport: (_period?: ChartPeriod): Promise<TrendPoint[]> => simulateNetwork(() => subscriptionActivityTrend()),
+  getDealClosureReport: (_period?: ChartPeriod): Promise<TrendPoint[]> => simulateNetwork(() => dealClosureActivity()),
 };

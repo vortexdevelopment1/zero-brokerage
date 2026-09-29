@@ -2,6 +2,7 @@ export interface ApprovalsBreakdown {
   properties: number;
   brokerKyc: number;
   userKyc: number;
+  agencies?: number;
 }
 
 export interface DealPipelineStageCount {
@@ -41,6 +42,7 @@ export interface DashboardStats {
   // Agreements & Admin attention
   pendingAgreements: number;
   agreementMismatches: number;
+  pendingAgencyReviews?: number;
 
   // Cancellations
   cancelledDealsCount: number;

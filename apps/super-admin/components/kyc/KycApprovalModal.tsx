@@ -29,7 +29,7 @@ export function KycApprovalModal({
           <button
             onClick={onClose}
             disabled={isSubmitting}
-            className="rounded-lg border border-ink-200 px-4 py-2 text-sm font-medium text-ink-700 transition-colors hover:bg-ink-50 disabled:opacity-50"
+            className="rounded-lg border border-ink-200 px-4 py-2 text-sm font-medium text-ink-700 transition-colors hover:bg-ink-50 disabled:opacity-50 dark:border-ink-700 dark:text-ink-300 dark:hover:bg-ink-800"
           >
             Cancel
           </button>
@@ -46,12 +46,12 @@ export function KycApprovalModal({
     >
       <div className="space-y-3">
         <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-success-100 text-success-700">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-success-100 text-success-700 dark:bg-success-950/60 dark:text-success-400">
             <ShieldCheck className="h-5 w-5" />
           </div>
-          <p className="text-sm text-ink-600 leading-relaxed">
-            Are you sure you want to approve this KYC for <strong className="text-ink-900">{entityName}</strong>?
-            This will mark their identity verification as <strong className="text-success-700 font-medium">Verified</strong> and enable full verified platform capabilities.
+          <p className="text-sm text-ink-600 dark:text-ink-300 leading-relaxed">
+            Are you sure you want to approve this KYC for <strong className="text-ink-900 dark:text-white">{entityName}</strong>?
+            This will mark their identity verification as <strong className="text-success-700 dark:text-success-400 font-medium">Verified</strong> and enable full verified platform capabilities.
           </p>
         </div>
       </div>

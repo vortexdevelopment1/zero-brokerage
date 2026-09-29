@@ -32,7 +32,7 @@ export function ConfirmationDialog({
         <>
           <button
             onClick={onClose}
-            className="rounded-lg border border-ink-200 px-4 py-2 text-sm font-medium text-ink-700 transition-colors hover:bg-ink-50"
+            className="rounded-lg border border-ink-200 px-4 py-2 text-sm font-medium text-ink-700 transition-colors hover:bg-ink-50 dark:border-ink-700 dark:text-ink-300 dark:hover:bg-ink-800"
           >
             Cancel
           </button>
@@ -49,7 +49,7 @@ export function ConfirmationDialog({
         </>
       }
     >
-      <p className="text-sm text-ink-600">{description}</p>
+      <p className="text-sm text-ink-600 dark:text-ink-300">{description}</p>
     </Modal>
   );
 }

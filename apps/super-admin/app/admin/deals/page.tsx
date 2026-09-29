@@ -76,8 +76,8 @@ export default function AllDealsPage() {
       header: "Deal ID",
       render: (d) => (
         <div>
-          <span className="font-mono text-xs font-semibold text-brand-600">{d.id}</span>
-          <p className="text-[11px] text-ink-400 capitalize">{d.stage.toLowerCase().replace(/_/g, " ")}</p>
+          <span className="font-mono text-xs font-semibold text-brand-600 dark:text-brand-400">{d.id}</span>
+          <p className="text-[11px] text-ink-400 dark:text-ink-500 capitalize">{d.stage.toLowerCase().replace(/_/g, " ")}</p>
         </div>
       ),
     },
@@ -85,9 +85,9 @@ export default function AllDealsPage() {
       key: "buyer",
       header: "Buyer / User",
       render: (d) => (
-        <div>
-          <p className="text-sm font-medium text-ink-900">{d.buyer.name}</p>
-          <p className="text-xs text-ink-500">{d.buyer.phone}</p>
+        <div className="max-w-[160px]">
+          <p className="truncate text-sm font-medium text-ink-900 dark:text-white" title={d.buyer.name}>{d.buyer.name}</p>
+          <p className="truncate text-xs text-ink-500 dark:text-ink-400">{d.buyer.phone}</p>
         </div>
       ),
     },
@@ -95,9 +95,9 @@ export default function AllDealsPage() {
       key: "broker",
       header: "Broker / Agency",
       render: (d) => (
-        <div>
-          <p className="text-sm font-medium text-ink-900">{d.broker.name}</p>
-          <p className="text-xs text-ink-500">{d.agency?.name ?? "Independent Broker"}</p>
+        <div className="max-w-[160px]">
+          <p className="truncate text-sm font-medium text-ink-900 dark:text-white" title={d.broker.name}>{d.broker.name}</p>
+          <p className="truncate text-xs text-ink-500 dark:text-ink-400" title={d.agency?.name ?? "Independent Broker"}>{d.agency?.name ?? "Independent Broker"}</p>
         </div>
       ),
     },
@@ -106,8 +106,8 @@ export default function AllDealsPage() {
       header: "Property",
       render: (d) => (
         <div className="max-w-[220px]">
-          <p className="truncate text-sm font-medium text-ink-900">{d.property.title}</p>
-          <p className="truncate text-xs text-ink-500">{d.property.locality}, {d.property.city}</p>
+          <p className="truncate text-sm font-medium text-ink-900 dark:text-white">{d.property.title}</p>
+          <p className="truncate text-xs text-ink-500 dark:text-ink-400">{d.property.locality}, {d.property.city}</p>
         </div>
       ),
     },
@@ -116,8 +116,8 @@ export default function AllDealsPage() {
       header: "Deal Amount",
       render: (d) => (
         <div>
-          <span className="text-sm font-semibold text-ink-900">{formatCurrencyINR(d.dealAmount)}</span>
-          <p className="text-[10px] text-ink-400">
+          <span className="text-sm font-semibold text-ink-900 dark:text-white">{formatCurrencyINR(d.dealAmount)}</span>
+          <p className="text-[10px] text-ink-400 dark:text-ink-500">
             {d.paymentMode === "platform_collected" ? "Platform Escrow" : "External Settlement"}
           </p>
         </div>
@@ -134,14 +134,14 @@ export default function AllDealsPage() {
       render: (d) => {
         if (d.agreementStatus === "mismatch_flagged") {
           return (
-            <span className="inline-flex items-center gap-1 rounded-full bg-danger-100 px-2.5 py-0.5 text-xs font-medium text-danger-700">
+            <span className="inline-flex items-center gap-1 rounded-full bg-danger-100 px-2.5 py-0.5 text-xs font-medium text-danger-700 dark:bg-danger-950/60 dark:text-danger-400">
               <AlertTriangle className="h-3 w-3" /> Mismatch
             </span>
           );
         }
         if (d.agreementStatus === "both_uploaded") {
           return (
-            <span className="inline-flex items-center gap-1 rounded-full bg-brand-100 px-2.5 py-0.5 text-xs font-medium text-brand-700">
+            <span className="inline-flex items-center gap-1 rounded-full bg-brand-100 px-2.5 py-0.5 text-xs font-medium text-brand-700 dark:bg-brand-950/60 dark:text-brand-300">
               <FileCheck2 className="h-3 w-3" /> Both Uploaded
             </span>
           );
@@ -152,12 +152,12 @@ export default function AllDealsPage() {
     {
       key: "createdAt",
       header: "Created Date",
-      render: (d) => <span className="text-xs text-ink-500">{formatDate(d.createdAt)}</span>,
+      render: (d) => <span className="text-xs text-ink-500 dark:text-ink-400">{formatDate(d.createdAt)}</span>,
     },
     {
       key: "updatedAt",
       header: "Last Updated",
-      render: (d) => <span className="text-xs text-ink-500">{formatDate(d.updatedAt)}</span>,
+      render: (d) => <span className="text-xs text-ink-500 dark:text-ink-400">{formatDate(d.updatedAt)}</span>,
     },
     {
       key: "actions",
@@ -170,7 +170,7 @@ export default function AllDealsPage() {
               e.stopPropagation();
               router.push(`/admin/deals/${d.id}`);
             }}
-            className="rounded-md p-1.5 text-ink-400 hover:bg-ink-100 hover:text-brand-600 transition-colors"
+            className="rounded-md p-1.5 text-ink-400 hover:bg-ink-100 hover:text-brand-600 transition-colors dark:text-ink-400 dark:hover:bg-ink-800 dark:hover:text-brand-400"
             title="View Deal Details"
           >
             <Eye className="h-4 w-4" />
@@ -193,7 +193,7 @@ export default function AllDealsPage() {
         actions={
           <button
             onClick={() => push("Deal ledger export initiated.", "info")}
-            className="flex items-center gap-1.5 rounded-lg border border-ink-200 px-3.5 py-2 text-sm font-medium text-ink-700 hover:bg-ink-50 transition-colors"
+            className="flex items-center gap-1.5 rounded-lg border border-ink-200 px-3.5 py-2 text-sm font-medium text-ink-700 hover:bg-ink-50 transition-colors dark:border-ink-700 dark:bg-ink-800 dark:text-ink-200 dark:hover:bg-ink-700"
           >
             <Download className="h-4 w-4" /> Export Ledger
           </button>

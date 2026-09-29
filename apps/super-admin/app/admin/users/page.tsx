@@ -86,22 +86,22 @@ export default function UsersPage() {
       header: "User",
       render: (u) => (
         <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-100 text-xs font-semibold text-brand-700">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-950/60 text-xs font-semibold text-brand-700 dark:text-brand-300">
             {u.name.charAt(0)}
           </div>
           <div className="min-w-0">
-            <p className="truncate text-sm font-medium text-ink-800">{u.name}</p>
-            <p className="truncate text-xs text-ink-500">{u.id}</p>
+            <p className="truncate text-sm font-medium text-ink-800 dark:text-ink-100">{u.name}</p>
+            <p className="truncate text-xs text-ink-500 dark:text-ink-400">{u.id}</p>
           </div>
         </div>
       ),
     },
-    { key: "email", header: "Email", render: (u) => <span className="text-ink-600">{u.email}</span> },
+    { key: "email", header: "Email", render: (u) => <span className="text-ink-600 dark:text-ink-300">{u.email}</span> },
     { key: "phone", header: "Phone" },
     { key: "verification", header: "Verification", render: (u) => <StatusBadge status={u.verification} /> },
-    { key: "subscription", header: "Subscription", render: (u) => <span className="text-ink-600">{u.subscription}</span> },
+    { key: "subscription", header: "Subscription", render: (u) => <span className="text-ink-600 dark:text-ink-300">{u.subscription}</span> },
     { key: "status", header: "Status", render: (u) => <StatusBadge status={u.status} /> },
-    { key: "createdAt", header: "Created", render: (u) => <span className="text-ink-500">{formatDate(u.createdAt)}</span> },
+    { key: "createdAt", header: "Created", render: (u) => <span className="text-ink-500 dark:text-ink-400">{formatDate(u.createdAt)}</span> },
     {
       key: "actions",
       header: "",
@@ -110,7 +110,7 @@ export default function UsersPage() {
         <div className="flex items-center justify-end gap-1.5">
           <button
             onClick={(e) => { e.stopPropagation(); router.push(`/admin/users/${u.id}`); }}
-            className="rounded-md p-1.5 text-ink-400 transition-colors hover:bg-ink-100 hover:text-brand-600"
+            className="rounded-md p-1.5 text-ink-400 transition-colors hover:bg-ink-100 hover:text-brand-600 dark:hover:bg-ink-800 dark:hover:text-brand-400"
             aria-label="View"
           >
             <Eye className="h-4 w-4" />
@@ -118,7 +118,7 @@ export default function UsersPage() {
           {u.status === "blocked" ? (
             <button
               onClick={(e) => { e.stopPropagation(); setConfirmTarget({ user: u, action: "unblock" }); }}
-              className="rounded-md p-1.5 text-ink-400 transition-colors hover:bg-success-100 hover:text-success-600"
+              className="rounded-md p-1.5 text-ink-400 transition-colors hover:bg-success-100 hover:text-success-600 dark:hover:bg-success-950/40 dark:hover:text-success-400"
               aria-label="Unblock"
             >
               <CheckCircle2 className="h-4 w-4" />
@@ -126,7 +126,7 @@ export default function UsersPage() {
           ) : (
             <button
               onClick={(e) => { e.stopPropagation(); setConfirmTarget({ user: u, action: "block" }); }}
-              className="rounded-md p-1.5 text-ink-400 transition-colors hover:bg-warning-100 hover:text-warning-600"
+              className="rounded-md p-1.5 text-ink-400 transition-colors hover:bg-warning-100 hover:text-warning-600 dark:hover:bg-warning-950/40 dark:hover:text-warning-400"
               aria-label="Block"
             >
               <Ban className="h-4 w-4" />
@@ -134,7 +134,7 @@ export default function UsersPage() {
           )}
           <button
             onClick={(e) => { e.stopPropagation(); setConfirmTarget({ user: u, action: "delete" }); }}
-            className="rounded-md p-1.5 text-ink-400 transition-colors hover:bg-danger-100 hover:text-danger-600"
+            className="rounded-md p-1.5 text-ink-400 transition-colors hover:bg-danger-100 hover:text-danger-600 dark:hover:bg-danger-950/40 dark:hover:text-danger-400"
             aria-label="Delete"
           >
             <Trash2 className="h-4 w-4" />

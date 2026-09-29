@@ -1,12 +1,13 @@
 import { AdCampaign, AdRevenueOverview, AdCampaignFilters } from "@/types/adRevenue";
-import { PaginatedResult, PaginationParams } from "@/types/common";
+import { PaginatedResult, PaginationParams, ChartPeriod } from "@/types/common";
 import { MOCK_AD_CAMPAIGNS, MOCK_AD_REVENUE_OVERVIEW } from "./mock/adRevenue.mock";
 import { paginate } from "./mock/paginate";
 
 class AdRevenueService {
   private campaigns: AdCampaign[] = [...MOCK_AD_CAMPAIGNS];
 
-  async getOverview(): Promise<AdRevenueOverview> {
+  // PROVISIONAL: Accepts optional ChartPeriod. The backend does not yet support period filtering.
+  async getOverview(_period?: ChartPeriod): Promise<AdRevenueOverview> {
     return { ...MOCK_AD_REVENUE_OVERVIEW };
   }
 

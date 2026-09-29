@@ -85,12 +85,12 @@ export default function CancellationRevenuePage() {
         <div className="space-y-0.5">
           <Link
             href={`/admin/deals/${r.dealId}`}
-            className="font-mono text-xs font-semibold text-brand-600 hover:underline"
+            className="font-mono text-xs font-semibold text-brand-600 hover:underline dark:text-brand-400"
           >
             {r.dealId}
           </Link>
-          <p className="text-xs text-ink-800 font-medium truncate max-w-[220px]">{r.property}</p>
-          <span className="text-[11px] text-ink-400 font-mono">Ref: {r.id}</span>
+          <p className="text-xs text-ink-800 font-medium truncate max-w-[220px] dark:text-ink-200">{r.property}</p>
+          <span className="text-[11px] text-ink-400 font-mono dark:text-ink-500">Ref: {r.id}</span>
         </div>
       ),
     },
@@ -98,7 +98,7 @@ export default function CancellationRevenuePage() {
       key: "initiator",
       header: "Initiator",
       render: (r) => (
-        <span className="inline-flex items-center rounded-full bg-ink-100 px-2 py-0.5 text-xs font-medium text-ink-700 capitalize">
+        <span className="inline-flex items-center rounded-full bg-ink-100 px-2 py-0.5 text-xs font-medium text-ink-700 capitalize dark:bg-ink-800 dark:text-ink-300">
           {r.initiator}
         </span>
       ),
@@ -108,8 +108,8 @@ export default function CancellationRevenuePage() {
       header: "Deal Value (Reference)",
       render: (r) => (
         <div>
-          <span className="text-xs text-ink-600 font-mono">{formatCurrencyINR(r.dealValue)}</span>
-          <p className="text-[10px] text-ink-400">Gross Consideration</p>
+          <span className="text-xs text-ink-600 font-mono dark:text-ink-300">{formatCurrencyINR(r.dealValue)}</span>
+          <p className="text-[10px] text-ink-400 dark:text-ink-500">Gross Consideration</p>
         </div>
       ),
     },
@@ -117,7 +117,7 @@ export default function CancellationRevenuePage() {
       key: "cancellationFeePercent",
       header: "Fee Rate",
       render: (r) => (
-        <span className="text-xs font-semibold text-ink-700">
+        <span className="text-xs font-semibold text-ink-700 dark:text-ink-300">
           {r.cancellationFeePercent > 0 ? `${r.cancellationFeePercent}%` : "Broker Penalty"}
         </span>
       ),
@@ -127,13 +127,13 @@ export default function CancellationRevenuePage() {
       header: "Platform Fee Collected",
       render: (r) => (
         <div>
-          <span className="text-sm font-bold text-ink-900 font-mono">
+          <span className="text-sm font-bold text-ink-900 font-mono dark:text-white">
             {formatCurrencyINR(r.cancellationFeeAmount + (r.brokerPenaltyAmount ?? 0))}
           </span>
           {r.brokerPenaltyAmount ? (
-            <p className="text-[10px] text-danger-600">Includes ₹{r.brokerPenaltyAmount.toLocaleString("en-IN")} penalty</p>
+            <p className="text-[10px] text-danger-600 dark:text-danger-400">Includes ₹{r.brokerPenaltyAmount.toLocaleString("en-IN")} penalty</p>
           ) : (
-            <p className="text-[10px] text-success-600">Platform retained fee</p>
+            <p className="text-[10px] text-success-600 dark:text-success-400">Platform retained fee</p>
           )}
         </div>
       ),
@@ -142,7 +142,7 @@ export default function CancellationRevenuePage() {
       key: "settlementMode",
       header: "Settlement Mode",
       render: (r) => (
-        <span className="text-xs font-medium text-ink-700 capitalize">
+        <span className="text-xs font-medium text-ink-700 capitalize dark:text-ink-300">
           {r.paymentMode === "platform_collected" ? "Escrow Deduction" : "Direct Invoice"}
         </span>
       ),
@@ -155,7 +155,7 @@ export default function CancellationRevenuePage() {
     {
       key: "date",
       header: "Date",
-      render: (r) => <span className="text-xs text-ink-400">{formatDate(r.date)}</span>,
+      render: (r) => <span className="text-xs text-ink-400 dark:text-ink-500">{formatDate(r.date)}</span>,
     },
   ];
 
@@ -172,11 +172,11 @@ export default function CancellationRevenuePage() {
         actions={
           <Link
             href="/admin/deals/cancellations"
-            className="flex items-center gap-1.5 rounded-lg border border-ink-200 bg-white px-3.5 py-2 text-xs font-medium text-ink-700 hover:bg-ink-50 shadow-sm transition-colors"
+            className="flex items-center gap-1.5 rounded-lg border border-ink-200 bg-white px-3.5 py-2 text-xs font-medium text-ink-700 hover:bg-ink-50 shadow-sm transition-colors dark:border-ink-700 dark:bg-ink-800 dark:text-ink-200 dark:hover:bg-ink-700"
           >
-            <Handshake className="h-3.5 w-3.5 text-brand-600" />
+            <Handshake className="h-3.5 w-3.5 text-brand-600 dark:text-brand-400" />
             <span>Go to Deals → Cancellations (Operations)</span>
-            <ArrowRight className="h-3.5 w-3.5 text-ink-400" />
+            <ArrowRight className="h-3.5 w-3.5 text-ink-400 dark:text-ink-500" />
           </Link>
         }
       />
@@ -210,7 +210,7 @@ export default function CancellationRevenuePage() {
       </div>
 
       {/* Financial Table */}
-      <div className="mt-6 rounded-2xl border border-ink-200 bg-white p-5 shadow-card">
+      <div className="mt-6 rounded-2xl border border-ink-200 bg-white p-5 shadow-card dark:border-ink-800 dark:bg-ink-900">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="w-full sm:max-w-xs">
             <SearchBar

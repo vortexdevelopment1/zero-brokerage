@@ -56,11 +56,11 @@ export default function MonitoringPage() {
       />
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <div className="rounded-2xl border border-ink-200 bg-white shadow-card lg:col-span-2">
-          <div className="border-b border-ink-100 px-5 py-4">
-            <h3 className="text-sm font-semibold text-ink-900">Service Status</h3>
+        <div className="rounded-2xl border border-ink-200 bg-white shadow-card dark:border-ink-800 dark:bg-ink-900 lg:col-span-2">
+          <div className="border-b border-ink-100 px-5 py-4 dark:border-ink-800">
+            <h3 className="text-sm font-semibold text-ink-900 dark:text-white">Service Status</h3>
           </div>
-          <div className="divide-y divide-ink-100">
+          <div className="divide-y divide-ink-100 dark:divide-ink-800">
             {data.services.map((s) => (
               <div key={s.name} className="flex items-center justify-between px-5 py-3.5">
                 <div className="flex items-center gap-3">
@@ -70,9 +70,9 @@ export default function MonitoringPage() {
                       s.health === "operational" ? "bg-success-600" : s.health === "degraded" ? "bg-warning-500" : "bg-danger-600"
                     )}
                   />
-                  <p className="text-sm font-medium text-ink-800">{s.name}</p>
+                  <p className="text-sm font-medium text-ink-800 dark:text-ink-200">{s.name}</p>
                 </div>
-                <div className="flex items-center gap-4 text-xs text-ink-500">
+                <div className="flex items-center gap-4 text-xs text-ink-500 dark:text-ink-400">
                   <span>{s.latencyMs}ms</span>
                   <span>{s.uptimePct}% uptime</span>
                   <StatusBadge status={s.health} />
@@ -83,10 +83,10 @@ export default function MonitoringPage() {
         </div>
 
         <div className="space-y-4">
-          <div className="rounded-2xl border border-ink-200 bg-white p-5 shadow-card">
+          <div className="rounded-2xl border border-ink-200 bg-white p-5 shadow-card dark:border-ink-800 dark:bg-ink-900">
             <div className="flex items-center gap-2">
-              <Database className="h-4 w-4 text-brand-600" />
-              <h3 className="text-sm font-semibold text-ink-900">PostGIS</h3>
+              <Database className="h-4 w-4 text-brand-600 dark:text-brand-400" />
+              <h3 className="text-sm font-semibold text-ink-900 dark:text-white">PostGIS</h3>
               <StatusBadge status={data.postgis.gistIndexHealth} />
             </div>
             <dl className="mt-3 space-y-2 text-sm">
@@ -95,10 +95,10 @@ export default function MonitoringPage() {
             </dl>
           </div>
 
-          <div className="rounded-2xl border border-ink-200 bg-white p-5 shadow-card">
+          <div className="rounded-2xl border border-ink-200 bg-white p-5 shadow-card dark:border-ink-800 dark:bg-ink-900">
             <div className="flex items-center gap-2">
-              <Zap className="h-4 w-4 text-accent-600" />
-              <h3 className="text-sm font-semibold text-ink-900">Redis</h3>
+              <Zap className="h-4 w-4 text-accent-600 dark:text-accent-400" />
+              <h3 className="text-sm font-semibold text-ink-900 dark:text-white">Redis</h3>
             </div>
             <dl className="mt-3 space-y-2 text-sm">
               <RowStat label="Cache hit ratio" value={`${data.redis.cacheHitRatio}%`} />
@@ -107,12 +107,12 @@ export default function MonitoringPage() {
             </dl>
           </div>
 
-          <div className="rounded-2xl border border-ink-200 bg-white p-5 shadow-card">
+          <div className="rounded-2xl border border-ink-200 bg-white p-5 shadow-card dark:border-ink-800 dark:bg-ink-900">
             <div className="flex items-center gap-2">
-              <Server className="h-4 w-4 text-ink-500" />
-              <h3 className="text-sm font-semibold text-ink-900">Fleet</h3>
+              <Server className="h-4 w-4 text-ink-500 dark:text-ink-400" />
+              <h3 className="text-sm font-semibold text-ink-900 dark:text-white">Fleet</h3>
             </div>
-            <p className="mt-2 text-xs text-ink-500">PM2 cluster mode · Node.js + Fastify · memory-limit auto-restart configured on the backend.</p>
+            <p className="mt-2 text-xs text-ink-500 dark:text-ink-400">PM2 cluster mode · Node.js + Fastify · memory-limit auto-restart configured on the backend.</p>
           </div>
         </div>
       </div>
@@ -139,8 +139,8 @@ export default function MonitoringPage() {
 function RowStat({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between">
-      <dt className="text-ink-500">{label}</dt>
-      <dd className="font-medium text-ink-800">{value}</dd>
+      <dt className="text-ink-500 dark:text-ink-400">{label}</dt>
+      <dd className="font-medium text-ink-800 dark:text-ink-200">{value}</dd>
     </div>
   );
 }

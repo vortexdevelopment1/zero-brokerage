@@ -82,49 +82,49 @@ export default function PropertyDetailPage() {
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-4">
-          <div className="flex aspect-video items-center justify-center rounded-2xl border border-dashed border-ink-200 bg-ink-50">
-            <div className="text-center text-ink-400">
+          <div className="flex aspect-video items-center justify-center rounded-2xl border border-dashed border-ink-200 bg-ink-50 dark:border-ink-800 dark:bg-ink-900/50">
+            <div className="text-center text-ink-400 dark:text-ink-500">
               <ImageIcon className="mx-auto h-8 w-8" />
               <p className="mt-2 text-xs">{property.images} media assets on file (gallery connects to media service)</p>
             </div>
           </div>
 
-          <div className="rounded-2xl border border-ink-200 bg-white p-5 shadow-card">
-            <h3 className="text-sm font-semibold text-ink-900">Description</h3>
-            <p className="mt-2 text-sm leading-relaxed text-ink-600">{property.description}</p>
+          <div className="rounded-2xl border border-ink-200 bg-white p-5 shadow-card dark:border-ink-800 dark:bg-ink-900">
+            <h3 className="text-sm font-semibold text-ink-900 dark:text-white">Description</h3>
+            <p className="mt-2 text-sm leading-relaxed text-ink-600 dark:text-ink-300">{property.description}</p>
           </div>
 
-          <div className="rounded-2xl border border-ink-200 bg-white p-5 shadow-card">
-            <h3 className="text-sm font-semibold text-ink-900">Attributes</h3>
+          <div className="rounded-2xl border border-ink-200 bg-white p-5 shadow-card dark:border-ink-800 dark:bg-ink-900">
+            <h3 className="text-sm font-semibold text-ink-900 dark:text-white">Attributes</h3>
             <dl className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
               {Object.entries(property.attributes).map(([k, v]) => (
-                <div key={k} className="rounded-xl bg-ink-50 px-3.5 py-2.5">
-                  <dt className="text-xs text-ink-500">{k}</dt>
-                  <dd className="mt-0.5 text-sm font-medium text-ink-800">{v}</dd>
+                <div key={k} className="rounded-xl bg-ink-50 px-3.5 py-2.5 dark:bg-ink-800/50">
+                  <dt className="text-xs text-ink-500 dark:text-ink-400">{k}</dt>
+                  <dd className="mt-0.5 text-sm font-medium text-ink-800 dark:text-ink-100">{v}</dd>
                 </div>
               ))}
             </dl>
-            <p className="mt-3 text-[11px] text-ink-400">
+            <p className="mt-3 text-[11px] text-ink-400 dark:text-ink-500">
               Stored as flexible PostgreSQL JSONB attributes per category, per SOW §4.1.
             </p>
           </div>
         </div>
 
         <div className="space-y-4">
-          <div className="rounded-2xl border border-ink-200 bg-white p-5 shadow-card">
-            <p className="text-2xl font-semibold text-ink-900">
+          <div className="rounded-2xl border border-ink-200 bg-white p-5 shadow-card dark:border-ink-800 dark:bg-ink-900">
+            <p className="text-2xl font-semibold text-ink-900 dark:text-white">
               {formatCurrencyINR(property.price)}
-              {property.priceUnit === "rent-month" && <span className="text-sm font-normal text-ink-400"> /month</span>}
+              {property.priceUnit === "rent-month" && <span className="text-sm font-normal text-ink-400 dark:text-ink-500"> /month</span>}
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <StatusBadge status={property.status} />
               {property.isLuxury && <StatusBadge status="info" label="Luxury (0% brokerage)" tone="brand" />}
               {property.isPremium && <StatusBadge status="info" label="Premium" tone="info" />}
             </div>
-            <div className="mt-4 flex items-center gap-2 text-sm text-ink-600">
-              <MapPin className="h-4 w-4 text-ink-400" /> {property.locality}, {property.city}
+            <div className="mt-4 flex items-center gap-2 text-sm text-ink-600 dark:text-ink-300">
+              <MapPin className="h-4 w-4 text-ink-400 dark:text-ink-500" /> {property.locality}, {property.city}
             </div>
-            <dl className="mt-4 space-y-2 border-t border-ink-100 pt-4 text-sm">
+            <dl className="mt-4 space-y-2 border-t border-ink-100 pt-4 text-sm dark:border-ink-800">
               <Row label="Category" value={titleCase(property.category)} />
               <Row label="Subtype" value={property.subtype} />
               <Row label="Broker" value={property.broker ?? "—"} />
@@ -152,8 +152,8 @@ export default function PropertyDetailPage() {
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between">
-      <dt className="text-ink-500">{label}</dt>
-      <dd className="font-medium text-ink-800">{value}</dd>
+      <dt className="text-ink-500 dark:text-ink-400">{label}</dt>
+      <dd className="font-medium text-ink-800 dark:text-ink-100">{value}</dd>
     </div>
   );
 }
