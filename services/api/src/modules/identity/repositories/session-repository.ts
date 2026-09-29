@@ -1,8 +1,7 @@
-import type { Pool, PoolClient } from "pg";
-import { executeQuery } from "@zero-brokerage/database";
+import { executeQuery, type QueryExecutor } from "@zero-brokerage/database";
 import type { AuthSession } from "../types.js";
 
-type DBExecutor = Pool | PoolClient;
+type DBExecutor = QueryExecutor;
 
 interface SessionRow {
   id: string;

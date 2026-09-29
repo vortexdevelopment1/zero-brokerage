@@ -3,9 +3,41 @@ export {
   type DatabaseClientOptions,
 } from "./client/index.js";
 
-export { executeQuery } from "./query/index.js";
+export { executeQuery, type QueryExecutor } from "./query/index.js";
 
-export { withTransaction } from "./transaction/index.js";
+export {
+  withTransaction,
+  type TransactionContext,
+  isTransactionContext,
+} from "./transaction/index.js";
+
+export {
+  DatabaseError,
+  type DatabaseErrorDetails,
+  UniqueConstraintViolationError,
+  ForeignKeyViolationError,
+  NotNullConstraintViolationError,
+  CheckConstraintViolationError,
+  SerializationFailureError,
+  DeadlockDetectedError,
+  UnknownDatabaseError,
+  mapDatabaseError,
+} from "./errors/index.js";
+
+export {
+  type OutboxStatus,
+  type OutboxEventRecord,
+  type InsertOutboxEventParams,
+  type ClaimOutboxEventsOptions,
+  type MarkOutboxPublishedOptions,
+  type MarkOutboxFailedOptions,
+  OutboxStateTransitionError,
+  insertOutboxEvent,
+  claimOutboxEvents,
+  markOutboxEventPublished,
+  markOutboxEventFailed,
+  reclaimStaleOutboxLeases,
+} from "./outbox/index.js";
 
 export type {
   Migration,

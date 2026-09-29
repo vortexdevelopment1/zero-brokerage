@@ -1,4 +1,5 @@
 import type { Pool } from "pg";
+import { withTransaction } from "@zero-brokerage/database";
 import {
   InvalidAccountStateError,
   NotFoundError,
@@ -234,100 +235,103 @@ export class AuthService {
       );
     }
 
-    // 4. Atomically consume the challenge (concurrency guard against duplicate submissions)
-    const consumed = await consumeOtpChallenge(this.pool, challenge.id);
-    if (!consumed) {
-      throw new UnauthorizedError(
-        "Verification code was already consumed or is no longer pending.",
+    // Steps 4-8 executed atomically in a single PostgreSQL transaction
+    return await withTransaction(this.pool, async (tx) => {
+      // 4. Atomically consume the challenge (concurrency guard against duplicate submissions)
+      const consumed = await consumeOtpChallenge(tx, challenge.id);
+      if (!consumed) {
+        throw new UnauthorizedError(
+          "Verification code was already consumed or is no longer pending.",
+        );
+      }
+
+      // 5. Lookup or register user
+      let user = await findIdentityByPhone(tx, challenge.phone);
+      let isNewUser = false;
+
+      if (!user) {
+        user = await createIdentity(tx, {
+          phone: challenge.phone,
+          role: "USER",
+        });
+        await createUserProfile(tx, {
+          userId: user.id,
+        });
+        isNewUser = true;
+      }
+
+      // 6. Check user account status
+      if (user.status === "SUSPENDED") {
+        throw new InvalidAccountStateError(
+          "Your account has been suspended. Please contact support.",
+        );
+      }
+
+      if (user.status === "DELETED") {
+        throw new InvalidAccountStateError("This account has been deleted.");
+      }
+
+      // 7. Create authenticated session and token pair
+      const sessionExpiresAt = new Date(
+        Date.now() + env.REFRESH_TOKEN_EXPIRY_DAYS * 24 * 60 * 60 * 1000,
       );
-    }
 
-    // 5. Lookup or register user
-    let user = await findIdentityByPhone(this.pool, challenge.phone);
-    let isNewUser = false;
-
-    if (!user) {
-      user = await createIdentity(this.pool, {
-        phone: challenge.phone,
-        role: "USER",
-      });
-      await createUserProfile(this.pool, {
+      // Initial dummy hash to create session record and obtain session ID
+      const initialSession = await createSession(tx, {
         userId: user.id,
-      });
-      isNewUser = true;
-    }
-
-    // 6. Check user account status
-    if (user.status === "SUSPENDED") {
-      throw new InvalidAccountStateError(
-        "Your account has been suspended. Please contact support.",
-      );
-    }
-
-    if (user.status === "DELETED") {
-      throw new InvalidAccountStateError("This account has been deleted.");
-    }
-
-    // 7. Create authenticated session and token pair
-    const sessionExpiresAt = new Date(
-      Date.now() + env.REFRESH_TOKEN_EXPIRY_DAYS * 24 * 60 * 60 * 1000,
-    );
-
-    // Initial dummy hash to create session record and obtain session ID
-    const initialSession = await createSession(this.pool, {
-      userId: user.id,
-      refreshTokenHash: hashToken(challenge.id + Date.now().toString()),
-      deviceInfo: params.deviceInfo,
-      ipAddress: params.ipAddress,
-      userAgent: params.userAgent,
-      expiresAt: sessionExpiresAt,
-    });
-
-    const { tokens, refreshTokenHash } = createTokenPair(
-      { id: user.id, role: user.role },
-      initialSession.id,
-      env.JWT_SECRET,
-      env.ACCESS_TOKEN_EXPIRY_SECONDS,
-    );
-
-    // Update with real refresh token hash
-    await rotateSessionToken(
-      this.pool,
-      initialSession.id,
-      initialSession.refreshTokenHash,
-      refreshTokenHash,
-      sessionExpiresAt,
-    );
-
-    // 8. Record audit events
-    await recordSecurityEvent(this.pool, {
-      eventType: "OTP_VERIFIED",
-      userId: user.id,
-      ipAddress: params.ipAddress,
-      userAgent: params.userAgent,
-      metadata: {
-        challengeId: challenge.id,
-        phone: maskPhoneNumber(challenge.phone),
-        isNewUser,
-      },
-    });
-
-    await recordSecurityEvent(this.pool, {
-      eventType: "SESSION_CREATED",
-      userId: user.id,
-      ipAddress: params.ipAddress,
-      userAgent: params.userAgent,
-      metadata: {
-        sessionId: initialSession.id,
+        refreshTokenHash: hashToken(challenge.id + Date.now().toString()),
         deviceInfo: params.deviceInfo,
-      },
-    });
+        ipAddress: params.ipAddress,
+        userAgent: params.userAgent,
+        expiresAt: sessionExpiresAt,
+      });
 
-    return {
-      user,
-      tokens,
-      isNewUser,
-    };
+      const { tokens, refreshTokenHash } = createTokenPair(
+        { id: user.id, role: user.role },
+        initialSession.id,
+        env.JWT_SECRET,
+        env.ACCESS_TOKEN_EXPIRY_SECONDS,
+      );
+
+      // Update with real refresh token hash
+      await rotateSessionToken(
+        tx,
+        initialSession.id,
+        initialSession.refreshTokenHash,
+        refreshTokenHash,
+        sessionExpiresAt,
+      );
+
+      // 8. Record audit events
+      await recordSecurityEvent(tx, {
+        eventType: "OTP_VERIFIED",
+        userId: user.id,
+        ipAddress: params.ipAddress,
+        userAgent: params.userAgent,
+        metadata: {
+          challengeId: challenge.id,
+          phone: maskPhoneNumber(challenge.phone),
+          isNewUser,
+        },
+      });
+
+      await recordSecurityEvent(tx, {
+        eventType: "SESSION_CREATED",
+        userId: user.id,
+        ipAddress: params.ipAddress,
+        userAgent: params.userAgent,
+        metadata: {
+          sessionId: initialSession.id,
+          deviceInfo: params.deviceInfo,
+        },
+      });
+
+      return {
+        user,
+        tokens,
+        isNewUser,
+      };
+    });
   }
 
   /**
@@ -415,14 +419,16 @@ export class AuthService {
     ipAddress?: string | null | undefined;
     userAgent?: string | null | undefined;
   }): Promise<void> {
-    await revokeSession(this.pool, params.sessionId, "LOGOUT");
+    await withTransaction(this.pool, async (tx) => {
+      await revokeSession(tx, params.sessionId, "LOGOUT");
 
-    await recordSecurityEvent(this.pool, {
-      eventType: "SESSION_REVOKED",
-      userId: params.userId,
-      ipAddress: params.ipAddress,
-      userAgent: params.userAgent,
-      metadata: { sessionId: params.sessionId, reason: "LOGOUT" },
+      await recordSecurityEvent(tx, {
+        eventType: "SESSION_REVOKED",
+        userId: params.userId,
+        ipAddress: params.ipAddress,
+        userAgent: params.userAgent,
+        metadata: { sessionId: params.sessionId, reason: "LOGOUT" },
+      });
     });
   }
 
@@ -434,13 +440,15 @@ export class AuthService {
     ipAddress?: string | null | undefined;
     userAgent?: string | null | undefined;
   }): Promise<void> {
-    await revokeAllUserSessions(this.pool, params.userId, "LOGOUT_ALL");
+    await withTransaction(this.pool, async (tx) => {
+      await revokeAllUserSessions(tx, params.userId, "LOGOUT_ALL");
 
-    await recordSecurityEvent(this.pool, {
-      eventType: "LOGOUT_ALL",
-      userId: params.userId,
-      ipAddress: params.ipAddress,
-      userAgent: params.userAgent,
+      await recordSecurityEvent(tx, {
+        eventType: "LOGOUT_ALL",
+        userId: params.userId,
+        ipAddress: params.ipAddress,
+        userAgent: params.userAgent,
+      });
     });
   }
 }

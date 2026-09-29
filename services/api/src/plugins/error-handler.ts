@@ -6,7 +6,11 @@ import type {
   FastifyRequest,
 } from "fastify";
 import { ZodError } from "zod";
-import { AppError } from "../common/errors/index.js";
+import { DatabaseError } from "@zero-brokerage/database";
+import {
+  AppError,
+  mapDatabaseErrorToAppError,
+} from "../common/errors/index.js";
 
 async function errorHandlerPlugin(app: FastifyInstance): Promise<void> {
   app.setErrorHandler(
@@ -18,21 +22,27 @@ async function errorHandlerPlugin(app: FastifyInstance): Promise<void> {
       const timestamp = new Date().toISOString();
       const requestId = request.id;
 
-      // 1. Known AppError instances
-      if (error instanceof AppError) {
-        return reply.status(error.statusCode).send({
+      // 1. Mapped database errors -> convert to AppError
+      let resolvedError = error;
+      if (error instanceof DatabaseError) {
+        resolvedError = mapDatabaseErrorToAppError(error);
+      }
+
+      // 2. Known AppError instances
+      if (resolvedError instanceof AppError) {
+        return reply.status(resolvedError.statusCode).send({
           success: false,
           error: {
-            code: error.code,
-            message: error.message,
-            ...(error.details ? { details: error.details } : {}),
+            code: resolvedError.code,
+            message: resolvedError.message,
+            ...(resolvedError.details ? { details: resolvedError.details } : {}),
             timestamp,
             requestId,
           },
         });
       }
 
-      // 2. Zod validation errors
+      // 3. Zod validation errors
       if (error instanceof ZodError) {
         const details = error.issues.map((issue) => ({
           field: issue.path.join("."),
@@ -52,7 +62,7 @@ async function errorHandlerPlugin(app: FastifyInstance): Promise<void> {
         });
       }
 
-      // 3. Fastify built-in validation / syntax errors
+      // 4. Fastify built-in validation / syntax errors
       const fastifyError = error as FastifyError;
       if (
         fastifyError.statusCode &&
@@ -70,7 +80,7 @@ async function errorHandlerPlugin(app: FastifyInstance): Promise<void> {
         });
       }
 
-      // 4. Uncaught server errors (never leak stack or internal details)
+      // 5. Uncaught server errors (never leak stack or internal details)
       request.log.error(
         { err: error, requestId },
         "Unhandled internal server error occurred",

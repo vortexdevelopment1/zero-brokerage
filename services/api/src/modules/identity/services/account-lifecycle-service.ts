@@ -1,4 +1,5 @@
 import type { Pool } from "pg";
+import { withTransaction } from "@zero-brokerage/database";
 import {
   ConflictError,
   NotFoundError,
@@ -184,25 +185,27 @@ export class AccountLifecycleService {
       throw new UnauthorizedError("Invalid verification code.");
     }
 
-    const consumed = await consumeOtpChallenge(this.pool, challenge.id);
-    if (!consumed) {
-      throw new UnauthorizedError("Challenge has already been consumed.");
-    }
+    await withTransaction(this.pool, async (tx) => {
+      const consumed = await consumeOtpChallenge(tx, challenge.id);
+      if (!consumed) {
+        throw new UnauthorizedError("Challenge has already been consumed.");
+      }
 
-    // Update phone on auth identity
-    await updateIdentityPhone(this.pool, params.userId, challenge.phone);
+      // Update phone on auth identity
+      await updateIdentityPhone(tx, params.userId, challenge.phone);
 
-    // Security best practice: Revoke other sessions on sensitive phone number change
-    await revokeAllUserSessions(this.pool, params.userId, "PHONE_CHANGED");
+      // Security best practice: Revoke other sessions on sensitive phone number change
+      await revokeAllUserSessions(tx, params.userId, "PHONE_CHANGED");
 
-    await recordSecurityEvent(this.pool, {
-      eventType: "PHONE_CHANGED",
-      userId: params.userId,
-      ipAddress: params.ipAddress,
-      userAgent: params.userAgent,
-      metadata: {
-        newPhone: maskPhoneNumber(challenge.phone),
-      },
+      await recordSecurityEvent(tx, {
+        eventType: "PHONE_CHANGED",
+        userId: params.userId,
+        ipAddress: params.ipAddress,
+        userAgent: params.userAgent,
+        metadata: {
+          newPhone: maskPhoneNumber(challenge.phone),
+        },
+      });
     });
   }
 
@@ -240,32 +243,34 @@ export class AccountLifecycleService {
     // 30 days retention window before permanent purge of non-financial data
     const scheduledAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
-    await updateIdentityStatus(
-      this.pool,
-      params.userId,
-      "DELETION_PENDING",
-      scheduledAt,
-    );
+    await withTransaction(this.pool, async (tx) => {
+      await updateIdentityStatus(
+        tx,
+        params.userId,
+        "DELETION_PENDING",
+        scheduledAt,
+      );
 
-    // Anonymize PII from user profile immediately
-    await anonymizeUserProfile(this.pool, params.userId);
+      // Anonymize PII from user profile immediately
+      await anonymizeUserProfile(tx, params.userId);
 
-    // Invalidate all active sessions with precise reason
-    await revokeAllUserSessions(
-      this.pool,
-      params.userId,
-      "ACCOUNT_DELETION_PENDING",
-    );
+      // Invalidate all active sessions with precise reason
+      await revokeAllUserSessions(
+        tx,
+        params.userId,
+        "ACCOUNT_DELETION_PENDING",
+      );
 
-    await recordSecurityEvent(this.pool, {
-      eventType: "ACCOUNT_DELETION_REQUESTED",
-      userId: params.userId,
-      ipAddress: params.ipAddress,
-      userAgent: params.userAgent,
-      metadata: {
-        reason: params.reason ?? "User initiated account deletion",
-        retentionExpiry: scheduledAt.toISOString(),
-      },
+      await recordSecurityEvent(tx, {
+        eventType: "ACCOUNT_DELETION_REQUESTED",
+        userId: params.userId,
+        ipAddress: params.ipAddress,
+        userAgent: params.userAgent,
+        metadata: {
+          reason: params.reason ?? "User initiated account deletion",
+          retentionExpiry: scheduledAt.toISOString(),
+        },
+      });
     });
 
     return {
@@ -311,16 +316,18 @@ export class AccountLifecycleService {
     }
 
     // Restore account status to ACTIVE and clear scheduled deletion timestamp
-    await updateIdentityStatus(this.pool, params.userId, "ACTIVE", null);
+    await withTransaction(this.pool, async (tx) => {
+      await updateIdentityStatus(tx, params.userId, "ACTIVE", null);
 
-    await recordSecurityEvent(this.pool, {
-      eventType: "ACCOUNT_DELETION_CANCELLED",
-      userId: params.userId,
-      ipAddress: params.ipAddress,
-      userAgent: params.userAgent,
-      metadata: {
-        cancelledAt: new Date().toISOString(),
-      },
+      await recordSecurityEvent(tx, {
+        eventType: "ACCOUNT_DELETION_CANCELLED",
+        userId: params.userId,
+        ipAddress: params.ipAddress,
+        userAgent: params.userAgent,
+        metadata: {
+          cancelledAt: new Date().toISOString(),
+        },
+      });
     });
 
     return {
@@ -368,20 +375,22 @@ export class AccountLifecycleService {
       );
     }
 
-    // Permanently mark identity as DELETED
-    await updateIdentityStatus(this.pool, params.userId, "DELETED", null);
+    // Permanently mark identity as DELETED and revoke sessions
+    await withTransaction(this.pool, async (tx) => {
+      await updateIdentityStatus(tx, params.userId, "DELETED", null);
 
-    // Invalidate any remaining sessions with exact DELETED reason
-    await revokeAllUserSessions(this.pool, params.userId, "ACCOUNT_DELETED");
+      // Invalidate any remaining sessions with exact DELETED reason
+      await revokeAllUserSessions(tx, params.userId, "ACCOUNT_DELETED");
 
-    await recordSecurityEvent(this.pool, {
-      eventType: "ACCOUNT_DELETED",
-      userId: params.userId,
-      ipAddress: params.ipAddress,
-      userAgent: params.userAgent,
-      metadata: {
-        finalizedAt: new Date().toISOString(),
-      },
+      await recordSecurityEvent(tx, {
+        eventType: "ACCOUNT_DELETED",
+        userId: params.userId,
+        ipAddress: params.ipAddress,
+        userAgent: params.userAgent,
+        metadata: {
+          finalizedAt: new Date().toISOString(),
+        },
+      });
     });
 
     return {

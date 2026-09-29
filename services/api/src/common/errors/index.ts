@@ -1,3 +1,13 @@
+import {
+  DatabaseError,
+  UniqueConstraintViolationError,
+  ForeignKeyViolationError,
+  NotNullConstraintViolationError,
+  CheckConstraintViolationError,
+  SerializationFailureError,
+  DeadlockDetectedError,
+} from "@zero-brokerage/database";
+
 export interface ErrorDetail {
   field?: string;
   message: string;
@@ -112,4 +122,83 @@ export class InternalServerError extends AppError {
   ) {
     super(500, "INTERNAL_SERVER_ERROR", message, details);
   }
+}
+
+/**
+ * Maps a low-level DatabaseError into an appropriate application AppError,
+ * preserving safe metadata and preventing exposure of internal database errors.
+ */
+export function mapDatabaseErrorToAppError(error: DatabaseError): AppError {
+  if (error instanceof UniqueConstraintViolationError) {
+    return new ConflictError(
+      "A record with this identifier or unique value already exists.",
+      error.constraint
+        ? [
+            {
+              field: error.constraint,
+              message: "Unique constraint violated",
+              code: "UNIQUE_VIOLATION",
+            },
+          ]
+        : undefined,
+    );
+  }
+
+  if (error instanceof ForeignKeyViolationError) {
+    return new BadRequestError(
+      "Referenced related record does not exist or cannot be modified.",
+      error.constraint
+        ? [
+            {
+              field: error.constraint,
+              message: "Foreign key constraint violated",
+              code: "FOREIGN_KEY_VIOLATION",
+            },
+          ]
+        : undefined,
+    );
+  }
+
+  if (error instanceof NotNullConstraintViolationError) {
+    return new ValidationError(
+      "A required field was missing or null.",
+      error.column
+        ? [
+            {
+              field: error.column,
+              message: "Field cannot be null",
+              code: "NOT_NULL_VIOLATION",
+            },
+          ]
+        : undefined,
+    );
+  }
+
+  if (error instanceof CheckConstraintViolationError) {
+    return new ValidationError(
+      "Provided value violated a data check constraint.",
+      error.constraint
+        ? [
+            {
+              field: error.constraint,
+              message: "Check constraint violated",
+              code: "CHECK_VIOLATION",
+            },
+          ]
+        : undefined,
+    );
+  }
+
+  if (
+    error instanceof SerializationFailureError ||
+    error instanceof DeadlockDetectedError
+  ) {
+    return new AppError(
+      503,
+      "CONCURRENCY_CONFLICT",
+      "A database concurrency conflict occurred. Please retry your request.",
+    );
+  }
+
+  return new InternalServerError("An unexpected database error occurred.");
 }

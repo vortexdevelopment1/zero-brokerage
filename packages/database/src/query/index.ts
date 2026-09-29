@@ -5,21 +5,34 @@ import type {
   QueryResult,
   QueryResultRow,
 } from "pg";
+import { mapDatabaseError } from "../errors/index.js";
+import {
+  type TransactionContext,
+  isTransactionContext,
+} from "../transaction/index.js";
 
-type QueryExecutor = Pool | PoolClient;
+export type QueryExecutor = Pool | PoolClient | TransactionContext;
 
 export async function executeQuery<Row extends QueryResultRow = QueryResultRow>(
   executor: QueryExecutor,
   query: string | QueryConfig,
   values?: unknown[],
 ): Promise<QueryResult<Row>> {
-  if (typeof query === "string") {
-    if (values === undefined) {
-      return executor.query<Row>(query);
+  try {
+    if (isTransactionContext(executor)) {
+      return await executor.query<Row>(query, values as unknown[]);
     }
 
-    return executor.query<Row>(query, values);
-  }
+    if (typeof query === "string") {
+      if (values === undefined) {
+        return await executor.query<Row>(query);
+      }
 
-  return executor.query<Row>(query);
+      return await executor.query<Row>(query, values);
+    }
+
+    return await executor.query<Row>(query);
+  } catch (error) {
+    throw mapDatabaseError(error);
+  }
 }

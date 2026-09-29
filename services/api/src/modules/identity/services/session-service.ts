@@ -1,4 +1,5 @@
 import type { Pool } from "pg";
+import { withTransaction } from "@zero-brokerage/database";
 import { ForbiddenError, NotFoundError } from "../../../common/errors/index.js";
 import { recordSecurityEvent } from "../repositories/security-event-repository.js";
 import {
@@ -51,17 +52,19 @@ export class SessionService {
       );
     }
 
-    await revokeSession(this.pool, params.sessionIdToRevoke, "USER_REVOKED");
+    await withTransaction(this.pool, async (tx) => {
+      await revokeSession(tx, params.sessionIdToRevoke, "USER_REVOKED");
 
-    await recordSecurityEvent(this.pool, {
-      eventType: "SESSION_REVOKED",
-      userId: params.userId,
-      ipAddress: params.ipAddress,
-      userAgent: params.userAgent,
-      metadata: {
-        sessionId: params.sessionIdToRevoke,
-        reason: "USER_REVOKED",
-      },
+      await recordSecurityEvent(tx, {
+        eventType: "SESSION_REVOKED",
+        userId: params.userId,
+        ipAddress: params.ipAddress,
+        userAgent: params.userAgent,
+        metadata: {
+          sessionId: params.sessionIdToRevoke,
+          reason: "USER_REVOKED",
+        },
+      });
     });
   }
 }
