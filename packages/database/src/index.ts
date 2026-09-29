@@ -7,9 +7,23 @@ export { executeQuery } from "./query/index.js";
 
 export { withTransaction } from "./transaction/index.js";
 
-export type { Migration } from "./migrations/index.js";
+export type {
+  Migration,
+  SchemaMigrationRecord,
+  RunMigrationsOptions,
+} from "./migrations/index.js";
 
-export { runMigrations } from "./migrations/index.js";
+export {
+  runMigrations,
+  computeMigrationChecksum,
+  normalizeContentForChecksum,
+  validateMigrationRegistry,
+  ensureMigrationTable,
+  getAppliedMigrationRecords,
+  reconcileAppliedChecksums,
+  MigrationChecksumMismatchError,
+  MIGRATION_ADVISORY_LOCK_ID,
+} from "./migrations/index.js";
 
 export { allMigrations } from "./migrations/registry.js";
 
