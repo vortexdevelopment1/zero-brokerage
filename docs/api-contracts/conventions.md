@@ -1,20 +1,100 @@
-# API Conventions
+# HTTP API Conventions
 
-## Purpose
-Establishes standardized conventions for HTTP REST and RPC APIs across the platform.
+## Versioning and compatibility
 
-## URL Structure & Naming
-* Resource-oriented URLs using plural nouns: `/api/v1/properties`, `/api/v1/brokers`.
-* Hierarchical relations: `/api/v1/agencies/:agencyId/brokers`.
-* Lowercase kebab-case for endpoint paths.
-* Query parameter naming: camelCase (e.g., `?pageSize=20&sortBy=createdAt`).
+All externally consumed business APIs use the major-version path prefix
+`/api/v1/...`. A breaking change requires a new major version or an approved,
+documented migration strategy. Additive backward-compatible changes remain in
+the current version. A deprecated endpoint must document its replacement and
+removal timeline. Internal module interfaces are not HTTP API versions.
 
-## Request / Response Standards
-* Standard request and response payloads must be JSON.
-* Consistent payload wrapping:
-  - Success: `{ "success": true, "data": { ... } }`
-  - Paginated responses: `{ "success": true, "data": [...], "pagination": { "page": 1, "limit": 20, "total": 100 } }`
-  - Error responses: See `error-format.md`.
+## Resource paths and methods
 
-## Versioning
-* Major versioning prefix in the path: `/api/v1/`.
+Use plural, noun-based collection paths and lowercase kebab-case multi-word
+segments. Resource identifiers are path parameters; filtering, sorting, and
+pagination are query parameters.
+
+```text
+GET    /api/v1/listings
+GET    /api/v1/listings/:listingId
+POST   /api/v1/listings
+PATCH  /api/v1/listings/:listingId
+```
+
+`GET` is safe retrieval and must not mutate state. `POST` creates a resource or
+performs a documented explicit command; it is not a generic substitute for
+other methods. `PUT` is complete replacement where required, `PATCH` is a
+partial update, and `DELETE` deletes or deactivates according to the resource
+contract.
+
+Command endpoints are permitted only where resource semantics are insufficient.
+Each command must have its own authorization, validation, state-transition, and
+idempotency contracts. This batch adds no command endpoints or domain routes.
+
+## Status codes
+
+Use `200` for successful retrieval/update, `201` for creation, `202` for
+accepted asynchronous work, and `204` for a successful response without a
+body. Use `400`, `401`, `403`, `404`, `409`, `422` (where adopted), `429`, and
+`500` according to their standard meanings. Use `502`, `503`, or `504` for
+appropriate upstream or availability failures. A failed business operation must
+not be represented as `200` merely for client convenience.
+
+## Request correlation
+
+`X-Request-Id` is the canonical HTTP header; JSON contracts use `requestId`.
+The API accepts a valid UUID supplied in `X-Request-Id` and otherwise generates
+a UUID. It returns the effective value in the `X-Request-Id` response header
+and in every standard response envelope. Structured request logs use Fastify's
+request identifier and must not include sensitive values. Future async work
+that is correlated to a request should carry this identifier as correlation
+metadata, not as business data.
+
+## Canonical adoption boundary
+
+The shared canonical constructors and request-context plugin implement the Step
+05 foundation. All **new externally consumed API endpoints** must use the
+canonical success and error envelopes in [error-format.md](error-format.md).
+New routes must not introduce an additional response or error envelope, and the
+legacy Step 04 format is not an alternative for new routes.
+
+Existing Step 04 authentication responses and its error handler are the **Legacy
+Step 04 Compatibility Surface**. They are intentionally unchanged in Batch 01,
+because migration would alter a separately verified API surface and begin later
+error-engine work. Their migration is a future explicit task and must not be
+silently mixed into an unrelated batch.
+
+## Pagination boundary
+
+Step 03 pagination types are internal application/persistence results. Public
+HTTP routes must not return those types directly. A route that exposes a
+collection adapts its internal result to the canonical HTTP representation:
+
+```text
+Step 03 internal pagination
+  -> HTTP response adapter
+  -> Step 05 meta.pagination { nextCursor, hasMore }
+```
+
+Clients only see `meta.pagination.nextCursor` and `meta.pagination.hasMore`.
+The existing Step 03 field names and implementation remain internal and are not
+renamed or duplicated by this contract.
+
+## Operational health endpoint
+
+`GET /health` is an operational health endpoint, not an externally consumed
+business or resource API. It intentionally returns its existing health-specific
+shape:
+
+```json
+{
+  "status": "ok",
+  "service": "zero-brokerage-api",
+  "timestamp": "..."
+}
+```
+
+It is intentionally outside the Canonical Step 05 business-response envelope
+and must not be wrapped in `{ "data": ..., "meta": ... }`. Its shape is not a
+general API response convention and must not be copied by business/resource
+endpoints.
