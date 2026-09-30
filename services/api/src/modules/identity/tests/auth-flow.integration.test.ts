@@ -183,6 +183,26 @@ describe("Identity and Authentication E2E Integration Flow", () => {
     assert.equal(afterLogoutRes.statusCode, 401);
   });
 
+  it("preserves the legacy Step 04 validation error envelope", async () => {
+    const response = await app.inject({
+      method: "POST",
+      url: "/api/v1/auth/request-otp",
+      payload: {},
+    });
+
+    assert.equal(response.statusCode, 422);
+    const body = JSON.parse(response.payload);
+    assert.equal(body.success, false);
+    assert.equal(body.error.code, "VALIDATION_FAILED");
+    assert.equal(
+      body.error.message,
+      "The request payload contains invalid values.",
+    );
+    assert.ok(Array.isArray(body.error.details));
+    assert.equal(typeof body.error.timestamp, "string");
+    assert.equal(typeof body.error.requestId, "string");
+  });
+
   it("handles account deletion lifecycle with 30-day retention and session revocation", async () => {
     const testPhone = "+919123456780";
 

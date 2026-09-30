@@ -59,10 +59,14 @@ New routes must not introduce an additional response or error envelope, and the
 legacy Step 04 format is not an alternative for new routes.
 
 Existing Step 04 authentication responses and its error handler are the **Legacy
-Step 04 Compatibility Surface**. They are intentionally unchanged in Batch 01,
-because migration would alter a separately verified API surface and begin later
-error-engine work. Their migration is a future explicit task and must not be
-silently mixed into an unrelated batch.
+Step 04 Compatibility Surface**. In Batch 02A, legacy compatibility is explicitly
+declared at route/module registration time via route configuration metadata
+(`compatibilitySurface: "step04-legacy"`), eliminating any path-based or
+prefix-based matching. The global error handler inspects this route metadata rather
+than maintaining a central route-path registry. Future endpoints under `/api/v1/auth/*`
+that are not part of Step 04 automatically receive canonical Step 05 formatting.
+Migration of legacy routes to canonical format is a future explicit task and must
+not be silently mixed into an unrelated batch.
 
 ## Pagination boundary
 

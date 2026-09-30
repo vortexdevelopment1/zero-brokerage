@@ -30,7 +30,7 @@ Raw error
 - New Step 05 routes must use the canonical error contract.
 - The legacy format is not an accepted pattern for new routes.
 - The implementation must not maintain independent legacy and canonical error classification systems.
-- Batch 02A will choose and implement the runtime dispatch mechanism. This ADR does not introduce route-specific API versioning or claim that dispatch exists today.
+- Batch 02A implements runtime dispatch via explicit route configuration metadata (`compatibilitySurface: "step04-legacy"` attached at Step 04 route/module registration), avoiding path-prefix matching or centralized path registries.
 
 ## Decision 2: Unknown Request Properties
 
