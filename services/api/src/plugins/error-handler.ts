@@ -6,6 +6,7 @@ import type {
   FastifyRequest,
 } from "fastify";
 import {
+  ClassifiedHttpError,
   classifyHttpError,
   formatCanonicalHttpError,
   formatLegacyStep04Error,
@@ -36,6 +37,26 @@ async function errorHandlerPlugin(app: FastifyInstance): Promise<void> {
       return reply.status(classifiedError.statusCode).send(body);
     },
   );
+
+  app.setNotFoundHandler((request: FastifyRequest, reply: FastifyReply) => {
+    const requestId = request.id;
+    const notFoundError = new ClassifiedHttpError({
+      statusCode: 404,
+      code: "NOT_FOUND",
+      publicMessage: "The requested resource was not found.",
+      retryable: false,
+      category: "framework",
+      causeError: new Error(`Route ${request.method}:${request.url} not found`),
+      legacyCode: "NOT_FOUND",
+      legacyMessage: "Resource not found",
+    });
+
+    const body = isLegacyStep04Route(request)
+      ? formatLegacyStep04Error(notFoundError, requestId)
+      : formatCanonicalHttpError(notFoundError, requestId);
+
+    return reply.status(404).send(body);
+  });
 }
 
 export default fp(errorHandlerPlugin, {

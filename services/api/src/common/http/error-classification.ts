@@ -66,12 +66,32 @@ function classifyAppError(
   error: AppError,
   category: ErrorCategory,
 ): ClassifiedHttpError {
+  let publicDetails: ErrorDetails | undefined = undefined;
+  if (category === "application" && error.details && error.details.length > 0) {
+    publicDetails = {
+      fields: error.details.map((d) => ({
+        field: d.field || "request",
+        code:
+          d.code && isStableErrorCode(d.code)
+            ? d.code
+            : d.code
+              ? d.code.toUpperCase()
+              : "INVALID_INPUT",
+        message: d.message,
+      })),
+    };
+  }
+
+  const retryable = error.code === "CONCURRENCY_CONFLICT" ? true : undefined;
+
   return new ClassifiedHttpError({
     statusCode: error.statusCode,
     code: stableCodeOrInternal(error.code),
     publicMessage: error.message,
     category,
     causeError: error,
+    ...(publicDetails ? { publicDetails } : {}),
+    ...(retryable !== undefined ? { retryable } : {}),
     legacyCode: error.code,
     legacyMessage: error.message,
     ...(error.details ? { legacyDetails: error.details } : {}),
@@ -152,20 +172,37 @@ export function classifyHttpError(
     });
   }
 
-  // Transport and framework errors (malformed JSON, 400 bad request, 415 unsupported media)
+  // Transport and framework errors (malformed JSON, 400 bad request, 404 not found, 415 unsupported media, etc.)
   if (
     fastifyError.statusCode &&
     fastifyError.statusCode >= 400 &&
     fastifyError.statusCode < 500
   ) {
+    let code: ApiErrorCode = "BAD_REQUEST";
+    let message = "The request could not be processed.";
+
+    if (fastifyError.statusCode === 404) {
+      code = "NOT_FOUND";
+      message = "The requested resource was not found.";
+    } else if (fastifyError.statusCode === 405) {
+      code = "METHOD_NOT_ALLOWED";
+      message = "The requested HTTP method is not allowed for this route.";
+    } else if (fastifyError.statusCode === 415) {
+      code = "UNSUPPORTED_MEDIA_TYPE";
+      message = "The request payload media type is not supported.";
+    } else if (fastifyError.statusCode === 413) {
+      code = "PAYLOAD_TOO_LARGE";
+      message = "The request payload is too large.";
+    }
+
     return new ClassifiedHttpError({
       statusCode: fastifyError.statusCode,
-      code: "BAD_REQUEST",
-      publicMessage: "The request could not be processed.",
+      code,
+      publicMessage: message,
       retryable: false,
       category: "framework",
       causeError: error,
-      legacyCode: fastifyError.code ?? "BAD_REQUEST",
+      legacyCode: fastifyError.code ?? code,
       legacyMessage: fastifyError.message,
     });
   }
