@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Users, UserCheck, Building2, Home, Briefcase, Trees, Sofa,
   CalendarCheck, Handshake, Wallet, ShieldAlert, BarChart3, Activity, Settings, ChevronLeft,
-  ChevronDown, Boxes, X, Megaphone,
+  ChevronDown, Boxes, X, Megaphone, Bell,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils/cn";
@@ -65,6 +65,7 @@ const NAV: NavGroup[] = [
   { label: "Urgent Requirements", icon: ShieldAlert, href: "/admin/urgent-requirements" },
   { label: "Reports & Analytics", icon: BarChart3, href: "/admin/reports" },
   { label: "System Monitoring", icon: Activity, href: "/admin/monitoring" },
+  { label: "Notifications", icon: Bell, href: "/admin/notifications" },
   {
     label: "Settings",
     icon: Settings,
