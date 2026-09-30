@@ -98,8 +98,12 @@ existing Step 04 Zod validation.
 - Existing Step 04 authentication routes remain on Zod and continue returning the Legacy Step 04 error envelope during the compatibility window.
 
 11. **Schema Compilation Failures**:
-
-- Malformed schemas, unsupported formats, or unresolved `$ref` references fail fast at application startup / route registration time (`app.ready()`), halting server boot to prevent deploying broken endpoints.
+    - Malformed schemas, unsupported formats, or unresolved `$ref` references fail fast at application startup / route registration time (`app.ready()`), halting server boot to prevent deploying broken endpoints.
+12. **Unified Error Pipeline Integration (Batch 02C)**:
+    - All error sources—Fastify schema validation, transport parsing failures, application domain errors, database errors, and unmatched routes (404 via `setNotFoundHandler`)—flow through the single `classifyHttpError` classifier and format via `formatCanonicalHttpError` (or `formatLegacyStep04Error` for legacy-marked routes).
+    - Concurrency conflicts (`CONCURRENCY_CONFLICT`, HTTP 503) explicitly set `retryable: true`.
+    - Application-level `ValidationError` field details are structured into canonical `details.fields`.
+    - Database error mapping shields all SQL statements, table names, constraint names, and column identifiers from public error responses.
 
 ## Compatibility boundary and legacy dispatch
 
