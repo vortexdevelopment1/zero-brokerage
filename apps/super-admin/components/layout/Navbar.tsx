@@ -1,17 +1,45 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Bell, Menu, Search, LogOut, User, ChevronDown } from "lucide-react";
 import { useUiStore } from "@/store/uiStore";
 import { useAuthStore } from "@/store/authStore";
 import { ThemeToggle } from "./ThemeToggle";
+import { NotificationDropdown } from "./NotificationDropdown";
 
 export function Navbar() {
   const { setMobileSidebarOpen } = useUiStore();
   const { session, logout } = useAuthStore();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const notificationsRef = useRef<HTMLDivElement>(null);
+  const notificationTriggerRef = useRef<HTMLButtonElement>(null);
   const router = useRouter();
+
+  // Close notifications on outside click or Escape key
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
+        setNotificationsOpen(false);
+      }
+    }
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape" && notificationsOpen) {
+        setNotificationsOpen(false);
+        notificationTriggerRef.current?.focus();
+      }
+    }
+
+    if (notificationsOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("keydown", handleKeyDown);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [notificationsOpen]);
 
   function handleLogout() {
     logout();
@@ -39,13 +67,27 @@ export function Navbar() {
       <div className="ml-auto flex items-center gap-2">
         <ThemeToggle />
 
-        <button
-          className="relative rounded-lg p-2 text-ink-500 transition-colors hover:bg-ink-100 dark:text-ink-400 dark:hover:bg-ink-800 dark:hover:text-ink-200"
-          aria-label="Notifications"
-        >
-          <Bell className="h-[18px] w-[18px]" />
-          <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-accent-500 ring-2 ring-white dark:ring-ink-950" />
-        </button>
+        <div className="relative" ref={notificationsRef}>
+          <button
+            ref={notificationTriggerRef}
+            onClick={() => setNotificationsOpen((prev) => !prev)}
+            className="relative rounded-lg p-2 text-ink-500 transition-colors hover:bg-ink-100 dark:text-ink-400 dark:hover:bg-ink-800 dark:hover:text-ink-200"
+            aria-label="Notifications"
+            aria-expanded={notificationsOpen}
+            aria-haspopup="true"
+          >
+            <Bell className="h-[18px] w-[18px]" />
+          </button>
+
+          {notificationsOpen && (
+            <NotificationDropdown
+              onClose={() => {
+                setNotificationsOpen(false);
+                notificationTriggerRef.current?.focus();
+              }}
+            />
+          )}
+        </div>
 
         <div className="relative">
           <button
