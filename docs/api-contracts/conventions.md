@@ -102,3 +102,14 @@ It is intentionally outside the Canonical Step 05 business-response envelope
 and must not be wrapped in `{ "data": ..., "meta": ... }`. Its shape is not a
 general API response convention and must not be copied by business/resource
 endpoints.
+
+## Request validation foundation (Batch 02B)
+
+All new Step 05 routes use Fastify JSON Schema with the shared Ajv compiler:
+
+- **Body validation**: Strict types without implicit coercion (`coerceTypes: false`). Strict schemas reject unexpected fields (`additionalProperties: false`, `removeAdditional: false`).
+- **Query and Path**: Controlled string-to-primitive coercion (`coerceTypes: true`).
+- **Headers**: Controlled string coercion (`coerceTypes: true`). Normalized to lower case during compilation for case-insensitive RFC matching. Root header schemas permit undeclared HTTP transport headers without rejecting requests, while strictly enforcing declared header rules.
+- **Shared Schemas**: Cross-route schema reuse via TypeScript schema imports, local `$defs`, and Fastify's native `app.addSchema()` registry via `schemaController.compilersFactory.buildValidator`.
+- **HTTP Status Codes**: `400 Bad Request` for malformed transport input (e.g., malformed JSON syntax); `422 Unprocessable Content` for schema validation failures.
+- **Step 04 Coexistence**: Step 04 identity routes remain on Zod and continue to pass through the legacy compatibility boundary.

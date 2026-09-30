@@ -47,7 +47,7 @@ Validation distinguishes HTTP transport representation from application values:
 - Headers require explicit validation.
 - Identifiers and dates require explicit format validation.
 
-Batch 02B will establish actual Ajv configuration and schema behavior. This is a policy decision, not a claim about current configuration.
+Batch 02B implements this via dedicated Ajv compilers: `coerceTypes: false` for body, and `coerceTypes: true` for querystring, params, and headers. Header normalization lowercases keys and ensures undeclared HTTP transport headers are permitted while declared header constraints remain strictly enforced. External `$ref` schemas resolve across routes via Fastify's native `schemaController.compilersFactory.buildValidator`.
 
 ## Decision 4: HTTP 400 and 422
 

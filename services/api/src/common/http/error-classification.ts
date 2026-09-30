@@ -82,6 +82,8 @@ function classifyAppError(
  * Converts raw errors into one reusable internal representation. Formatters
  * intentionally decide which, if any, classified information becomes public.
  */
+import { normalizeFastifyValidationErrors } from "./validation.js";
+
 export function classifyHttpError(
   error: FastifyError | Error,
 ): ClassifiedHttpError {
@@ -104,10 +106,17 @@ export function classifyHttpError(
       code: issue.code,
     }));
 
+    const publicFields = error.issues.map((issue) => ({
+      field: issue.path.join("."),
+      code: issue.code.toUpperCase(),
+      message: issue.message,
+    }));
+
     return new ClassifiedHttpError({
       statusCode: 422,
       code: "VALIDATION_FAILED",
       publicMessage: "The request contains invalid values.",
+      publicDetails: { fields: publicFields },
       retryable: false,
       category: "validation",
       causeError: error,
@@ -118,6 +127,32 @@ export function classifyHttpError(
   }
 
   const fastifyError = error as FastifyError;
+
+  // Fastify / Ajv schema validation failures receive 422 Unprocessable Content
+  if (
+    fastifyError.code === "FST_ERR_VALIDATION" ||
+    Array.isArray(fastifyError.validation)
+  ) {
+    const normalized = normalizeFastifyValidationErrors(
+      fastifyError.validation,
+      fastifyError.validationContext,
+    );
+
+    return new ClassifiedHttpError({
+      statusCode: 422,
+      code: "VALIDATION_FAILED",
+      publicMessage: "The request contains invalid values.",
+      publicDetails: { fields: normalized.fields },
+      retryable: false,
+      category: "validation",
+      causeError: error,
+      legacyCode: "VALIDATION_FAILED",
+      legacyMessage: "The request payload contains invalid values.",
+      legacyDetails: normalized.legacyDetails,
+    });
+  }
+
+  // Transport and framework errors (malformed JSON, 400 bad request, 415 unsupported media)
   if (
     fastifyError.statusCode &&
     fastifyError.statusCode >= 400 &&

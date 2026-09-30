@@ -12,6 +12,7 @@ import requestContextPlugin from "../plugins/request-context.js";
 import {
   REQUEST_ID_HEADER,
   createRequestId,
+  createValidatorCompiler,
 } from "../common/http/contracts.js";
 
 import { registerHooks } from "./register-hooks.js";
@@ -23,6 +24,11 @@ export async function buildApp() {
     logger: true,
     requestIdHeader: false,
     genReqId: (request) => createRequestId(request.headers[REQUEST_ID_HEADER]),
+    schemaController: {
+      compilersFactory: {
+        buildValidator: createValidatorCompiler as any,
+      },
+    },
   });
 
   await app.register(requestContextPlugin);
