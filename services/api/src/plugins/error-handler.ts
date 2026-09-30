@@ -20,6 +20,14 @@ async function errorHandlerPlugin(app: FastifyInstance): Promise<void> {
       request: FastifyRequest,
       reply: FastifyReply,
     ) => {
+      if (reply.sent) {
+        request.log.warn(
+          { requestId: request.id },
+          "Reply already sent; skipping error handling",
+        );
+        return;
+      }
+
       const requestId = request.id;
       const classifiedError = classifyHttpError(error);
 

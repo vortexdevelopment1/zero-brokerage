@@ -193,6 +193,9 @@ export function classifyHttpError(
     } else if (fastifyError.statusCode === 413) {
       code = "PAYLOAD_TOO_LARGE";
       message = "The request payload is too large.";
+    } else if (fastifyError.statusCode === 429) {
+      code = "RATE_LIMITED";
+      message = "Too many requests. Please try again later.";
     }
 
     return new ClassifiedHttpError({
