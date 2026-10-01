@@ -5,6 +5,7 @@ import { DatabaseError } from "@zero-brokerage/database";
 import {
   type ErrorDetail,
   AppError,
+  RateLimitedError,
   mapDatabaseErrorToAppError,
 } from "../errors/index.js";
 import {
@@ -25,6 +26,7 @@ export class ClassifiedHttpError extends Error {
   public readonly publicMessage: string;
   public readonly publicDetails?: ErrorDetails | undefined;
   public readonly retryable?: boolean | undefined;
+  public readonly retryAfterSeconds?: number | undefined;
   public readonly category: ErrorCategory;
   public readonly causeError: Error;
   public readonly legacyCode: string;
@@ -37,6 +39,7 @@ export class ClassifiedHttpError extends Error {
     publicMessage: string;
     publicDetails?: ErrorDetails;
     retryable?: boolean;
+    retryAfterSeconds?: number;
     category: ErrorCategory;
     causeError: Error;
     legacyCode?: string;
@@ -50,6 +53,7 @@ export class ClassifiedHttpError extends Error {
     this.publicMessage = input.publicMessage;
     this.publicDetails = input.publicDetails;
     this.retryable = input.retryable;
+    this.retryAfterSeconds = input.retryAfterSeconds;
     this.category = input.category;
     this.causeError = input.causeError;
     this.legacyCode = input.legacyCode ?? input.code;
@@ -82,7 +86,15 @@ function classifyAppError(
     };
   }
 
-  const retryable = error.code === "CONCURRENCY_CONFLICT" ? true : undefined;
+  const retryable =
+    error.code === "CONCURRENCY_CONFLICT"
+      ? true
+      : error.code === "RATE_LIMITED"
+        ? false
+        : undefined;
+
+  const retryAfterSeconds =
+    error instanceof RateLimitedError ? error.retryAfterSeconds : undefined;
 
   return new ClassifiedHttpError({
     statusCode: error.statusCode,
@@ -92,6 +104,7 @@ function classifyAppError(
     causeError: error,
     ...(publicDetails ? { publicDetails } : {}),
     ...(retryable !== undefined ? { retryable } : {}),
+    ...(retryAfterSeconds !== undefined ? { retryAfterSeconds } : {}),
     legacyCode: error.code,
     legacyMessage: error.message,
     ...(error.details ? { legacyDetails: error.details } : {}),

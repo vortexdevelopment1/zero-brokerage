@@ -238,3 +238,89 @@ Sensitive mutating operations (POST commands, payment orders, reservations, stat
 - **Expiration and Lifecycle Reclamation**: Records expire after the specified TTL (default 24 hours, `expires_at`). Reclaiming an expired record atomically updates `created_at = NOW()` and `updated_at = NOW()`, resetting the logical lifecycle for the new idempotency operation.
 - **Multi-Instance Concurrency**: Engine-level unique constraints (`uq_idempotency_scope_key`) and row-level locking prevent concurrent duplicate claims across horizontal API instances.
 - **Test Double**: `InMemoryIdempotencyStore` is retained strictly for isolated unit-test doubles where explicit injection is requested; it is never used implicitly in production.
+
+## OpenAPI documentation (Batch 05)
+
+The API provides machine-readable OpenAPI 3.0.3 documentation generated dynamically via `@fastify/swagger`:
+
+- **Endpoint**: Exposed over HTTP at `GET /api/v1/openapi.json`.
+- **Accuracy Guarantee**: The document strictly describes only implemented, externally accessible routes (`/health`, `/api/v1/auth/*`). Future domain endpoints (`/listings`, `/leads`, `/visits`, `/payments`, etc.) are strictly excluded until implemented.
+- **Components & References**: Schemas for canonical success envelopes, pagination metadata, and canonical errors are published under `components/schemas`. Canonical components (`CanonicalSuccessMeta`, `CanonicalPaginationMeta`, `CanonicalError`) are intentionally defined as reusable building blocks for upcoming Step 06+ canonical routes. Step 04 legacy routes reference `Step04LegacyError` and `Step04LegacyRateLimitError` to accurately document their compatibility envelopes without falsely advertising the Step 05 canonical envelope. All `$ref` references are validated during automated CI tests.
+- **Schema Parity Protection**: Automated regression tests (`openapi.test.ts`) assert strict structural parity between runtime Zod schemas (`auth-schemas.ts`) and OpenAPI component schemas, preventing silent drift in property names, required constraints, data types, min/max lengths, and enum values.
+- **Authentication**: Authenticated endpoints document requirement of the `bearerAuth` security scheme (HTTP Bearer JWT).
+
+## API security baseline (Batch 05)
+
+### Secure response headers
+
+Responses from the API are hardened using `@fastify/helmet` tailored for REST APIs:
+
+- `X-Frame-Options: DENY` (disallows framing)
+- `X-Content-Type-Options: nosniff` (prevents MIME type sniffing)
+- `Referrer-Policy: no-referrer`
+- `Strict-Transport-Security: max-age=31536000; includeSubDomains` (enforced when deployed in production)
+- HTML Content-Security-Policy is disabled for pure JSON API endpoints.
+
+### Cross-Origin Resource Sharing (CORS)
+
+- **Allowed Origins**: Configured via `CORS_ALLOWED_ORIGINS` (comma-delimited).
+- **Wildcard Restriction**: Wildcard origins with credentials (`origin: '*' && credentials: true`) are strictly forbidden in production.
+- **Non-Browser Clients**: Requests without an `Origin` header (e.g. mobile applications, backend services) are permitted.
+- **Preflight**: Options preflight requests receive appropriate headers (`Access-Control-Allow-Methods`, `Access-Control-Allow-Headers`, `Access-Control-Allow-Credentials: true`).
+
+### Request body limits and content types
+
+- **Payload Size**: Default maximum request body limit is 1 MB (`MAX_BODY_LIMIT_BYTES = 1048576`). Payloads exceeding this limit receive HTTP `413 Payload Too Large` (`PAYLOAD_TOO_LARGE`) wrapped in the canonical error envelope.
+- **Content-Type Enforcement**: Endpoints expecting JSON reject unsupported media types (e.g. `text/plain`, `application/xml`) with HTTP `415 Unsupported Media Type` (`UNSUPPORTED_MEDIA_TYPE`).
+
+### Proxy trust and IP resolution
+
+- `trustProxy` defaults to `false`. Forwarded headers (`X-Forwarded-For`, `X-Forwarded-Proto`) are ignored unless explicitly enabled via `TRUST_PROXY` configuration when running behind trusted reverse proxies (e.g. AWS ALB, Cloudflare).
+
+## Rate limiting architecture (Batch 05)
+
+### Distributed multi-instance infrastructure
+
+Abuse prevention and rate limiting require cross-process coordination across multiple horizontal API instances:
+
+- **Shared Backing Store**: Production rate limiting uses `RedisRateLimiter` backed by Redis running an atomic sliding-window Lua script.
+- **Prohibited Memory Limiter**: In-memory stores (`InMemoryRateLimiter`, `Map`) are strictly prohibited in production and allowed only for isolated unit test doubles.
+- **Testing Architecture**: CI uses a high-fidelity deterministic mock client (`MockSharedRedisClient`) for atomic unit isolation, supplemented by an environment-conditional real-Redis integration test when `REDIS_URL` is configured.
+
+### Rate limiting mechanisms: Step 04 legacy vs Step 05 HTTP policies
+
+The repository distinguishes between two distinct rate-limiting mechanisms:
+
+#### 1. Enforced Step 04 Authentication Rate Limiting
+
+Existing Step 04 identity endpoints are protected at the service layer inside `AuthService` via `assertRateLimit(...)` against the shared `RedisRateLimiter`:
+
+- **OTP Request (Phone)**: 3 requests / 600s (`auth:ratelimit:phone:<normalizedPhone>`)
+- **OTP Request (IP)**: 10 requests / 3600s (`auth:ratelimit:ip:<ipAddress>`)
+- **OTP Verification (IP)**: 15 attempts / 600s (`auth:ratelimit:verify:<ipAddress>`)
+- **Error Contract**: Exhausted quotas return HTTP `429 Too Many Requests` formatted as the Step 04 legacy envelope `{ success: false, error: { code: "RATE_LIMITED", message, timestamp, requestId } }`.
+- **Headers**: Because Step 04 routes are rate-limited within service domain logic during the compatibility window, they intentionally do not emit `RateLimit-*` headers.
+
+#### 2. Step 05 Reusable HTTP PreHandler Policy Catalog
+
+New endpoints and future canonical routes use `createRateLimitHandler(policy)` as Fastify `preHandler` hooks. These hooks execute before route handlers, enforce multi-instance sliding windows, emit RFC-draft headers, and integrate with the canonical error pipeline:
+
+- **Standard Headers**:
+  - `RateLimit-Limit`: Maximum requests allowed in the sliding window.
+  - `RateLimit-Remaining`: Remaining request quota.
+  - `RateLimit-Reset`: UTC epoch timestamp (in seconds) when quota window resets.
+- **Exhaustion Contract**:
+  - HTTP Status: `429 Too Many Requests`.
+  - Header: `Retry-After: <seconds>` indicating cooldown duration until the oldest request expires.
+  - Envelope: Canonical error envelope (`{ error: { code: "RATE_LIMITED", message, requestId, retryable: false } }`).
+  - Information Shielding: Internal counters and Redis keys are never leaked.
+- **Approved Step 05 Policy Catalog (`RATE_LIMIT_POLICIES`)**:
+  - `AUTH_REQUEST_OTP`: 5 requests / 60s (scope: `ip`)
+  - `AUTH_VERIFY_OTP`: 5 requests / 60s (scope: `ip`)
+  - `AUTH_REFRESH`: 10 requests / 60s (scope: `ip`)
+  - `AUTH_LOGOUT`: 20 requests / 60s (scope: `actor`)
+  - `AUTH_STEP_UP_REQUEST`: 3 requests / 60s (scope: `actor`)
+  - `AUTH_STEP_UP_VERIFY`: 5 requests / 60s (scope: `actor`)
+  - `AUTH_CHANGE_PHONE`: 3 requests / 300s (scope: `actor`)
+  - `AUTH_DELETE_ACCOUNT`: 2 requests / 3600s (scope: `actor`)
+- **Future Migration**: In future batches when authentication routes migrate from their Step 04 legacy compatibility surface to the canonical Step 05 envelope, they will be attached to the HTTP preHandler policies. During the compatibility window, service-level enforcement remains authoritative.
