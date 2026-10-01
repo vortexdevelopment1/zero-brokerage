@@ -185,3 +185,56 @@ Actor and organization contexts are never inferred from unauthenticated client h
 ### Duration semantics
 
 Duration is calculated monotonically using `process.hrtime.bigint()` captured in the `onRequest` hook and evaluated in the `onResponse` hook. Wall-clock timestamps (`Date.now()`) are never used for duration calculations to prevent skew from NTP adjustments.
+
+## Collection pagination, filtering, and sorting (Batch 04)
+
+### Pagination standards
+
+All collection endpoints must use bounded keyset pagination:
+
+- `DEFAULT_PAGE_LIMIT = 20`
+- `MAX_PAGE_LIMIT = 100`
+- `MIN_PAGE_LIMIT = 1`
+- Next page is retrieved using an opaque Base64URL-encoded cursor token bound to query context (`queryContext`, `sortField`, `direction`, `tieBreakerField`).
+- Canonical collection responses wrap records in `{ data: [...], meta: { requestId, pagination: { hasMore: boolean, nextCursor: string | null } } }`.
+
+### Sorting allowlists
+
+- Sorting parameters (`sortBy`, `sortOrder`) must be validated against explicit per-endpoint allowlists.
+- Disallowed sort fields or invalid directions reject with `422 Unprocessable Content` (`INVALID_SORT`).
+- Every sorted query must include a deterministic unique tie-breaker (`id`).
+
+### Filtering allowlists
+
+- Filtering queries (`field[operator]=value`) must match strictly declared filter specifications.
+- Supported operators: `eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `in`, `like`, `between`.
+- Disallowed fields or unsupported operators reject with `422 Unprocessable Content` (`INVALID_FILTER`).
+- Array limits (e.g. `in` operator) are strictly enforced to prevent unbounded query allocations.
+
+## Idempotent command APIs (Batch 04)
+
+Sensitive mutating operations (POST commands, payment orders, reservations, state transitions) require idempotency protection:
+
+- **Header**: `Idempotency-Key` (RFC draft standard). Must contain 16–128 alphanumeric characters, dashes, dots, or underscores.
+- **Scope**: Keys are isolated per authenticated actor (`actor:userId`) and agency (`agency:agencyId:actor:userId`) to prevent cross-tenant key hijacking.
+- **Fingerprint**: Deterministic SHA-256 hash computed over canonicalized method, route, parameters, query, and request body. Sensitive fields (passwords, tokens, OTPs, secrets) are redacted prior to hashing.
+- **State Model**:
+  - `IN_PROGRESS`: Transaction/operation is actively processing. Concurrent requests with the same key are rejected with `409 Conflict` (`IDEMPOTENCY_IN_PROGRESS`).
+  - `COMPLETED`: Operation has finished. Exact retries replay the stored response status and payload with header `Idempotency-Replayed: true` and the _current_ request's `requestId`.
+  - Mismatched Payload: Same key presented with a materially different payload is rejected with `409 Conflict` (`IDEMPOTENCY_KEY_PAYLOAD_MISMATCH`).
+
+### Production persistence and transaction boundary
+
+- **Production Store**: `PostgresIdempotencyStore` persists idempotency records in PostgreSQL table `idempotency_keys` with atomic `INSERT ... ON CONFLICT (scope, key)` claim semantics. The production application wires `app.idempotencyStore` directly to `PostgresIdempotencyStore` backed by the PostgreSQL pool; no silent fallback to `InMemoryIdempotencyStore` is permitted.
+- **Pre-Transaction HTTP Hook**: `createIdempotencyHandler` performs non-transactional pre-checks: HTTP header parsing/validation, server-derived scope extraction, canonical fingerprint calculation, and completed replay verification. It attaches `request.idempotencyContext` containing the key, scope, fingerprint, and store to the request, without opening or holding a database connection.
+- **Atomic Transaction Boundary**: The application command layer coordinates durable state using `withIdempotentTransaction(pool, context, async (tx) => ...)` or explicit `withTransaction`. Within the exact same PostgreSQL transaction:
+  1. `claimKey({ ..., executor: tx })` atomically acquires the key or verifies existing state.
+  2. Business mutations execute using the same `tx` executor.
+  3. Outbox events are inserted using the same `tx` executor (`insertOutboxEvent`).
+  4. `completeKey({ ..., executor: tx })` persists the HTTP status code and response payload.
+  5. The transaction commits atomically.
+- **Rollback Semantics**: If any business mutation fails or an exception is thrown, the entire transaction rolls back. Neither the idempotency claim, business mutation, nor outbox events persist, enabling safe subsequent retries.
+- **Failure and Retry Lifecycle**: If an operation records `FAILED`, subsequent client requests with the matching fingerprint can safely reclaim the key (`IN_PROGRESS`) and advance it to `COMPLETED` upon successful execution.
+- **Expiration and Lifecycle Reclamation**: Records expire after the specified TTL (default 24 hours, `expires_at`). Reclaiming an expired record atomically updates `created_at = NOW()` and `updated_at = NOW()`, resetting the logical lifecycle for the new idempotency operation.
+- **Multi-Instance Concurrency**: Engine-level unique constraints (`uq_idempotency_scope_key`) and row-level locking prevent concurrent duplicate claims across horizontal API instances.
+- **Test Double**: `InMemoryIdempotencyStore` is retained strictly for isolated unit-test doubles where explicit injection is requested; it is never used implicitly in production.

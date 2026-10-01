@@ -4,6 +4,7 @@ import { migration as createIdentityAndAuth } from "../../migrations/20260928_00
 import { migration as createOutboxTable } from "../../migrations/20260929_003_create_outbox_table.js";
 import { migration as createAgenciesPropertiesListings } from "../../migrations/20260930_004_create_agencies_properties_listings.js";
 import { migration as hardenAgenciesPropertiesListings } from "../../migrations/20260930_005_harden_agencies_properties_listings.js";
+import { migration as createIdempotencyKeys } from "../../migrations/20260930_006_create_idempotency_keys_table.js";
 
 export const allMigrations: readonly Migration[] = [
   enablePostgis,
@@ -11,4 +12,5 @@ export const allMigrations: readonly Migration[] = [
   createOutboxTable,
   createAgenciesPropertiesListings,
   hardenAgenciesPropertiesListings,
+  createIdempotencyKeys,
 ];

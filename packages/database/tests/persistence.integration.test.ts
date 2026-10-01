@@ -17,10 +17,7 @@ import {
   UniqueConstraintViolationError,
   withTransaction,
 } from "../src/index.js";
-import {
-  cleanTestDatabase,
-  createTestPool,
-} from "./test-config.js";
+import { cleanTestDatabase, createTestPool } from "./test-config.js";
 
 describe("Persistence Engine Hardening — Integration Tests (Real PostgreSQL)", () => {
   let pool: Pool;
@@ -41,6 +38,7 @@ describe("Persistence Engine Hardening — Integration Tests (Real PostgreSQL)",
   beforeEach(async () => {
     await pool.query(`
       TRUNCATE TABLE
+        idempotency_keys,
         outbox_events,
         auth_security_events,
         user_profiles,
@@ -111,10 +109,9 @@ describe("Persistence Engine Hardening — Integration Tests (Real PostgreSQL)",
       await assert.rejects(
         async () => {
           await withTransaction(pool, async (tx) => {
-            await tx.query(
-              "INSERT INTO auth_identities (phone) VALUES ($1);",
-              [null],
-            );
+            await tx.query("INSERT INTO auth_identities (phone) VALUES ($1);", [
+              null,
+            ]);
           });
         },
         (err: unknown) => {
@@ -186,21 +183,20 @@ describe("Persistence Engine Hardening — Integration Tests (Real PostgreSQL)",
     it("rolls back all writes completely when callback throws", async () => {
       let insertedUserId: string | null = null;
 
-      await assert.rejects(
-        async () => {
-          await withTransaction(pool, async (tx) => {
-            const idRes = await tx.query<{ id: string }>(
-              "INSERT INTO auth_identities (phone, role) VALUES ($1, $2) RETURNING id;",
-              ["+919876543202", "USER"],
-            );
-            insertedUserId = idRes.rows[0]!.id;
+      await assert.rejects(async () => {
+        await withTransaction(pool, async (tx) => {
+          const idRes = await tx.query<{ id: string }>(
+            "INSERT INTO auth_identities (phone, role) VALUES ($1, $2) RETURNING id;",
+            ["+919876543202", "USER"],
+          );
+          insertedUserId = idRes.rows[0]!.id;
 
-            // Injected failure
-            throw new Error("Simulated business failure midway through transaction");
-          });
-        },
-        /Simulated business failure/,
-      );
+          // Injected failure
+          throw new Error(
+            "Simulated business failure midway through transaction",
+          );
+        });
+      }, /Simulated business failure/);
 
       assert.ok(insertedUserId !== null);
 
@@ -316,26 +312,23 @@ describe("Persistence Engine Hardening — Integration Tests (Real PostgreSQL)",
 
     it("rolls back outer transaction if a nested savepoint failure is not caught by caller", async () => {
       let outerId: string | null = null;
-      await assert.rejects(
-        async () => {
-          await withTransaction(pool, async (tx) => {
-            const res = await tx.query<{ id: string }>(
-              "INSERT INTO auth_identities (phone, role) VALUES ($1, $2) RETURNING id;",
-              ["+919876543209", "USER"],
-            );
-            outerId = res.rows[0]!.id;
+      await assert.rejects(async () => {
+        await withTransaction(pool, async (tx) => {
+          const res = await tx.query<{ id: string }>(
+            "INSERT INTO auth_identities (phone, role) VALUES ($1, $2) RETURNING id;",
+            ["+919876543209", "USER"],
+          );
+          outerId = res.rows[0]!.id;
 
-            await tx.withSavepoint(async (nested) => {
-              await nested.query(
-                "INSERT INTO auth_identities (phone, role) VALUES ($1, $2);",
-                ["+919876543219", "USER"],
-              );
-              throw new Error("Uncaught error inside savepoint");
-            });
+          await tx.withSavepoint(async (nested) => {
+            await nested.query(
+              "INSERT INTO auth_identities (phone, role) VALUES ($1, $2);",
+              ["+919876543219", "USER"],
+            );
+            throw new Error("Uncaught error inside savepoint");
           });
-        },
-        /Uncaught error inside savepoint/,
-      );
+        });
+      }, /Uncaught error inside savepoint/);
 
       const check = await pool.query(
         "SELECT id FROM auth_identities WHERE id = $1;",
@@ -420,12 +413,9 @@ describe("Persistence Engine Hardening — Integration Tests (Real PostgreSQL)",
 
     it("rejects invalid savepoint identifiers to prevent SQL injection", async () => {
       await withTransaction(pool, async (tx) => {
-        await assert.rejects(
-          async () => {
-            await tx.withSavepoint("sp; DROP TABLE users;--", async () => {});
-          },
-          /Invalid savepoint identifier/,
-        );
+        await assert.rejects(async () => {
+          await tx.withSavepoint("sp; DROP TABLE users;--", async () => {});
+        }, /Invalid savepoint identifier/);
       });
     });
   });
@@ -481,23 +471,20 @@ describe("Persistence Engine Hardening — Integration Tests (Real PostgreSQL)",
     it("rolls back outbox event if business mutation fails", async () => {
       let createdEventId: string | null = null;
 
-      await assert.rejects(
-        async () => {
-          await withTransaction(pool, async (tx) => {
-            const event = await insertOutboxEvent(tx, {
-              eventName: "user.registered",
-              aggregateId: "agg-test",
-              correlationId: "corr-test",
-              payload: { test: true },
-            });
-            createdEventId = event.id;
-
-            // Injected failure
-            throw new Error("Business logic aborted transaction");
+      await assert.rejects(async () => {
+        await withTransaction(pool, async (tx) => {
+          const event = await insertOutboxEvent(tx, {
+            eventName: "user.registered",
+            aggregateId: "agg-test",
+            correlationId: "corr-test",
+            payload: { test: true },
           });
-        },
-        /Business logic aborted transaction/,
-      );
+          createdEventId = event.id;
+
+          // Injected failure
+          throw new Error("Business logic aborted transaction");
+        });
+      }, /Business logic aborted transaction/);
 
       const eventCheck = await pool.query(
         "SELECT id FROM outbox_events WHERE id = $1;",
@@ -570,9 +557,10 @@ describe("Persistence Engine Hardening — Integration Tests (Real PostgreSQL)",
         status: string;
         claimed_by: string | null;
         processed_at: Date | null;
-      }>("SELECT status, claimed_by, processed_at FROM outbox_events WHERE id = $1;", [
-        eventId,
-      ]);
+      }>(
+        "SELECT status, claimed_by, processed_at FROM outbox_events WHERE id = $1;",
+        [eventId],
+      );
 
       assert.equal(check.rows[0]?.status, "PUBLISHED");
       assert.equal(check.rows[0]?.claimed_by, null);
@@ -600,9 +588,10 @@ describe("Persistence Engine Hardening — Integration Tests (Real PostgreSQL)",
         status: string;
         attempt_count: number;
         last_error: string;
-      }>("SELECT status, attempt_count, last_error FROM outbox_events WHERE id = $1;", [
-        eventId,
-      ]);
+      }>(
+        "SELECT status, attempt_count, last_error FROM outbox_events WHERE id = $1;",
+        [eventId],
+      );
       assert.equal(check.rows[0]?.status, "FAILED");
       assert.equal(check.rows[0]?.attempt_count, 1);
       assert.equal(check.rows[0]?.last_error, "Network timeout 1");
@@ -717,12 +706,9 @@ describe("Persistence Engine Hardening — Integration Tests (Real PostgreSQL)",
       });
 
       // 1. PENDING -> PUBLISHED without claim must be rejected
-      await assert.rejects(
-        async () => {
-          await markOutboxEventPublished(pool, eventId);
-        },
-        OutboxStateTransitionError,
-      );
+      await assert.rejects(async () => {
+        await markOutboxEventPublished(pool, eventId);
+      }, OutboxStateTransitionError);
 
       // 2. Claim event -> transitions to PROCESSING
       await claimOutboxEvents(pool, { workerId: "worker-trans", limit: 1 });
@@ -737,12 +723,9 @@ describe("Persistence Engine Hardening — Integration Tests (Real PostgreSQL)",
       assert.equal(checkDead.rows[0]?.status, "DEAD_LETTER");
 
       // 4. DEAD_LETTER -> PUBLISHED must be rejected
-      await assert.rejects(
-        async () => {
-          await markOutboxEventPublished(pool, eventId);
-        },
-        OutboxStateTransitionError,
-      );
+      await assert.rejects(async () => {
+        await markOutboxEventPublished(pool, eventId);
+      }, OutboxStateTransitionError);
 
       // 5. DEAD_LETTER -> PROCESSING via claim must also be impossible
       const claimedAfterDead = await claimOutboxEvents(pool, {
@@ -766,12 +749,9 @@ describe("Persistence Engine Hardening — Integration Tests (Real PostgreSQL)",
       await markOutboxEventPublished(pool, pubEventId);
 
       // Once PUBLISHED, attempting to mark FAILED must be rejected
-      await assert.rejects(
-        async () => {
-          await markOutboxEventFailed(pool, pubEventId, "Cannot fail published");
-        },
-        OutboxStateTransitionError,
-      );
+      await assert.rejects(async () => {
+        await markOutboxEventFailed(pool, pubEventId, "Cannot fail published");
+      }, OutboxStateTransitionError);
     });
 
     it("enforces claim ownership: worker B cannot mark worker A's claim as PUBLISHED or FAILED", async () => {
@@ -787,27 +767,24 @@ describe("Persistence Engine Hardening — Integration Tests (Real PostgreSQL)",
       });
 
       // Worker A claims the event
-      const claims = await claimOutboxEvents(pool, { workerId: "worker-A", limit: 1 });
+      const claims = await claimOutboxEvents(pool, {
+        workerId: "worker-A",
+        limit: 1,
+      });
       assert.equal(claims.length, 1);
       assert.equal(claims[0]?.claimedBy, "worker-A");
 
       // Worker B attempts to mark Worker A's claim as PUBLISHED -> REJECTED
-      await assert.rejects(
-        async () => {
-          await markOutboxEventPublished(pool, eventId, { workerId: "worker-B" });
-        },
-        OutboxStateTransitionError,
-      );
+      await assert.rejects(async () => {
+        await markOutboxEventPublished(pool, eventId, { workerId: "worker-B" });
+      }, OutboxStateTransitionError);
 
       // Worker B attempts to mark Worker A's claim as FAILED -> REJECTED
-      await assert.rejects(
-        async () => {
-          await markOutboxEventFailed(pool, eventId, "Unauthorized failure", {
-            workerId: "worker-B",
-          });
-        },
-        OutboxStateTransitionError,
-      );
+      await assert.rejects(async () => {
+        await markOutboxEventFailed(pool, eventId, "Unauthorized failure", {
+          workerId: "worker-B",
+        });
+      }, OutboxStateTransitionError);
 
       // Event is still in PROCESSING with claimed_by = worker-A
       const check = await pool.query<{ status: string; claimed_by: string }>(
@@ -820,10 +797,12 @@ describe("Persistence Engine Hardening — Integration Tests (Real PostgreSQL)",
       // Rightful owner Worker A marks it PUBLISHED -> SUCCEEDS
       await markOutboxEventPublished(pool, eventId, { workerId: "worker-A" });
 
-      const finalCheck = await pool.query<{ status: string; claimed_by: string | null }>(
-        "SELECT status, claimed_by FROM outbox_events WHERE id = $1;",
-        [eventId],
-      );
+      const finalCheck = await pool.query<{
+        status: string;
+        claimed_by: string | null;
+      }>("SELECT status, claimed_by FROM outbox_events WHERE id = $1;", [
+        eventId,
+      ]);
       assert.equal(finalCheck.rows[0]?.status, "PUBLISHED");
       assert.equal(finalCheck.rows[0]?.claimed_by, null);
     });
@@ -836,28 +815,25 @@ describe("Persistence Engine Hardening — Integration Tests (Real PostgreSQL)",
     it("ensures user identity and user profile are not left partially created when profile fails", async () => {
       let createdUserId: string | null = null;
 
-      await assert.rejects(
-        async () => {
-          await withTransaction(pool, async (tx) => {
-            // Write 1: Identity creation
-            const res = await tx.query<{ id: string }>(
-              "INSERT INTO auth_identities (phone, role) VALUES ($1, $2) RETURNING id;",
-              ["+919876543299", "USER"],
-            );
-            createdUserId = res.rows[0]!.id;
+      await assert.rejects(async () => {
+        await withTransaction(pool, async (tx) => {
+          // Write 1: Identity creation
+          const res = await tx.query<{ id: string }>(
+            "INSERT INTO auth_identities (phone, role) VALUES ($1, $2) RETURNING id;",
+            ["+919876543299", "USER"],
+          );
+          createdUserId = res.rows[0]!.id;
 
-            // Write 2: Intentionally invalid profile insert (duplicate or syntax error)
-            await tx.query(
-              "INSERT INTO user_profiles (user_id, full_name, email) VALUES ($1, $2, $3);",
-              [createdUserId, "Test User", "test@example.com"],
-            );
+          // Write 2: Intentionally invalid profile insert (duplicate or syntax error)
+          await tx.query(
+            "INSERT INTO user_profiles (user_id, full_name, email) VALUES ($1, $2, $3);",
+            [createdUserId, "Test User", "test@example.com"],
+          );
 
-            // Injected crash
-            throw new Error("Crash right after profile insert");
-          });
-        },
-        /Crash right after profile insert/,
-      );
+          // Injected crash
+          throw new Error("Crash right after profile insert");
+        });
+      }, /Crash right after profile insert/);
 
       assert.ok(createdUserId !== null);
 
@@ -866,13 +842,21 @@ describe("Persistence Engine Hardening — Integration Tests (Real PostgreSQL)",
         "SELECT id FROM auth_identities WHERE id = $1;",
         [createdUserId],
       );
-      assert.equal(idCheck.rows.length, 0, "Identity record must be rolled back");
+      assert.equal(
+        idCheck.rows.length,
+        0,
+        "Identity record must be rolled back",
+      );
 
       const profCheck = await pool.query(
         "SELECT user_id FROM user_profiles WHERE user_id = $1;",
         [createdUserId],
       );
-      assert.equal(profCheck.rows.length, 0, "Profile record must be rolled back");
+      assert.equal(
+        profCheck.rows.length,
+        0,
+        "Profile record must be rolled back",
+      );
     });
   });
 
@@ -929,8 +913,143 @@ describe("Persistence Engine Hardening — Integration Tests (Real PostgreSQL)",
 
       const page1Ids = new Set(page1.rows.map((r) => r.id));
       for (const r of page2.rows) {
-        assert.equal(page1Ids.has(r.id), false, "Page 2 must contain no duplicates from Page 1");
+        assert.equal(
+          page1Ids.has(r.id),
+          false,
+          "Page 2 must contain no duplicates from Page 1",
+        );
       }
+    });
+  });
+
+  // =========================================================================
+  // G. POSTGRESQL IDEMPOTENCY KEYS PERSISTENCE & CONCURRENCY
+  // =========================================================================
+  describe("G. PostgreSQL Idempotency Keys Persistence & Concurrency", () => {
+    it("enforces unique scope and key constraint (uq_idempotency_scope_key)", async () => {
+      const scope = "actor:user_real_pg_1";
+      const key = "key_unique_test_12345678";
+      const fingerprint = "sha256_hash_123";
+      const expiresAt = new Date(Date.now() + 3600000);
+
+      // 1. Initial insert
+      await pool.query(
+        `INSERT INTO idempotency_keys (scope, key, fingerprint, status, expires_at)
+         VALUES ($1, $2, $3, 'IN_PROGRESS', $4);`,
+        [scope, key, fingerprint, expiresAt],
+      );
+
+      // 2. Duplicate insert must trigger 23505 UniqueConstraintViolationError
+      await assert.rejects(
+        async () => {
+          await withTransaction(pool, async (tx) => {
+            await tx.query(
+              `INSERT INTO idempotency_keys (scope, key, fingerprint, status, expires_at)
+               VALUES ($1, $2, $3, 'IN_PROGRESS', $4);`,
+              [scope, key, fingerprint, expiresAt],
+            );
+          });
+        },
+        (err: unknown) => {
+          assert.ok(err instanceof UniqueConstraintViolationError);
+          assert.equal(err.code, "UNIQUE_VIOLATION");
+          assert.equal(err.table, "idempotency_keys");
+          assert.ok(err.constraint?.includes("uq_idempotency_scope_key"));
+          return true;
+        },
+      );
+    });
+
+    it("rolls back idempotency record when the business transaction fails", async () => {
+      const scope = "actor:user_real_pg_2";
+      const key = "key_rollback_test_12345678";
+      const fingerprint = "sha256_hash_rollback";
+      const expiresAt = new Date(Date.now() + 3600000);
+
+      await assert.rejects(async () => {
+        await withTransaction(pool, async (tx) => {
+          // Claim key inside transaction
+          await tx.query(
+            `INSERT INTO idempotency_keys (scope, key, fingerprint, status, expires_at)
+             VALUES ($1, $2, $3, 'IN_PROGRESS', $4);`,
+            [scope, key, fingerprint, expiresAt],
+          );
+
+          // Simulated failure in business mutation
+          throw new Error("Simulated business mutation failure");
+        });
+      });
+
+      // Verify that no idempotency record persisted
+      const checkResult = await pool.query(
+        "SELECT * FROM idempotency_keys WHERE scope = $1 AND key = $2;",
+        [scope, key],
+      );
+      assert.equal(checkResult.rows.length, 0);
+    });
+
+    it("commits business mutation, outbox event, and idempotency completion atomically", async () => {
+      const scope = "actor:user_real_pg_3";
+      const key = "key_atomic_complete_12345678";
+      const fingerprint = "sha256_hash_atomic";
+      const expiresAt = new Date(Date.now() + 3600000);
+      let identityId = "";
+
+      await withTransaction(pool, async (tx) => {
+        // 1. Claim key
+        await tx.query(
+          `INSERT INTO idempotency_keys (scope, key, fingerprint, status, expires_at)
+           VALUES ($1, $2, $3, 'IN_PROGRESS', $4);`,
+          [scope, key, fingerprint, expiresAt],
+        );
+
+        // 2. Business mutation
+        const identity = await tx.query<{ id: string }>(
+          "INSERT INTO auth_identities (phone, role) VALUES ($1, $2) RETURNING id;",
+          ["+919988776655", "USER"],
+        );
+        identityId = identity.rows[0]!.id;
+
+        // 3. Outbox event
+        await insertOutboxEvent(tx, {
+          eventName: "USER_REGISTERED",
+          aggregateId: identityId,
+          correlationId: "corr_atomic_123",
+          payload: { phone: "+919988776655" },
+        });
+
+        // 4. Complete idempotency
+        await tx.query(
+          `UPDATE idempotency_keys
+           SET status = 'COMPLETED', status_code = 201, response_body = $1, updated_at = NOW()
+           WHERE scope = $2 AND key = $3;`,
+          [JSON.stringify({ success: true, userId: identityId }), scope, key],
+        );
+      });
+
+      // Verify all 3 components are durably recorded
+      const idRecord = await pool.query(
+        "SELECT * FROM auth_identities WHERE id = $1;",
+        [identityId],
+      );
+      assert.equal(idRecord.rows.length, 1);
+
+      const outboxRecord = await pool.query(
+        "SELECT * FROM outbox_events WHERE aggregate_id = $1;",
+        [identityId],
+      );
+      assert.equal(outboxRecord.rows.length, 1);
+
+      const idemRecord = await pool.query<{
+        status: string;
+        status_code: number;
+      }>("SELECT * FROM idempotency_keys WHERE scope = $1 AND key = $2;", [
+        scope,
+        key,
+      ]);
+      assert.equal(idemRecord.rows.length, 1);
+      assert.equal(idemRecord.rows[0]!.status, "COMPLETED");
+      assert.equal(idemRecord.rows[0]!.status_code, 201);
     });
   });
 });

@@ -4,7 +4,11 @@ import * as net from "node:net";
 
 let resolvedTestDatabaseUrl: string | null = null;
 
-async function isPortOpen(host: string, port: number, timeoutMs = 1000): Promise<boolean> {
+async function isPortOpen(
+  host: string,
+  port: number,
+  timeoutMs = 1000,
+): Promise<boolean> {
   return new Promise((resolve) => {
     const socket = new net.Socket();
     let status = false;
@@ -77,13 +81,15 @@ export async function getTestDatabaseUrl(): Promise<string> {
   return resolvedTestDatabaseUrl;
 }
 
-export async function createTestPool(options?: { max?: number }): Promise<Pool> {
+export async function createTestPool(options?: {
+  max?: number;
+}): Promise<Pool> {
   const connectionString = await getTestDatabaseUrl();
   return new Pool({
     connectionString,
     max: options?.max ?? 10,
     idleTimeoutMillis: 10_000,
-    connectionTimeoutMillis: 5_000,
+    connectionTimeoutMillis: 15_000,
   });
 }
 
@@ -99,7 +105,11 @@ export async function cleanTestDatabase(pool: Pool): Promise<void> {
 
   // Multi-layer safety guard:
   // 1. Explicitly disallow production and development database names
-  if (currentDb === "zero_brokerage" || currentDb === "postgres" || currentDb === "production") {
+  if (
+    currentDb === "zero_brokerage" ||
+    currentDb === "postgres" ||
+    currentDb === "production"
+  ) {
     throw new Error(
       `CRITICAL SAFETY VIOLATION: cleanTestDatabase was invoked on protected database "${currentDb}". Aborting immediately.`,
     );

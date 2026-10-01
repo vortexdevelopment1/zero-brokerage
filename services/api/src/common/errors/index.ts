@@ -115,6 +115,51 @@ export class SecurityChallengeRequiredError extends AppError {
   }
 }
 
+export class IdempotencyConflictError extends AppError {
+  constructor(
+    message = "An operation with this idempotency key is currently in progress",
+    details?: ErrorDetail[],
+  ) {
+    super(409, "IDEMPOTENCY_IN_PROGRESS", message, details);
+  }
+}
+
+export class IdempotencyMismatchError extends AppError {
+  constructor(
+    message = "Idempotency key was previously used with a different request payload",
+    details?: ErrorDetail[],
+  ) {
+    super(409, "IDEMPOTENCY_KEY_PAYLOAD_MISMATCH", message, details);
+  }
+}
+
+export class InvalidCursorError extends AppError {
+  constructor(
+    message = "Invalid or corrupted pagination cursor",
+    details?: ErrorDetail[],
+  ) {
+    super(422, "INVALID_CURSOR", message, details);
+  }
+}
+
+export class InvalidFilterError extends AppError {
+  constructor(
+    message = "Invalid or unsupported filter parameter",
+    details?: ErrorDetail[],
+  ) {
+    super(422, "INVALID_FILTER", message, details);
+  }
+}
+
+export class InvalidSortError extends AppError {
+  constructor(
+    message = "Invalid or unsupported sort parameter",
+    details?: ErrorDetail[],
+  ) {
+    super(422, "INVALID_SORT", message, details);
+  }
+}
+
 export class InternalServerError extends AppError {
   constructor(
     message = "An unexpected internal server error occurred",

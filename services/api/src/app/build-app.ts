@@ -21,6 +21,7 @@ import { registerRoutes } from "./register-routes.js";
 
 export interface BuildAppOptions {
   logger?: FastifyServerOptions["logger"];
+  idempotencyStore?: import("../common/http/idempotency/types.js").IdempotencyStore;
 }
 
 export async function buildApp(options: BuildAppOptions = {}) {
@@ -44,7 +45,11 @@ export async function buildApp(options: BuildAppOptions = {}) {
     origin: true,
   });
 
-  await app.register(databasePlugin);
+  await app.register(databasePlugin, {
+    ...(options.idempotencyStore
+      ? { idempotencyStore: options.idempotencyStore }
+      : {}),
+  });
   await app.register(rateLimitPlugin);
   await app.register(authenticationPlugin);
   await app.register(authorizationPlugin);
