@@ -11,6 +11,7 @@ This directory will contain Architectural Decision Records (ADRs) documenting cr
 
 ## Decision Records Index
 
+- [ADR 0007 — OpenAPI Documentation, Security Baseline, and Distributed Rate Limiting](./0007-openapi-security-and-rate-limiting.md)
 - [ADR 0006 — API Validation and Error-Handling Transition](./0006-api-validation-and-error-handling-transition.md)
 
 - [ADR 0001 — Public Identifier Strategy](./0001-public-identifier-strategy.md)

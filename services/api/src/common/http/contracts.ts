@@ -120,3 +120,4 @@ export * from "./idempotency/fingerprint.js";
 export * from "./idempotency/store.js";
 export * from "./idempotency/postgres-store.js";
 export * from "./idempotency/handler.js";
+export * from "./rate-limit/index.js";

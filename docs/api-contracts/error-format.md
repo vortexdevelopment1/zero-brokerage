@@ -104,6 +104,11 @@ existing Step 04 Zod validation.
     - Concurrency conflicts (`CONCURRENCY_CONFLICT`, HTTP 503) explicitly set `retryable: true`.
     - Application-level `ValidationError` field details are structured into canonical `details.fields`.
     - Database error mapping shields all SQL statements, table names, constraint names, and column identifiers from public error responses.
+13. **Rate Limiting Error Contract (Batch 05)**:
+    - Rate limit violations return status `429 Too Many Requests` with canonical error code `RATE_LIMITED` and safe public message.
+    - Rate-limited responses set `retryable: false` (immediate retries without waiting for the cooldown window are invalid).
+    - When a cooldown window applies, the server emits the standard HTTP response header `Retry-After: <seconds>`.
+    - Client requests that exceed quota do not expose internal counters, policy thresholds, or datastore internals in the error payload.
 
 ## Compatibility boundary and legacy dispatch
 

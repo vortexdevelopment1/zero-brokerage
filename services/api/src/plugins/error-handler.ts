@@ -39,6 +39,13 @@ async function errorHandlerPlugin(app: FastifyInstance): Promise<void> {
         );
       }
 
+      if (
+        classifiedError.retryAfterSeconds !== undefined &&
+        !reply.getHeader("retry-after")
+      ) {
+        reply.header("retry-after", String(classifiedError.retryAfterSeconds));
+      }
+
       const body = isLegacyStep04Route(request)
         ? formatLegacyStep04Error(classifiedError, requestId)
         : formatCanonicalHttpError(classifiedError, requestId);

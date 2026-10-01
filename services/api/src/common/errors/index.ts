@@ -71,11 +71,18 @@ export class ValidationError extends AppError {
 }
 
 export class RateLimitedError extends AppError {
+  public readonly retryAfterSeconds?: number | undefined;
+
   constructor(
     message = "Too many requests. Please try again later.",
-    details?: ErrorDetail[],
+    options?:
+      { retryAfterSeconds?: number; details?: ErrorDetail[] } | ErrorDetail[],
   ) {
+    const details = Array.isArray(options) ? options : options?.details;
     super(429, "RATE_LIMITED", message, details);
+    if (!Array.isArray(options) && options?.retryAfterSeconds !== undefined) {
+      this.retryAfterSeconds = options.retryAfterSeconds;
+    }
   }
 }
 
