@@ -113,3 +113,75 @@ All new Step 05 routes use Fastify JSON Schema with the shared Ajv compiler:
 - **Shared Schemas**: Cross-route schema reuse via TypeScript schema imports, local `$defs`, and Fastify's native `app.addSchema()` registry via `schemaController.compilersFactory.buildValidator`.
 - **HTTP Status Codes**: `400 Bad Request` for malformed transport input (e.g., malformed JSON syntax); `422 Unprocessable Content` for schema validation failures.
 - **Step 04 Coexistence**: Step 04 identity routes remain on Zod and continue to pass through the legacy compatibility boundary.
+
+## Request context and structured completion logging (Batch 03)
+
+Every HTTP request is instrumented through the central request context plugin and lifecycle hooks:
+
+### Standard request-context fields
+
+The request context is accessible via `request.getContext()` and Fastify request decorators:
+
+- `requestId`: The canonical request UUID (string).
+- `method`: HTTP method in uppercase (`GET`, `POST`, `PATCH`, `DELETE`, etc.).
+- `route`: The parameterized route pattern (e.g., `/api/v1/listings/:listingId`). Unmatched 404 routes evaluate safely to `"unmatched"`.
+- `startTime`: Monotonic nanosecond start timestamp (`bigint`) captured at the `onRequest` hook via `process.hrtime.bigint()`.
+- `durationMs`: Elapsed monotonic request duration in milliseconds (numeric float).
+- `actorId`: Safe authenticated actor identifier (UUID) extracted from `request.user.id` when an authenticated user context is present; `null` otherwise.
+- `agencyId`: Safe organization identifier (UUID) from `request.agencyId` when agency context is present; `null` otherwise.
+- `errorCode`: Classified error code (`ApiErrorCode`) populated from `classifyHttpError(error).code` when a failure occurs; `null` otherwise.
+
+### Structured completion log fields
+
+On request completion (`onResponse` hook), Fastify emits exactly one structured completion record containing allowlisted metadata:
+
+```json
+{
+  "requestId": "550e8400-e29b-41d4-a716-446655440000",
+  "method": "GET",
+  "route": "/api/v1/listings/:listingId",
+  "statusCode": 200,
+  "durationMs": 1.245,
+  "actorId": "usr_9999",
+  "agencyId": "ag_1234",
+  "errorCode": "NOT_FOUND",
+  "upstreamTimingMs": 42.5
+}
+```
+
+Optional fields (`actorId`, `agencyId`, `errorCode`, `upstreamTimingMs`) are included only when available and safe. Upstream timing is logged only when an actual upstream timing measurement exists.
+
+### Sensitive fields strictly excluded from logging
+
+To ensure data security and compliance, the structured logging layer allowlists only safe metadata fields. The following sensitive data must NEVER be logged:
+
+- OTP codes and verification tokens
+- JWT access tokens and refresh tokens
+- Payment secrets, client secrets, and webhook signing keys
+- Passwords and credential hashes
+- API keys
+- Identity documents and biometric records
+- Authorization headers and cookie contents
+- Raw database error objects, constraint strings, SQL statements, and database connection strings
+- Raw provider response payloads
+- Unsanitized request bodies, query parameters, or header dumps
+
+### Route pattern convention
+
+To prevent high-cardinality log noise and avoid leaking sensitive parameter data, logs record the parameterized Fastify route pattern (`request.routeOptions.url`, such as `/api/v1/listings/:listingId`) rather than concrete resource identifiers. Unmatched paths fall back safely to `"unmatched"` without throwing.
+
+### Request-ID relationship
+
+The request ID generation and normalization path is centralized in `contracts.ts` via `createRequestId()`:
+
+- A valid inbound UUID in `X-Request-Id` is preserved and normalized to lowercase.
+- An absent or invalid inbound header generates a new random UUIDv4.
+- The authoritative request ID is assigned to `request.id`, echoed in the `X-Request-Id` response header, returned in all canonical/legacy response envelopes, and attached to structured log records.
+
+### Safe actor and organization context
+
+Actor and organization contexts are never inferred from unauthenticated client headers or body fields. They are extracted exclusively from verified authentication/authorization middleware (`request.user.id`, `request.agencyId`). When absent, the fields are omitted from logs and set to `null` in context.
+
+### Duration semantics
+
+Duration is calculated monotonically using `process.hrtime.bigint()` captured in the `onRequest` hook and evaluated in the `onResponse` hook. Wall-clock timestamps (`Date.now()`) are never used for duration calculations to prevent skew from NTP adjustments.

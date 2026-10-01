@@ -30,6 +30,7 @@ async function errorHandlerPlugin(app: FastifyInstance): Promise<void> {
 
       const requestId = request.id;
       const classifiedError = classifyHttpError(error);
+      request.errorCode = classifiedError.code;
 
       if (classifiedError.category === "unexpected") {
         request.log.error(
@@ -58,6 +59,7 @@ async function errorHandlerPlugin(app: FastifyInstance): Promise<void> {
       legacyCode: "NOT_FOUND",
       legacyMessage: "Resource not found",
     });
+    request.errorCode = notFoundError.code;
 
     const body = isLegacyStep04Route(request)
       ? formatLegacyStep04Error(notFoundError, requestId)

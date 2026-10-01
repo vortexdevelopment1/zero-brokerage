@@ -1,4 +1,4 @@
-import Fastify from "fastify";
+import Fastify, { type FastifyServerOptions, LogController } from "fastify";
 
 import cors from "@fastify/cors";
 import helmet from "@fastify/helmet";
@@ -19,9 +19,14 @@ import { registerHooks } from "./register-hooks.js";
 import { registerModules } from "./register-modules.js";
 import { registerRoutes } from "./register-routes.js";
 
-export async function buildApp() {
+export interface BuildAppOptions {
+  logger?: FastifyServerOptions["logger"];
+}
+
+export async function buildApp(options: BuildAppOptions = {}) {
   const app = Fastify({
-    logger: true,
+    logger: options.logger ?? true,
+    logController: new LogController({ disableRequestLogging: true }),
     requestIdHeader: false,
     genReqId: (request) => createRequestId(request.headers[REQUEST_ID_HEADER]),
     schemaController: {
