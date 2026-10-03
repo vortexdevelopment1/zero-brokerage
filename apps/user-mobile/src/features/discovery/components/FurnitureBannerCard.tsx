@@ -2,6 +2,7 @@
  * Furniture Marketplace Entry Card
  *
  * Promotes the zero-brokerage furnished living journey contextually from Discover.
+ * Editorial design moment connecting architectural residences with turnkey interiors.
  */
 
 import React from "react";
@@ -21,8 +22,8 @@ export function FurnitureBannerCard() {
     <View className="px-5 py-3">
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="Explore Furniture Marketplace"
-        accessibilityHint="Opens the Zero Brokerage designer home furnishing marketplace"
+        accessibilityLabel="Living by Zero Brokerage, Explore Turnkey Furnished Packages"
+        accessibilityHint="Opens the Zero Brokerage designer home furnishing catalog"
         onPress={handlePress}
       >
         <Card
@@ -33,43 +34,43 @@ export function FurnitureBannerCard() {
         >
           <Stack spacing={3}>
             <View className="flex-row items-center justify-between">
-              <View className="px-2.5 py-1 rounded-full bg-brand/20 border border-brand/40">
+              <View className="px-2.5 py-1 rounded-full bg-brand/30 border border-brand/50">
                 <Text
                   variant="caption"
                   tone="brand"
                   weight="bold"
-                  className="tracking-wider uppercase text-[10px]"
+                  className="tracking-widest uppercase text-[10px]"
                 >
-                  CURATED LIVING
+                  LIVING BY ZERO BROKERAGE
                 </Text>
               </View>
-              <Text variant="caption" tone="inverse" weight="bold">
+              <Text variant="bodySmall" tone="inverse" weight="bold">
                 →
               </Text>
             </View>
 
             <Stack spacing={1}>
               <Text variant="h3" tone="inverse" weight="bold">
-                Designer Furniture Marketplace
+                Turnkey Designer Interiors
               </Text>
               <Text
                 variant="bodySmall"
                 tone="secondary"
-                className="text-neutral-400"
+                className="text-neutral-300 leading-5"
               >
-                Rent or purchase bespoke room packages delivered and installed
-                with zero brokerage fee.
+                Furnish your zero-brokerage residence with curated room suites.
+                Delivered, assembled, and zero broker markup.
               </Text>
             </Stack>
 
-            <View className="pt-1">
+            <View className="pt-1 flex-row items-center">
               <Text
                 variant="bodySmall"
                 tone="brand"
-                weight="semibold"
+                weight="bold"
                 className="text-[13px]"
               >
-                Browse Curated Furniture Collections →
+                Explore Curated Suites →
               </Text>
             </View>
           </Stack>

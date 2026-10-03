@@ -52,12 +52,12 @@ export function OtpVerificationScreen({
     <AppContainer>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        className="flex-1"
+        className="flex-1 bg-surface"
       >
         <ScrollView
           contentContainerStyle={{ flexGrow: 1 }}
           keyboardShouldPersistTaps="handled"
-          className="flex-1 px-6 pt-12 pb-8"
+          className="flex-1 px-6 pt-10 pb-8"
         >
           <Stack spacing={8} className="flex-1 justify-between">
             <Stack spacing={6}>
@@ -66,15 +66,16 @@ export function OtpVerificationScreen({
                 <Text
                   variant="label"
                   tone="brand"
-                  className="tracking-widest uppercase"
+                  weight="bold"
+                  className="tracking-widest uppercase text-[10px]"
                 >
-                  Verification
+                  SECURITY VERIFICATION
                 </Text>
                 <Text variant="display" tone="primary" weight="bold">
-                  Enter Code
+                  Enter 6-Digit Code
                 </Text>
                 <Text variant="bodyLarge" tone="secondary">
-                  We sent a 6-digit code to{" "}
+                  We sent a code to{" "}
                   <Text variant="bodyLarge" tone="primary" weight="semibold">
                     {maskPhoneNumber(phoneNumber)}
                   </Text>
@@ -84,10 +85,10 @@ export function OtpVerificationScreen({
                     onPress={onChangePhoneNumber}
                     accessibilityRole="button"
                     accessibilityLabel="Change phone number"
-                    className="self-start pt-1"
+                    className="self-start pt-1 active:opacity-70"
                   >
-                    <Text variant="bodySmall" tone="brand" weight="medium">
-                      Change phone number
+                    <Text variant="bodySmall" tone="brand" weight="semibold">
+                      Change phone number →
                     </Text>
                   </Pressable>
                 </Box>
@@ -108,14 +109,14 @@ export function OtpVerificationScreen({
                     return (
                       <View
                         key={index}
-                        className={`h-14 w-12 items-center justify-center rounded-large border bg-surface ${
+                        className={`h-14 w-12 items-center justify-center rounded-large border ${
                           errorMessage
-                            ? "border-error"
+                            ? "border-error bg-error-light/30"
                             : isFocused
-                              ? "border-brand border-2"
+                              ? "border-brand border-2 bg-surface shadow-sm"
                               : digit
-                                ? "border-primary-content"
-                                : "border-default-border"
+                                ? "border-primary-content bg-surface"
+                                : "border-default-border bg-surface-muted"
                         }`}
                       >
                         <Text variant="h2" tone="primary" weight="semibold">
@@ -179,13 +180,13 @@ export function OtpVerificationScreen({
                 {countdownSeconds > 0 ? (
                   <Text variant="bodySmall" tone="secondary">
                     Resend code in{" "}
-                    <Text variant="bodySmall" tone="primary" weight="medium">
+                    <Text variant="bodySmall" tone="primary" weight="semibold">
                       {formattedCountdown}
                     </Text>
                   </Text>
                 ) : (
                   <Button
-                    label="Resend Code"
+                    label="Resend Verification Code"
                     onPress={onResend}
                     variant="tertiary"
                     size="small"
@@ -199,8 +200,8 @@ export function OtpVerificationScreen({
             {/* Security note */}
             <Box className="pt-8">
               <Text variant="caption" tone="muted" align="center">
-                Never share this verification code with anyone. Our support team
-                will never ask for your code.
+                Never share this verification code with anyone. Zero Brokerage
+                support will never ask for your code.
               </Text>
             </Box>
           </Stack>

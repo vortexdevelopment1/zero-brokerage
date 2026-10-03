@@ -1,77 +1,41 @@
 /**
  * Discovery Domain API Client
  *
- * PROVISIONAL ROUTE NOTICE:
- * The backend discovery and search endpoints are NOT yet registered or implemented in `services/api`.
- * The route paths defined here (e.g. `/api/v1/discovery/home` or `/api/v1/listings`) are provisional.
- * The final HTTP route, HTTP method, request parameters, and response envelope remain a
- * shared backend API-contract decision.
+ * PROVISIONAL CONTRACT NOTICE:
+ * The backend discovery and search endpoints are NOT yet registered or implemented in Shared Core Backend (`services/api`).
+ * The route paths defined here (`PROVISIONAL_DISCOVERY_HOME_ROUTE`, `PROVISIONAL_LISTINGS_ROUTE`) are provisional
+ * development integration placeholders and must NOT be treated as finalized backend contracts.
+ *
+ * The Shared Core Backend remains the sole authoritative source for finalized API contracts.
+ * When official discovery/listing contracts are implemented on the backend, this client and its
+ * adapters will be reconciled against those authoritative specifications.
+ *
+ * Section 23 Architecture:
+ * Functions route through `discoveryRepository` which delegates to either `RealDiscoveryApiAdapter`
+ * or `FixtureDiscoveryApiAdapter`.
  */
 
-import { apiRequest } from "@/services/api";
 import type {
   CursorPaginationDto,
   DiscoveryFeedUiModel,
   ListingPresentationModel,
   SearchFilterParams,
 } from "../types/discovery.types";
+import {
+  discoveryRepository,
+  PROVISIONAL_DISCOVERY_HOME_ROUTE,
+  PROVISIONAL_LISTINGS_ROUTE,
+} from "./discovery-adapter";
 
-export const PROVISIONAL_DISCOVERY_HOME_ROUTE = "/api/v1/discovery/home";
-export const PROVISIONAL_LISTINGS_ROUTE = "/api/v1/listings";
-
-/**
- * Encodes verified search filter parameters into query string.
- * Does NOT send unconfirmed category or taxonomy parameters.
- */
-function serializeSearchParams(
-  filters: SearchFilterParams,
-  cursor?: string | null,
-  limit: number = 20,
-): string {
-  const params = new URLSearchParams();
-
-  if (filters.query?.trim()) {
-    params.set("q", filters.query.trim());
-  }
-  if (filters.intent) {
-    params.set("intent", filters.intent);
-  }
-  if (typeof filters.minPrice === "number" && !isNaN(filters.minPrice)) {
-    params.set("minPrice", String(filters.minPrice));
-  }
-  if (typeof filters.maxPrice === "number" && !isNaN(filters.maxPrice)) {
-    params.set("maxPrice", String(filters.maxPrice));
-  }
-  if (typeof filters.bedrooms === "number" && !isNaN(filters.bedrooms)) {
-    params.set("bedrooms", String(filters.bedrooms));
-  }
-  if (filters.verifiedOnly) {
-    params.set("verifiedOnly", "true");
-  }
-  if (cursor) {
-    params.set("cursor", cursor);
-  }
-  params.set("limit", String(Math.min(limit, 50)));
-
-  const qs = params.toString();
-  return qs ? `?${qs}` : "";
-}
+export { PROVISIONAL_DISCOVERY_HOME_ROUTE, PROVISIONAL_LISTINGS_ROUTE };
 
 /**
  * Domain-level function to retrieve discovery landing data.
- * Does not assume the final route is locked.
  */
 export async function getDiscoveryHome(
   signal?: AbortSignal,
 ): Promise<DiscoveryFeedUiModel> {
-  const result = await apiRequest<DiscoveryFeedUiModel>(
-    PROVISIONAL_DISCOVERY_HOME_ROUTE,
-    {
-      method: "GET",
-      signal,
-    },
-  );
-  return result.data;
+  return discoveryRepository.getDiscoveryHome(signal);
 }
 
 // Backward-compatible alias
@@ -86,14 +50,7 @@ export async function searchListings(
   limit: number = 20,
   signal?: AbortSignal,
 ): Promise<CursorPaginationDto<ListingPresentationModel>> {
-  const queryString = serializeSearchParams(filters, cursor, limit);
-  const result = await apiRequest<
-    CursorPaginationDto<ListingPresentationModel>
-  >(`${PROVISIONAL_LISTINGS_ROUTE}${queryString}`, {
-    method: "GET",
-    signal,
-  });
-  return result.data;
+  return discoveryRepository.searchListings(filters, cursor, limit, signal);
 }
 
 /**
@@ -103,13 +60,5 @@ export async function fetchListingById(
   listingId: string,
   signal?: AbortSignal,
 ): Promise<ListingPresentationModel> {
-  const sanitizedId = encodeURIComponent(listingId.trim());
-  const result = await apiRequest<ListingPresentationModel>(
-    `${PROVISIONAL_LISTINGS_ROUTE}/${sanitizedId}`,
-    {
-      method: "GET",
-      signal,
-    },
-  );
-  return result.data;
+  return discoveryRepository.fetchListingById(listingId, signal);
 }

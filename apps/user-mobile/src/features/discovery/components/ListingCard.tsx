@@ -11,6 +11,7 @@
  * 5. Displays sponsored badge ONLY if `isSponsored === true`.
  * 6. Never calculates trust score, ranking, or availability locally.
  * 7. Formats currency (INR) and area cleanly.
+ * 8. Non-nested Pressable architecture for reliable cross-platform interaction.
  */
 
 import React, { useState } from "react";
@@ -22,6 +23,8 @@ import type { ListingSummaryDto } from "../types/discovery.types";
 import { getListingDetailRoute } from "@/navigation/routes";
 import { trackEvent } from "@/services/analytics/analytics";
 import { formatArea, formatPrice } from "../utils/formatters";
+import { FavoriteButton } from "./FavoriteButton";
+import { VerificationBadge } from "./VerificationBadge";
 
 export { formatArea, formatPrice };
 
@@ -68,45 +71,52 @@ export function ListingCard({ listing, onPress }: ListingCardProps) {
     .filter(Boolean)
     .join(", ");
 
+  const accessibilityLabel = `${listing.title}, ${priceDisplay}${
+    specsSummary ? `, ${specsSummary}` : ""
+  }${locationSummary ? ` in ${locationSummary}` : ""}${
+    isVerified ? ", Verified" : ""
+  }${isSponsored ? ", Sponsored" : ""}`;
+
   return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={`${listing.title}, ${priceDisplay}${
-        specsSummary ? `, ${specsSummary}` : ""
-      }${locationSummary ? ` in ${locationSummary}` : ""}${
-        isVerified ? ", Verified" : ""
-      }${isSponsored ? ", Sponsored" : ""}`}
-      accessibilityHint="Opens property details"
-      onPress={handleCardPress}
-      className="mb-4"
-    >
+    <View className="mb-4">
       <Card
         variant="elevated"
         padding="none"
         radius="large"
         className="overflow-hidden border border-default-border bg-surface"
       >
-        {/* Media Container with 16:9 Aspect Ratio */}
+        {/* Media Container with 16:10 Aspect Ratio */}
         <View className="relative w-full aspect-[16/10] bg-surface-muted overflow-hidden">
-          {listing.coverImageUrl && !imageError ? (
-            <Image
-              source={{ uri: listing.coverImageUrl }}
-              style={{ width: "100%", height: "100%" }}
-              contentFit="cover"
-              transition={200}
-              onError={() => setImageError(true)}
-              accessibilityLabel={`Photo of ${listing.title}`}
-            />
-          ) : (
-            <View className="w-full h-full items-center justify-center bg-neutral-200">
-              <Text variant="caption" tone="muted">
-                No Preview Available
-              </Text>
-            </View>
-          )}
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={accessibilityLabel}
+            accessibilityHint="Opens property details"
+            onPress={handleCardPress}
+            className="w-full h-full"
+          >
+            {listing.coverImageUrl && !imageError ? (
+              <Image
+                source={{ uri: listing.coverImageUrl }}
+                style={{ width: "100%", height: "100%" }}
+                contentFit="cover"
+                transition={200}
+                onError={() => setImageError(true)}
+                accessibilityLabel={`Photo of ${listing.title}`}
+              />
+            ) : (
+              <View className="w-full h-full items-center justify-center bg-neutral-200">
+                <Text variant="caption" tone="muted">
+                  No Preview Available
+                </Text>
+              </View>
+            )}
+          </Pressable>
 
           {/* Badges Overlay */}
-          <View className="absolute top-3 left-3 right-3 flex-row items-center justify-between">
+          <View
+            pointerEvents="box-none"
+            className="absolute top-3 left-3 right-3 flex-row items-center justify-between"
+          >
             <View className="flex-row items-center space-x-1.5">
               {/* Intent Pill */}
               <View className="px-2.5 py-1 rounded-full bg-neutral-900/80 backdrop-blur-md">
@@ -122,37 +132,45 @@ export function ListingCard({ listing, onPress }: ListingCardProps) {
 
               {/* Verified Badge */}
               {isVerified ? (
-                <View className="px-2.5 py-1 rounded-full bg-success/90 backdrop-blur-md ml-1.5">
-                  <Text
-                    variant="caption"
-                    tone="inverse"
-                    weight="bold"
-                    className="text-[10px] tracking-wider uppercase"
-                  >
-                    ✓ VERIFIED
-                  </Text>
+                <View className="ml-1.5">
+                  <VerificationBadge status={listing.verificationStatus} />
                 </View>
               ) : null}
             </View>
 
-            {/* Sponsored Placement Indicator */}
-            {isSponsored ? (
-              <View className="px-2 py-0.5 rounded bg-neutral-800/80 backdrop-blur-md">
-                <Text
-                  variant="caption"
-                  tone="inverse"
-                  weight="medium"
-                  className="text-[9px] uppercase tracking-wider text-neutral-300"
-                >
-                  SPONSORED
-                </Text>
-              </View>
-            ) : null}
+            <View className="flex-row items-center space-x-2">
+              {/* Sponsored Placement Indicator */}
+              {isSponsored ? (
+                <View className="px-2 py-0.5 rounded bg-neutral-800/80 backdrop-blur-md mr-1.5">
+                  <Text
+                    variant="caption"
+                    tone="inverse"
+                    weight="medium"
+                    className="text-[9px] uppercase tracking-wider text-neutral-300"
+                  >
+                    SPONSORED
+                  </Text>
+                </View>
+              ) : null}
+
+              {/* Favorite Action Button */}
+              <FavoriteButton
+                listingId={listing.id}
+                variant="floating"
+                size="small"
+              />
+            </View>
           </View>
         </View>
 
         {/* Content Body */}
-        <View className="p-4">
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={accessibilityLabel}
+          accessibilityHint="Opens property details"
+          onPress={handleCardPress}
+          className="p-4"
+        >
           <Stack spacing={2}>
             {/* Price Row */}
             <View className="flex-row items-baseline justify-between">
@@ -220,8 +238,8 @@ export function ListingCard({ listing, onPress }: ListingCardProps) {
               </View>
             ) : null}
           </Stack>
-        </View>
+        </Pressable>
       </Card>
-    </Pressable>
+    </View>
   );
 }

@@ -42,19 +42,19 @@ export function DiscoverHeader({
 
   return (
     <View className="px-5 pt-4 pb-3 bg-surface border-b border-subtle-border">
-      {/* Top Row: Brand & Profile/Sign-In */}
+      {/* Top Row: Brand & Account Access */}
       <View className="flex-row items-center justify-between">
         <Stack spacing={1}>
           <Text
             variant="label"
             tone="brand"
             weight="bold"
-            className="tracking-widest uppercase text-[11px]"
+            className="tracking-widest uppercase text-[10px]"
           >
             ZERO BROKERAGE
           </Text>
           <Text variant="h2" tone="primary" weight="bold">
-            Discover
+            Where to live?
           </Text>
         </Stack>
 
@@ -65,8 +65,18 @@ export function DiscoverHeader({
               accessibilityLabel="View Account"
               accessibilityHint="Navigates to your profile and account settings"
               onPress={handleAuthPress}
-              className="px-3.5 py-1.5 rounded-full bg-brand-light border border-brand/20 active:opacity-80"
+              className="flex-row items-center px-3 py-1.5 rounded-full bg-brand-light border border-brand/20 active:opacity-80"
             >
+              <View className="w-5 h-5 rounded-full bg-brand items-center justify-center mr-1.5">
+                <Text
+                  variant="caption"
+                  tone="inverse"
+                  weight="bold"
+                  className="text-[10px]"
+                >
+                  {user?.fullName ? user.fullName[0].toUpperCase() : "U"}
+                </Text>
+              </View>
               <Text
                 variant="bodySmall"
                 tone="brand"
@@ -93,10 +103,10 @@ export function DiscoverHeader({
       <View className="mt-3">
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`Location: ${locationLabel}`}
+          accessibilityLabel={`Location filter: ${locationLabel}`}
           accessibilityHint="Geospatial location filtering is pending backend geocoding service integration"
           onPress={handleLocationTap}
-          className="flex-row items-center self-start py-1 px-2.5 rounded-full bg-surface-muted border border-default-border/60 active:bg-surface-elevated"
+          className="flex-row items-center self-start py-1 px-3 rounded-full bg-surface-muted border border-default-border active:bg-neutral-200"
         >
           <Text
             variant="caption"
@@ -109,13 +119,13 @@ export function DiscoverHeader({
           <Text
             variant="caption"
             tone="secondary"
-            weight="medium"
+            weight="semibold"
             className="text-[12px]"
           >
             {locationLabel}
           </Text>
           <Text variant="caption" tone="muted" className="ml-1 text-[10px]">
-            ▼
+            ▾
           </Text>
         </Pressable>
       </View>

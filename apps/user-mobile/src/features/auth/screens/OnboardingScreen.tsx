@@ -1,9 +1,17 @@
+/**
+ * Onboarding Screen
+ *
+ * Welcoming onboarding step following successful verification.
+ * Respects backend contract boundaries without inventing mandatory fields.
+ */
+
 import React from "react";
 import { View } from "react-native";
+import { router } from "expo-router";
 
 import { AppContainer } from "@/components/AppContainer";
 import { Box, Button, Card, Stack, Text } from "@/components/primitives";
-
+import { ROUTES } from "@/navigation/routes";
 import { maskPhoneNumber } from "../utils/phone-validation";
 
 type OnboardingScreenProps = {
@@ -17,20 +25,28 @@ export function OnboardingScreen({
   onLogout,
   isLoggingOut = false,
 }: OnboardingScreenProps) {
+  function handleExplore() {
+    router.replace(ROUTES.DISCOVER as any);
+  }
+
   return (
     <AppContainer>
-      <View className="flex-1 px-6 pt-16 pb-8 justify-between">
+      <View className="flex-1 px-6 pt-16 pb-8 justify-between bg-surface">
         <Stack spacing={6}>
+          {/* Header */}
           <Stack spacing={2}>
-            <Text
-              variant="label"
-              tone="brand"
-              className="tracking-widest uppercase"
-            >
-              Profile Setup
-            </Text>
+            <View className="px-2.5 py-1 self-start rounded-full bg-success-light border border-success/30">
+              <Text
+                variant="caption"
+                tone="success"
+                weight="bold"
+                className="tracking-widest uppercase text-[10px]"
+              >
+                ✓ PHONE VERIFIED
+              </Text>
+            </View>
             <Text variant="display" tone="primary" weight="bold">
-              Account Created
+              Welcome to Zero Brokerage
             </Text>
             <Text variant="bodyLarge" tone="secondary">
               Your mobile number{" "}
@@ -39,34 +55,69 @@ export function OnboardingScreen({
                   {maskPhoneNumber(phone)}
                 </Text>
               ) : null}{" "}
-              is verified.
+              is now securely authenticated.
             </Text>
           </Stack>
 
-          <Card variant="outlined" padding="medium" radius="large">
+          {/* Member Privileges Card */}
+          <Card
+            variant="outlined"
+            padding="large"
+            radius="large"
+            className="border-default-border bg-surface-muted"
+          >
             <Stack spacing={3}>
               <Text variant="title" tone="primary" weight="semibold">
-                Profile Registration
+                What you can do now:
               </Text>
-              <Text variant="body" tone="secondary">
-                The profile completion API is awaiting backend deployment in the
-                shared identity service. Once deployed, full name and
-                preferences will be recorded here.
-              </Text>
+              <Stack spacing={2}>
+                <View className="flex-row items-center">
+                  <Text variant="body" tone="brand" className="mr-2.5">
+                    ✦
+                  </Text>
+                  <Text variant="body" tone="primary">
+                    Save and track your favorite residences
+                  </Text>
+                </View>
+                <View className="flex-row items-center">
+                  <Text variant="body" tone="brand" className="mr-2.5">
+                    ✦
+                  </Text>
+                  <Text variant="body" tone="primary">
+                    Schedule direct private visits with verified owners
+                  </Text>
+                </View>
+                <View className="flex-row items-center">
+                  <Text variant="body" tone="brand" className="mr-2.5">
+                    ✦
+                  </Text>
+                  <Text variant="body" tone="primary">
+                    Zero brokerage fees across all transactions
+                  </Text>
+                </View>
+              </Stack>
             </Stack>
           </Card>
         </Stack>
 
-        <Box className="pt-8">
+        <Stack spacing={3} className="pt-8">
+          <Button
+            label="Start Exploring Homes"
+            onPress={handleExplore}
+            variant="primary"
+            size="large"
+            fullWidth
+          />
+
           <Button
             label="Sign Out"
             onPress={onLogout}
-            variant="secondary"
-            size="large"
+            variant="tertiary"
+            size="medium"
             loading={isLoggingOut}
             fullWidth
           />
-        </Box>
+        </Stack>
       </View>
     </AppContainer>
   );

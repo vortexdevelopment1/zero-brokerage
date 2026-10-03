@@ -13,9 +13,10 @@ import { Pressable, Text } from "@/components/primitives";
 import type { PropertyCategoryItem } from "../types/discovery.types";
 
 export const PROVISIONAL_CATEGORIES: readonly PropertyCategoryItem[] = [
-  { id: "cat-residential", label: "Residential", iconName: "🏡" },
-  { id: "cat-commercial", label: "Commercial", iconName: "🏬" },
-  { id: "cat-furnished", label: "Furnished", iconName: "🛋" },
+  { id: "cat-all", label: "All Properties", iconName: "✦" },
+  { id: "cat-residential", label: "Penthouses & Villas", iconName: "🏡" },
+  { id: "cat-apartments", label: "Apartments", iconName: "🏢" },
+  { id: "cat-furnished", label: "Furnished Living", iconName: "🛋" },
 ];
 
 interface CategoryShortcutsProps {
@@ -30,7 +31,7 @@ export function CategoryShortcuts({
   onSelectCategory,
 }: CategoryShortcutsProps) {
   return (
-    <View className="py-2.5">
+    <View className="py-2">
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -42,11 +43,11 @@ export function CategoryShortcuts({
             <Pressable
               key={category.id}
               accessibilityRole="button"
-              accessibilityLabel={`Category option: ${category.label}`}
-              accessibilityHint="Category filtering is pending backend taxonomy finalization"
+              accessibilityLabel={`Filter: ${category.label}`}
+              accessibilityHint="Category filtering is exploratory pending backend taxonomy finalization"
               onPress={() => onSelectCategory?.(category)}
               className={[
-                "flex-row items-center py-2 px-3.5 mr-2.5 rounded-full border active:opacity-80",
+                "flex-row items-center py-2 px-3.5 mr-2 rounded-full border active:opacity-80 transition-colors",
                 isSelected
                   ? "bg-brand border-brand"
                   : "bg-surface border-default-border",
@@ -54,7 +55,7 @@ export function CategoryShortcuts({
             >
               <Text
                 variant="caption"
-                className="mr-1.5 text-[13px]"
+                className="mr-1.5 text-[12px]"
                 accessibilityElementsHidden
               >
                 {category.iconName}
@@ -63,6 +64,7 @@ export function CategoryShortcuts({
                 variant="bodySmall"
                 tone={isSelected ? "inverse" : "primary"}
                 weight={isSelected ? "bold" : "medium"}
+                className="text-[13px]"
               >
                 {category.label}
               </Text>

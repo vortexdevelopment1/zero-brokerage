@@ -1,11 +1,12 @@
 /**
  * Search Entry Bar Component
  *
- * Search input field and filter trigger action.
+ * Refined search input object with focus transitions, clear control,
+ * and filter trigger.
  */
 
-import React from "react";
-import { TextInput, View } from "react-native";
+import React, { useState } from "react";
+import { ActivityIndicator, TextInput, View } from "react-native";
 import { Pressable, Text } from "@/components/primitives";
 import { colors } from "@/theme/tokens";
 
@@ -16,6 +17,7 @@ interface SearchEntryBarProps {
   onFilterPress?: () => void;
   activeFilterCount?: number;
   placeholder?: string;
+  isLoading?: boolean;
 }
 
 export function SearchEntryBar({
@@ -24,47 +26,69 @@ export function SearchEntryBar({
   onSubmitEditing,
   onFilterPress,
   activeFilterCount = 0,
-  placeholder = "Search localities, projects, or bedrooms...",
+  placeholder = "Search by locality, architecture, or bedrooms...",
+  isLoading = false,
 }: SearchEntryBarProps) {
+  const [isFocused, setIsFocused] = useState(false);
+
   return (
-    <View className="px-5 py-2.5 bg-surface">
+    <View className="px-5 py-3 bg-surface">
       <View className="flex-row items-center space-x-2">
         {/* Search Input Container */}
-        <View className="flex-1 flex-row items-center h-12 px-3.5 rounded-large bg-surface-muted border border-default-border focus:border-brand">
-          <Text
-            variant="body"
-            tone="muted"
-            className="mr-2 text-[15px]"
-            accessibilityElementsHidden
-          >
-            🔍
-          </Text>
+        <View
+          className={[
+            "flex-1 flex-row items-center h-12 px-3.5 rounded-large bg-surface-muted border transition-all",
+            isFocused
+              ? "border-brand bg-surface shadow-sm"
+              : "border-default-border",
+          ].join(" ")}
+        >
+          {isLoading ? (
+            <ActivityIndicator
+              size="small"
+              color={colors.brand.primary}
+              style={{ marginRight: 8 }}
+            />
+          ) : (
+            <Text
+              variant="body"
+              tone={isFocused ? "brand" : "muted"}
+              className="mr-2.5 text-[15px]"
+              accessibilityElementsHidden
+            >
+              🔍
+            </Text>
+          )}
+
           <TextInput
             accessibilityRole="search"
             accessibilityLabel="Search properties"
-            accessibilityHint="Type to search for apartments, villas, or localities"
-            className="flex-1 text-[15px] text-content-primary py-0"
+            accessibilityHint="Type to search for apartments, penthouses, or localities"
+            className="flex-1 text-[14px] text-primary-content py-0"
             placeholder={placeholder}
             placeholderTextColor={colors.secondaryContent}
             value={value}
             onChangeText={onChangeText}
             onSubmitEditing={onSubmitEditing}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
             returnKeyType="search"
             autoCorrect={false}
-            clearButtonMode="while-editing"
+            clearButtonMode="never"
           />
+
           {value.length > 0 ? (
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel="Clear search text"
+              accessibilityLabel="Clear search query"
               onPress={() => onChangeText("")}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              className="p-1"
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+              className="w-6 h-6 items-center justify-center rounded-full bg-neutral-200 active:bg-neutral-300"
             >
               <Text
                 variant="caption"
-                tone="muted"
-                className="text-[12px] font-bold"
+                tone="primary"
+                className="text-[11px] font-bold"
               >
                 ✕
               </Text>
@@ -83,7 +107,12 @@ export function SearchEntryBar({
             }
             accessibilityHint="Opens search filter sheet"
             onPress={onFilterPress}
-            className="w-12 h-12 rounded-large items-center justify-center bg-surface-muted border border-default-border active:bg-surface-elevated ml-2"
+            className={[
+              "w-12 h-12 rounded-large items-center justify-center border active:opacity-80 ml-2",
+              activeFilterCount > 0
+                ? "bg-brand-light border-brand"
+                : "bg-surface-muted border-default-border",
+            ].join(" ")}
           >
             <Text
               variant="body"
@@ -93,7 +122,7 @@ export function SearchEntryBar({
               ⚙
             </Text>
             {activeFilterCount > 0 ? (
-              <View className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-brand" />
+              <View className="absolute top-2 right-2 w-2 h-2 rounded-full bg-brand" />
             ) : null}
           </Pressable>
         ) : null}

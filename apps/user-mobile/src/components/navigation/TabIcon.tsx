@@ -22,8 +22,8 @@ interface TabIconProps {
 const TAB_ICONS: Record<TabKey, { active: string; inactive: string }> = {
   discover: { active: "✦", inactive: "✧" },
   saved: { active: "♥", inactive: "♡" },
-  activity: { active: "●", inactive: "○" },
-  account: { active: "◼", inactive: "◻" },
+  activity: { active: "◈", inactive: "◇" },
+  account: { active: "●", inactive: "○" },
 };
 
 export function TabIcon({
@@ -38,7 +38,11 @@ export function TabIcon({
     <View className="items-center justify-center w-7 h-7">
       <Text
         variant="bodyLarge"
-        style={{ color: color as string, fontSize: 18, lineHeight: 22 }}
+        style={{
+          color: color as string,
+          fontSize: focused ? 18 : 16,
+          lineHeight: 22,
+        }}
         accessibilityElementsHidden
       >
         {glyph}

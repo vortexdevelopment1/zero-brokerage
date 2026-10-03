@@ -1,11 +1,12 @@
 /**
  * Discover Screen (Home Experience)
  *
- * Contract Neutrality:
- * - Does not claim curation, ranking, recommendations, or verification without backend confirmation.
- * - Uses neutral section terminology ("Properties", "Search Results").
- * - Does not pass unconfirmed category enums to the backend search API.
- * - Supports pull-to-refresh and independent section error boundaries.
+ * Visual & Editorial Foundations:
+ * - Emotional hook: "Where to live?" with honest location indicator.
+ * - Visual rhythm: Cinematic PropertyHero at the top, followed by editorial sections.
+ * - Contextual Furniture entry point integrated between property collections.
+ * - Dynamic search experience with focus states and filter triggers.
+ * - Resilient state boundaries: skeleton loaders, graceful empty/error states.
  */
 
 import React, { useState } from "react";
@@ -20,6 +21,11 @@ import {
 import { FurnitureBannerCard } from "../components/FurnitureBannerCard";
 import { DiscoverSection } from "../components/DiscoverSection";
 import { ListingCard } from "../components/ListingCard";
+import { PropertyHero } from "../components/PropertyHero";
+import {
+  PropertyHeroSkeleton,
+  PropertyCardSkeleton,
+} from "@/components/feedback";
 import { useDiscoveryFeed } from "../hooks/useDiscoveryFeed";
 import { useListingSearch } from "../hooks/useListingSearch";
 import type {
@@ -63,6 +69,8 @@ export function DiscoverScreen() {
     await Promise.all([feedQuery.refresh(), search.refresh()]);
   }
 
+  const sections = feedQuery.data?.sections || [];
+
   return (
     <AppContainer>
       <View className="flex-1 bg-background">
@@ -84,6 +92,7 @@ export function DiscoverScreen() {
           <SearchEntryBar
             value={searchQuery}
             onChangeText={handleSearchChange}
+            isLoading={search.isLoading && isSearching}
             onSubmitEditing={() => {
               if (searchQuery.trim()) {
                 trackEvent("search_submitted", { query: searchQuery.trim() });
@@ -111,41 +120,77 @@ export function DiscoverScreen() {
               error={search.error}
               isEmpty={!search.isLoading && search.items.length === 0}
               emptyTitle="No properties found"
-              emptyDescription="No properties match your current search query."
+              emptyDescription="No properties match your current search query. Try searching for a different area or bedroom count."
               onRetry={search.refresh}
             >
               {search.items.map((listing: ListingPresentationModel) => (
                 <ListingCard key={listing.id} listing={listing} />
               ))}
             </DiscoverSection>
+          ) : feedQuery.isLoading ? (
+            /* Layout-preserving Skeletons */
+            <View className="px-5 pt-3">
+              <PropertyHeroSkeleton />
+              <PropertyCardSkeleton />
+            </View>
           ) : (
-            /* Contract-Neutral Discovery Feed */
+            /* Visual Rhythm Discovery Feed */
             <>
-              {/* Contextual Furniture Living Banner */}
-              <FurnitureBannerCard />
+              {sections.length > 0 ? (
+                sections.map((section, sIndex) => {
+                  const listings = section.listings || [];
+                  if (listings.length === 0) return null;
 
-              {/* Primary Properties Section */}
-              <DiscoverSection
-                title="Properties"
-                subtitle="Available property listings"
-                isLoading={feedQuery.isLoading}
-                isUnavailable={feedQuery.isUnavailable}
-                isOffline={feedQuery.isOffline}
-                error={feedQuery.errorMessage}
-                isEmpty={
-                  feedQuery.status === "success" &&
-                  (!feedQuery.data?.sections ||
-                    feedQuery.data.sections.length === 0)
-                }
-                emptyTitle="No properties available"
-                emptyDescription="The property listings catalog is currently empty or updating."
-                onRetry={feedQuery.refetch}
-              >
-                {/* Render listings when backend feed response is available */}
-                {feedQuery.data?.sections?.[0]?.listings?.map((listing) => (
-                  <ListingCard key={listing.id} listing={listing} />
-                ))}
-              </DiscoverSection>
+                  // Render hero for the very first property
+                  const hasHero = sIndex === 0 && listings.length > 0;
+                  const heroListing = hasHero ? listings[0] : null;
+                  const displayListings = hasHero
+                    ? listings.slice(1)
+                    : listings;
+
+                  return (
+                    <View key={section.id}>
+                      {heroListing ? (
+                        <View className="px-5 pt-3">
+                          <PropertyHero
+                            listing={heroListing}
+                            label="FEATURED RESIDENCE"
+                          />
+                        </View>
+                      ) : null}
+
+                      {displayListings.length > 0 ? (
+                        <DiscoverSection
+                          title={section.title}
+                          subtitle={section.subtitle}
+                        >
+                          {displayListings.map((listing) => (
+                            <ListingCard key={listing.id} listing={listing} />
+                          ))}
+                        </DiscoverSection>
+                      ) : null}
+
+                      {/* Editorial Furniture Living moment after the primary showcase */}
+                      {sIndex === 0 ? <FurnitureBannerCard /> : null}
+                    </View>
+                  );
+                })
+              ) : (
+                /* Primary fallback section if feed is empty or offline */
+                <DiscoverSection
+                  title="Properties"
+                  subtitle="Available property listings"
+                  isUnavailable={feedQuery.isUnavailable}
+                  isOffline={feedQuery.isOffline}
+                  error={feedQuery.errorMessage}
+                  isEmpty={feedQuery.status === "success"}
+                  emptyTitle="No properties available"
+                  emptyDescription="The property catalog is currently being updated. Please pull down to refresh."
+                  onRetry={feedQuery.refetch}
+                >
+                  <View />
+                </DiscoverSection>
+              )}
             </>
           )}
         </ScrollView>

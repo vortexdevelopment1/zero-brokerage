@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -6,9 +6,12 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { router } from "expo-router";
 
 import { AppContainer } from "@/components/AppContainer";
-import { Box, Button, Stack, Text } from "@/components/primitives";
+import { Box, Button, Pressable, Stack, Text } from "@/components/primitives";
+import { ROUTES } from "@/navigation/routes";
+import { colors } from "@/theme/tokens";
 
 type AuthEntryScreenProps = {
   phoneNumber: string;
@@ -25,16 +28,41 @@ export function AuthEntryScreen({
   onContinue,
   isLoading = false,
 }: AuthEntryScreenProps) {
+  const [isFocused, setIsFocused] = useState(false);
+
+  function handleBack() {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace(ROUTES.DISCOVER as any);
+    }
+  }
+
   return (
     <AppContainer>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        className="flex-1"
+        className="flex-1 bg-surface"
       >
+        {/* Navigation Bar */}
+        <View className="px-5 py-3 flex-row items-center justify-between border-b border-subtle-border">
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Back to Discover"
+            onPress={handleBack}
+            className="flex-row items-center py-1.5 px-3 rounded-full bg-surface-muted border border-default-border active:opacity-70"
+          >
+            <Text variant="bodySmall" tone="secondary" weight="semibold">
+              ← Discover
+            </Text>
+          </Pressable>
+          <View className="w-16" />
+        </View>
+
         <ScrollView
           contentContainerStyle={{ flexGrow: 1 }}
           keyboardShouldPersistTaps="handled"
-          className="flex-1 px-6 pt-12 pb-8"
+          className="flex-1 px-6 pt-8 pb-8"
         >
           <Stack spacing={8} className="flex-1 justify-between">
             <Stack spacing={6}>
@@ -43,45 +71,57 @@ export function AuthEntryScreen({
                 <Text
                   variant="label"
                   tone="brand"
-                  className="tracking-widest uppercase"
+                  weight="bold"
+                  className="tracking-widest uppercase text-[10px]"
                 >
-                  Zero Brokerage
+                  ZERO BROKERAGE ACCOUNT
                 </Text>
                 <Text variant="display" tone="primary" weight="bold">
                   Welcome
                 </Text>
                 <Text variant="bodyLarge" tone="secondary">
-                  Sign in or create an account with your mobile number to get
-                  started.
+                  Direct verified communication between property owners and
+                  residents.
                 </Text>
               </Stack>
 
               {/* Phone Input Card */}
               <Stack spacing={3}>
-                <Text variant="label" tone="primary">
+                <Text variant="label" tone="primary" weight="semibold">
                   Mobile Number
                 </Text>
 
-                <View className="flex-row items-center rounded-large border border-default-border bg-surface px-4 py-3.5 focus:border-brand">
+                <View
+                  className={[
+                    "flex-row items-center rounded-large border bg-surface px-4 py-3.5 transition-all",
+                    errorMessage
+                      ? "border-error"
+                      : isFocused
+                        ? "border-brand bg-surface shadow-sm"
+                        : "border-default-border bg-surface-muted",
+                  ].join(" ")}
+                >
                   <View className="flex-row items-center border-r border-default-border pr-3 mr-3">
                     <Text variant="body" tone="primary" weight="semibold">
-                      +91
+                      🇮🇳 +91
                     </Text>
                   </View>
 
                   <TextInput
                     value={phoneNumber}
                     onChangeText={onPhoneNumberChange}
+                    onFocus={() => setIsFocused(true)}
+                    onBlur={() => setIsFocused(false)}
                     keyboardType="phone-pad"
                     autoComplete="tel"
                     textContentType="telephoneNumber"
                     placeholder="98765 43210"
-                    placeholderTextColor="#A1A1AA"
+                    placeholderTextColor={colors.mutedContent}
                     editable={!isLoading}
                     maxLength={15}
                     accessibilityLabel="Mobile phone number"
                     accessibilityHint="Enter your 10-digit mobile number"
-                    className="flex-1 text-[16px] text-primary-content"
+                    className="flex-1 text-[16px] text-primary-content py-0"
                   />
                 </View>
 
@@ -95,7 +135,7 @@ export function AuthEntryScreen({
                   </Text>
                 ) : (
                   <Text variant="caption" tone="muted">
-                    We will send a 6-digit verification code via SMS.
+                    We will send a 6-digit verification code via secure SMS.
                   </Text>
                 )}
 
@@ -117,8 +157,8 @@ export function AuthEntryScreen({
             {/* Legal / Policy note */}
             <Box className="pt-8">
               <Text variant="caption" tone="muted" align="center">
-                By continuing, you agree to our Terms of Service and Privacy
-                Policy. Standard carrier messaging rates may apply.
+                By continuing, you agree to the Zero Brokerage Terms of Service
+                and Privacy Policy. Zero spam, zero broker commissions.
               </Text>
             </Box>
           </Stack>

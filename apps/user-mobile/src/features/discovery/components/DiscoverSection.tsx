@@ -2,7 +2,7 @@
  * Discover Section Container
  *
  * Provides isolated error and state boundaries per section:
- * - Loading
+ * - Loading (layout-matching skeletons)
  * - Success
  * - Empty
  * - Partial Failure / Error
@@ -18,8 +18,8 @@ import { Card, Stack, Text } from "@/components/primitives";
 import {
   EmptyState,
   ErrorState,
-  LoadingState,
   OfflineState,
+  PropertyCardSkeleton,
 } from "@/components/feedback";
 
 export interface DiscoverSectionProps {
@@ -84,9 +84,10 @@ export function DiscoverSection({
       {/* Section Body with Isolated State Boundaries */}
       <View className="px-5">
         {isLoading ? (
-          <Card variant="outlined" padding="large" radius="large">
-            <LoadingState message={`Loading ${title.toLowerCase()}...`} />
-          </Card>
+          <View>
+            <PropertyCardSkeleton />
+            <PropertyCardSkeleton />
+          </View>
         ) : isOffline ? (
           <Card variant="outlined" padding="medium" radius="large">
             <OfflineState
