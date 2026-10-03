@@ -32,6 +32,12 @@ const envSchema = z.object({
   OTP_RESEND_COOLDOWN_SECONDS: z.coerce.number().int().positive().default(60),
 
   REDIS_URL: z.string().optional(),
+
+  CORS_ALLOWED_ORIGINS: z.string().optional(),
+
+  MAX_BODY_LIMIT_BYTES: z.coerce.number().int().positive().default(1048576),
+
+  TRUST_PROXY: z.string().default("false"),
 });
 
 export const env = envSchema.parse(process.env);

@@ -7,10 +7,13 @@ import {
 } from "@zero-brokerage/database";
 
 import { env } from "../config/env.js";
+import { PostgresIdempotencyStore } from "../common/http/idempotency/postgres-store.js";
+import type { IdempotencyStore } from "../common/http/idempotency/types.js";
 
 declare module "fastify" {
   interface FastifyInstance {
     db: ReturnType<typeof createDatabasePool>;
+    idempotencyStore: IdempotencyStore;
   }
 }
 
@@ -19,6 +22,7 @@ export interface DatabasePluginOptions extends Omit<
   "connectionString"
 > {
   connectionString?: string;
+  idempotencyStore?: IdempotencyStore;
 }
 
 async function databasePlugin(
@@ -44,6 +48,10 @@ async function databasePlugin(
   const pool = createDatabasePool(databaseOptions);
 
   app.decorate("db", pool);
+  app.decorate(
+    "idempotencyStore",
+    options.idempotencyStore ?? new PostgresIdempotencyStore(pool),
+  );
 
   app.addHook("onClose", async () => {
     await pool.end();

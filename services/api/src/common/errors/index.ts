@@ -1,3 +1,13 @@
+import {
+  DatabaseError,
+  UniqueConstraintViolationError,
+  ForeignKeyViolationError,
+  NotNullConstraintViolationError,
+  CheckConstraintViolationError,
+  SerializationFailureError,
+  DeadlockDetectedError,
+} from "@zero-brokerage/database";
+
 export interface ErrorDetail {
   field?: string;
   message: string;
@@ -61,11 +71,18 @@ export class ValidationError extends AppError {
 }
 
 export class RateLimitedError extends AppError {
+  public readonly retryAfterSeconds?: number | undefined;
+
   constructor(
     message = "Too many requests. Please try again later.",
-    details?: ErrorDetail[],
+    options?:
+      { retryAfterSeconds?: number; details?: ErrorDetail[] } | ErrorDetail[],
   ) {
+    const details = Array.isArray(options) ? options : options?.details;
     super(429, "RATE_LIMITED", message, details);
+    if (!Array.isArray(options) && options?.retryAfterSeconds !== undefined) {
+      this.retryAfterSeconds = options.retryAfterSeconds;
+    }
   }
 }
 
@@ -105,6 +122,51 @@ export class SecurityChallengeRequiredError extends AppError {
   }
 }
 
+export class IdempotencyConflictError extends AppError {
+  constructor(
+    message = "An operation with this idempotency key is currently in progress",
+    details?: ErrorDetail[],
+  ) {
+    super(409, "IDEMPOTENCY_IN_PROGRESS", message, details);
+  }
+}
+
+export class IdempotencyMismatchError extends AppError {
+  constructor(
+    message = "Idempotency key was previously used with a different request payload",
+    details?: ErrorDetail[],
+  ) {
+    super(409, "IDEMPOTENCY_KEY_PAYLOAD_MISMATCH", message, details);
+  }
+}
+
+export class InvalidCursorError extends AppError {
+  constructor(
+    message = "Invalid or corrupted pagination cursor",
+    details?: ErrorDetail[],
+  ) {
+    super(422, "INVALID_CURSOR", message, details);
+  }
+}
+
+export class InvalidFilterError extends AppError {
+  constructor(
+    message = "Invalid or unsupported filter parameter",
+    details?: ErrorDetail[],
+  ) {
+    super(422, "INVALID_FILTER", message, details);
+  }
+}
+
+export class InvalidSortError extends AppError {
+  constructor(
+    message = "Invalid or unsupported sort parameter",
+    details?: ErrorDetail[],
+  ) {
+    super(422, "INVALID_SORT", message, details);
+  }
+}
+
 export class InternalServerError extends AppError {
   constructor(
     message = "An unexpected internal server error occurred",
@@ -112,4 +174,83 @@ export class InternalServerError extends AppError {
   ) {
     super(500, "INTERNAL_SERVER_ERROR", message, details);
   }
+}
+
+/**
+ * Maps a low-level DatabaseError into an appropriate application AppError,
+ * preserving safe metadata and preventing exposure of internal database errors.
+ */
+export function mapDatabaseErrorToAppError(error: DatabaseError): AppError {
+  if (error instanceof UniqueConstraintViolationError) {
+    return new ConflictError(
+      "A record with this identifier or unique value already exists.",
+      error.constraint
+        ? [
+            {
+              field: error.constraint,
+              message: "Unique constraint violated",
+              code: "UNIQUE_VIOLATION",
+            },
+          ]
+        : undefined,
+    );
+  }
+
+  if (error instanceof ForeignKeyViolationError) {
+    return new BadRequestError(
+      "Referenced related record does not exist or cannot be modified.",
+      error.constraint
+        ? [
+            {
+              field: error.constraint,
+              message: "Foreign key constraint violated",
+              code: "FOREIGN_KEY_VIOLATION",
+            },
+          ]
+        : undefined,
+    );
+  }
+
+  if (error instanceof NotNullConstraintViolationError) {
+    return new ValidationError(
+      "A required field was missing or null.",
+      error.column
+        ? [
+            {
+              field: error.column,
+              message: "Field cannot be null",
+              code: "NOT_NULL_VIOLATION",
+            },
+          ]
+        : undefined,
+    );
+  }
+
+  if (error instanceof CheckConstraintViolationError) {
+    return new ValidationError(
+      "Provided value violated a data check constraint.",
+      error.constraint
+        ? [
+            {
+              field: error.constraint,
+              message: "Check constraint violated",
+              code: "CHECK_VIOLATION",
+            },
+          ]
+        : undefined,
+    );
+  }
+
+  if (
+    error instanceof SerializationFailureError ||
+    error instanceof DeadlockDetectedError
+  ) {
+    return new AppError(
+      503,
+      "CONCURRENCY_CONFLICT",
+      "A database concurrency conflict occurred. Please retry your request.",
+    );
+  }
+
+  return new InternalServerError("An unexpected database error occurred.");
 }

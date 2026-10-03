@@ -5,8 +5,13 @@ import type {
   FastifyReply,
   FastifyRequest,
 } from "fastify";
-import { ZodError } from "zod";
-import { AppError } from "../common/errors/index.js";
+import {
+  ClassifiedHttpError,
+  classifyHttpError,
+  formatCanonicalHttpError,
+  formatLegacyStep04Error,
+} from "../common/http/error-classification.js";
+import { isLegacyStep04Route } from "../common/http/compatibility.js";
 
 async function errorHandlerPlugin(app: FastifyInstance): Promise<void> {
   app.setErrorHandler(
@@ -15,78 +20,60 @@ async function errorHandlerPlugin(app: FastifyInstance): Promise<void> {
       request: FastifyRequest,
       reply: FastifyReply,
     ) => {
-      const timestamp = new Date().toISOString();
+      if (reply.sent) {
+        request.log.warn(
+          { requestId: request.id },
+          "Reply already sent; skipping error handling",
+        );
+        return;
+      }
+
       const requestId = request.id;
+      const classifiedError = classifyHttpError(error);
+      request.errorCode = classifiedError.code;
 
-      // 1. Known AppError instances
-      if (error instanceof AppError) {
-        return reply.status(error.statusCode).send({
-          success: false,
-          error: {
-            code: error.code,
-            message: error.message,
-            ...(error.details ? { details: error.details } : {}),
-            timestamp,
-            requestId,
-          },
-        });
+      if (classifiedError.category === "unexpected") {
+        request.log.error(
+          { err: classifiedError.causeError, requestId },
+          "Unhandled internal server error occurred",
+        );
       }
 
-      // 2. Zod validation errors
-      if (error instanceof ZodError) {
-        const details = error.issues.map((issue) => ({
-          field: issue.path.join("."),
-          message: issue.message,
-          code: issue.code,
-        }));
-
-        return reply.status(422).send({
-          success: false,
-          error: {
-            code: "VALIDATION_FAILED",
-            message: "The request payload contains invalid values.",
-            details,
-            timestamp,
-            requestId,
-          },
-        });
-      }
-
-      // 3. Fastify built-in validation / syntax errors
-      const fastifyError = error as FastifyError;
       if (
-        fastifyError.statusCode &&
-        fastifyError.statusCode >= 400 &&
-        fastifyError.statusCode < 500
+        classifiedError.retryAfterSeconds !== undefined &&
+        !reply.getHeader("retry-after")
       ) {
-        return reply.status(fastifyError.statusCode).send({
-          success: false,
-          error: {
-            code: fastifyError.code ?? "BAD_REQUEST",
-            message: fastifyError.message,
-            timestamp,
-            requestId,
-          },
-        });
+        reply.header("retry-after", String(classifiedError.retryAfterSeconds));
       }
 
-      // 4. Uncaught server errors (never leak stack or internal details)
-      request.log.error(
-        { err: error, requestId },
-        "Unhandled internal server error occurred",
-      );
+      const body = isLegacyStep04Route(request)
+        ? formatLegacyStep04Error(classifiedError, requestId)
+        : formatCanonicalHttpError(classifiedError, requestId);
 
-      return reply.status(500).send({
-        success: false,
-        error: {
-          code: "INTERNAL_SERVER_ERROR",
-          message: "An internal server error occurred.",
-          timestamp,
-          requestId,
-        },
-      });
+      return reply.status(classifiedError.statusCode).send(body);
     },
   );
+
+  app.setNotFoundHandler((request: FastifyRequest, reply: FastifyReply) => {
+    const requestId = request.id;
+    const notFoundError = new ClassifiedHttpError({
+      statusCode: 404,
+      code: "NOT_FOUND",
+      publicMessage: "The requested resource was not found.",
+      retryable: false,
+      category: "framework",
+      causeError: new Error(`Route ${request.method}:${request.url} not found`),
+      legacyCode: "NOT_FOUND",
+      legacyMessage: "Resource not found",
+    });
+    request.errorCode = notFoundError.code;
+
+    const body = isLegacyStep04Route(request)
+      ? formatLegacyStep04Error(notFoundError, requestId)
+      : formatCanonicalHttpError(notFoundError, requestId);
+
+    return reply.status(404).send(body);
+  });
 }
 
 export default fp(errorHandlerPlugin, {

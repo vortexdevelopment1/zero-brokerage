@@ -1,5 +1,6 @@
 import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import type { Pool } from "pg";
+import { withTransaction } from "@zero-brokerage/database";
 import {
   ForbiddenError,
   NotFoundError,
@@ -309,10 +310,23 @@ export class StepUpService {
       throw new UnauthorizedError("Invalid step-up verification code.");
     }
 
-    const consumed = await consumeOtpChallenge(this.pool, challenge.id);
-    if (!consumed) {
-      throw new UnauthorizedError("Challenge has already been consumed.");
-    }
+    await withTransaction(this.pool, async (tx) => {
+      const consumed = await consumeOtpChallenge(tx, challenge.id);
+      if (!consumed) {
+        throw new UnauthorizedError("Challenge has already been consumed.");
+      }
+
+      await recordSecurityEvent(tx, {
+        eventType: "OTP_VERIFIED",
+        userId: params.userId,
+        ipAddress: params.ipAddress,
+        userAgent: params.userAgent,
+        metadata: {
+          purpose: "SENSITIVE_ACTION",
+          challengeId: challenge.id,
+        },
+      });
+    });
 
     // Step-up tokens are strictly short-lived (5 minutes / 300 seconds)
     const expiresInSeconds = 300;
@@ -329,17 +343,6 @@ export class StepUpService {
     };
 
     const stepUpToken = this.signStepUpToken(payload);
-
-    await recordSecurityEvent(this.pool, {
-      eventType: "OTP_VERIFIED",
-      userId: params.userId,
-      ipAddress: params.ipAddress,
-      userAgent: params.userAgent,
-      metadata: {
-        purpose: "SENSITIVE_ACTION",
-        challengeId: challenge.id,
-      },
-    });
 
     return {
       stepUpToken,

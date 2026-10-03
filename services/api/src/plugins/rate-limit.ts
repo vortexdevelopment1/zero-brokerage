@@ -14,19 +14,35 @@ import {
   type StepUpNonceStore,
 } from "../modules/identity/services/step-up-service.js";
 
+import {
+  createRateLimitHandler,
+  RATE_LIMIT_POLICIES,
+} from "../common/http/rate-limit/index.js";
+
 declare module "fastify" {
   interface FastifyInstance {
     rateLimiter: RateLimiter;
     assertRateLimit: typeof assertRateLimit;
     stepUpNonceStore: StepUpNonceStore;
+    createRateLimitHandler: typeof createRateLimitHandler;
+    rateLimitPolicies: typeof RATE_LIMIT_POLICIES;
   }
 }
 
-const rateLimitPlugin: FastifyPluginAsync = async (app) => {
-  const limiter = createConfiguredRateLimiter({
-    nodeEnv: env.NODE_ENV,
-    redisUrl: env.REDIS_URL,
-  });
+export interface RateLimitPluginOptions {
+  rateLimiter?: RateLimiter;
+}
+
+const rateLimitPlugin: FastifyPluginAsync<RateLimitPluginOptions> = async (
+  app,
+  options = {},
+) => {
+  const limiter =
+    options.rateLimiter ??
+    createConfiguredRateLimiter({
+      nodeEnv: env.NODE_ENV,
+      redisUrl: env.REDIS_URL,
+    });
 
   setRateLimiter(limiter);
 
@@ -43,6 +59,8 @@ const rateLimitPlugin: FastifyPluginAsync = async (app) => {
   app.decorate("rateLimiter", limiter);
   app.decorate("assertRateLimit", assertRateLimit);
   app.decorate("stepUpNonceStore", nonceStore);
+  app.decorate("createRateLimitHandler", createRateLimitHandler);
+  app.decorate("rateLimitPolicies", RATE_LIMIT_POLICIES);
 
   app.addHook("onClose", async () => {
     if (limiter instanceof RedisRateLimiter) {

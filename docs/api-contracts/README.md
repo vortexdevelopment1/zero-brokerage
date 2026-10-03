@@ -1,11 +1,15 @@
 # API Contracts
 
-## Purpose
-This directory will contain formal API contract definitions and interface specifications.
+This directory defines the Canonical Step 05 API Contract for new externally
+consumed Zero Brokerage HTTP endpoints. It does not claim that every currently
+running endpoint already uses that contract: the Step 04 authentication surface
+is a Legacy Step 04 Compatibility Surface and remains unchanged in Batch 01.
 
-## Scope
-* OpenAPI/Swagger specifications, GraphQL schemas, or gRPC proto files.
-* Request/response examples, endpoint definitions, and versioning notes.
+Migration of that legacy surface is a future explicit task. It must not be
+silently combined with unrelated batches.
 
-## Implementation Status
-Documentation and contract specifications will be added in a later step.
+- [HTTP conventions and compatibility](conventions.md)
+- [Response and error contract](error-format.md)
+
+The public HTTP contract is distinct from internal TypeScript module interfaces,
+database persistence models, and provider payloads.
