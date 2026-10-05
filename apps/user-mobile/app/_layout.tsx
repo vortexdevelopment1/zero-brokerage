@@ -28,8 +28,29 @@ export default function RootLayout() {
             presentation: "modal",
           }}
         />
-        <Stack.Screen name="listing/[id]" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="listing/[id]/index"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="listing/[id]/schedule"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="activity/visits/[visitId]"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="activity/inquiries/[inquiryId]"
+          options={{ headerShown: false }}
+        />
         <Stack.Screen name="furniture/index" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="notifications/index"
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen name="support/index" options={{ headerShown: false }} />
+        <Stack.Screen name="support/request" options={{ headerShown: false }} />
       </Stack>
     </>
   );

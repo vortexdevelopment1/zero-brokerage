@@ -4,6 +4,8 @@ import assert from "node:assert/strict";
 import {
   isValidUuid,
   getListingDetailRoute,
+  getInquiryDetailRoute,
+  getVisitDetailRoute,
   sanitizeRouteParams,
 } from "../src/navigation/routes";
 import { parseDeepLink } from "../src/navigation/deep-links";
@@ -41,6 +43,33 @@ describe("navigation: routes & UUID validation", () => {
     assert.throws(
       () => getListingDetailRoute("invalid-id"),
       /Invalid listing identifier/,
+    );
+  });
+
+  it("getInquiryDetailRoute & getVisitDetailRoute handle UUIDs and prefixed fixture identifiers", () => {
+    const canonicalUuid = "550e8400-e29b-41d4-a716-446655440000";
+    const fixtureInquiryId = "inq-00000002-2222-4000-8000-000000000002";
+    const fixtureVisitId = "v-00000001-1111-4000-8000-000000000001";
+
+    assert.equal(
+      getInquiryDetailRoute(canonicalUuid),
+      `/activity/inquiries/${canonicalUuid}`,
+    );
+    assert.equal(
+      getInquiryDetailRoute(fixtureInquiryId),
+      `/activity/inquiries/${fixtureInquiryId}`,
+    );
+    assert.equal(
+      getVisitDetailRoute(fixtureVisitId),
+      `/activity/visits/${fixtureVisitId}`,
+    );
+    assert.throws(
+      () => getInquiryDetailRoute("malformed-id"),
+      /Invalid inquiry identifier/,
+    );
+    assert.throws(
+      () => getVisitDetailRoute("malformed-id"),
+      /Invalid visit identifier/,
     );
   });
 

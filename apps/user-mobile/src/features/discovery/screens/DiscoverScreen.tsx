@@ -9,7 +9,7 @@
  * - Resilient state boundaries: skeleton loaders, graceful empty/error states.
  */
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { RefreshControl, ScrollView, View } from "react-native";
 import { AppContainer } from "@/components/AppContainer";
 import { DiscoverHeader } from "../components/DiscoverHeader";
@@ -32,6 +32,10 @@ import type {
   ListingPresentationModel,
   PropertyCategoryItem,
 } from "../types/discovery.types";
+import {
+  matchesCategory,
+  matchesLocation,
+} from "../utils/discovery-filters";
 import { trackEvent } from "@/services/analytics/analytics";
 
 export function DiscoverScreen() {
@@ -39,6 +43,7 @@ export function DiscoverScreen() {
   const [selectedCategory, setSelectedCategory] = useState<string | undefined>(
     undefined,
   );
+  const [selectedLocation, setSelectedLocation] = useState("All Locations");
 
   const feedQuery = useDiscoveryFeed();
   const search = useListingSearch({
@@ -56,7 +61,7 @@ export function DiscoverScreen() {
   }
 
   function handleSelectCategory(cat: PropertyCategoryItem) {
-    if (selectedCategory === cat.id) {
+    if (selectedCategory === cat.id || cat.id === "cat-all") {
       setSelectedCategory(undefined);
       trackEvent("filter_reset", { type: "category" });
     } else {
@@ -65,17 +70,60 @@ export function DiscoverScreen() {
     }
   }
 
+  function handleResetFilters() {
+    setSelectedCategory(undefined);
+    setSelectedLocation("All Locations");
+    trackEvent("filter_reset", { type: "all" });
+  }
+
   async function handleRefresh() {
     await Promise.all([feedQuery.refresh(), search.refresh()]);
   }
 
   const sections = feedQuery.data?.sections || [];
 
+  const isFilterActive =
+    (!!selectedCategory && selectedCategory !== "cat-all") ||
+    (selectedLocation !== "All Locations" && selectedLocation !== "all");
+
+  const filteredSections = useMemo(() => {
+    if (!isFilterActive) return sections;
+
+    return sections
+      .map((section) => ({
+        ...section,
+        listings: (section.listings || []).filter(
+          (listing) =>
+            matchesCategory(listing, selectedCategory) &&
+            matchesLocation(listing, selectedLocation),
+        ),
+      }))
+      .filter((section) => section.listings.length > 0);
+  }, [sections, selectedCategory, selectedLocation, isFilterActive]);
+
+  const hasAnyFilteredListings = filteredSections.some(
+    (s) => (s.listings?.length ?? 0) > 0,
+  );
+
+  const displaySearchResults = useMemo(() => {
+    return search.items.filter(
+      (listing) =>
+        matchesCategory(listing, selectedCategory) &&
+        matchesLocation(listing, selectedLocation),
+    );
+  }, [search.items, selectedCategory, selectedLocation]);
+
   return (
     <AppContainer>
       <View className="flex-1 bg-background">
-        {/* Sticky Top Header with honest location state */}
-        <DiscoverHeader />
+        {/* Sticky Top Header with location dropdown */}
+        <DiscoverHeader
+          selectedLocation={selectedLocation}
+          onSelectLocation={(loc) => {
+            setSelectedLocation(loc);
+            trackEvent("location_selected", { location: loc });
+          }}
+        />
 
         {/* Scrollable Discovery Feed */}
         <ScrollView
@@ -100,7 +148,7 @@ export function DiscoverScreen() {
             }}
           />
 
-          {/* Exploratory Category Shortcuts (Visual placeholder, pending backend taxonomy) */}
+          {/* Exploratory Category Shortcuts */}
           <CategoryShortcuts
             categories={PROVISIONAL_CATEGORIES}
             selectedCategory={selectedCategory}
@@ -112,18 +160,18 @@ export function DiscoverScreen() {
             <DiscoverSection
               title="Search Results"
               subtitle={
-                search.items.length > 0
-                  ? `${search.items.length} properties found`
+                displaySearchResults.length > 0
+                  ? `${displaySearchResults.length} properties found`
                   : undefined
               }
               isLoading={search.isLoading}
               error={search.error}
-              isEmpty={!search.isLoading && search.items.length === 0}
+              isEmpty={!search.isLoading && displaySearchResults.length === 0}
               emptyTitle="No properties found"
-              emptyDescription="No properties match your current search query. Try searching for a different area or bedroom count."
+              emptyDescription="No properties match your current search and filters. Try searching for a different area or bedroom count."
               onRetry={search.refresh}
             >
-              {search.items.map((listing: ListingPresentationModel) => (
+              {displaySearchResults.map((listing: ListingPresentationModel) => (
                 <ListingCard key={listing.id} listing={listing} />
               ))}
             </DiscoverSection>
@@ -133,11 +181,31 @@ export function DiscoverScreen() {
               <PropertyHeroSkeleton />
               <PropertyCardSkeleton />
             </View>
+          ) : isFilterActive && !hasAnyFilteredListings ? (
+            /* Filtered Empty State */
+            <View className="px-5 pt-6">
+              <DiscoverSection
+                title="Filtered Residences"
+                subtitle="No properties match your active filters"
+                isEmpty={true}
+                emptyTitle="No residences found"
+                emptyDescription={`No properties found for ${
+                  selectedCategory
+                    ? PROVISIONAL_CATEGORIES.find(
+                        (c) => c.id === selectedCategory,
+                      )?.label || "selected category"
+                    : "all categories"
+                } in ${selectedLocation}.`}
+                onRetry={handleResetFilters}
+              >
+                <View />
+              </DiscoverSection>
+            </View>
           ) : (
             /* Visual Rhythm Discovery Feed */
             <>
-              {sections.length > 0 ? (
-                sections.map((section, sIndex) => {
+              {filteredSections.length > 0 ? (
+                filteredSections.map((section, sIndex) => {
                   const listings = section.listings || [];
                   if (listings.length === 0) return null;
 

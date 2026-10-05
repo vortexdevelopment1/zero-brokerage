@@ -58,8 +58,45 @@ export function mapApiErrorToUserMessage(error: unknown): string {
     if (error.code === "RATE_LIMITED" || error.status === 429) {
       return "Too many attempts. Please wait a few moments before trying again.";
     }
+    if (error.code === "VISIT_CONFLICT") {
+      return "You already have an active visit request for this property.";
+    }
+    if (error.code === "DUPLICATE_ACTIVE_INQUIRY") {
+      return "You already have an active inquiry for this property.";
+    }
+    if (error.code === "SLOT_EXPIRED") {
+      return "The selected timeslot has expired. Please choose a fresh timeslot.";
+    }
+    if (error.code === "SLOT_UNAVAILABLE" || error.code === "SLOT_TAKEN") {
+      return "The selected timeslot is no longer available. Please select another slot.";
+    }
+    if (error.code === "LISTING_UNAVAILABLE") {
+      return "This property is currently not available for visits or inquiries.";
+    }
+    if (error.code === "VISIT_STATE_TRANSITION_INVALID") {
+      return error.message || "This visit cannot currently be modified.";
+    }
+    if (error.code === "VISIT_TIME_INVALID") {
+      return error.message || "The selected visit time is invalid.";
+    }
+    if (error.code === "FORBIDDEN" || error.status === 403) {
+      return "You do not have permission to access or modify this resource.";
+    }
+    if (
+      error.code === "SESSION_EXPIRED" ||
+      (error.code === "UNAUTHORIZED" && error.message?.includes("expired"))
+    ) {
+      return "Your session has expired. Please sign in again.";
+    }
     if (error.code === "UNAUTHORIZED" || error.status === 401) {
-      return "Invalid verification code. Please check and try again.";
+      if (
+        !error.message ||
+        error.message.toLowerCase().includes("code") ||
+        error.message.toLowerCase().includes("verification")
+      ) {
+        return "Invalid verification code. Please check and try again.";
+      }
+      return "Please sign in to continue.";
     }
     if (
       error.code === "VALIDATION_FAILED" ||
@@ -71,10 +108,27 @@ export function mapApiErrorToUserMessage(error: unknown): string {
       }
       return error.message || "Invalid input. Please check your information.";
     }
-    if (error.code === "NOT_FOUND" || error.status === 404) {
-      return "The requested verification challenge could not be found or has expired.";
+    if (
+      error.code === "NOT_FOUND" ||
+      error.code === "VISIT_NOT_FOUND" ||
+      error.code === "INQUIRY_NOT_FOUND" ||
+      error.code === "LISTING_NOT_FOUND" ||
+      error.status === 404
+    ) {
+      if (error.code === "VISIT_NOT_FOUND") {
+        return "The requested visit could not be found.";
+      }
+      if (error.code === "INQUIRY_NOT_FOUND") {
+        return "The requested inquiry could not be found.";
+      }
+      if (error.code === "LISTING_NOT_FOUND") {
+        return "The requested property could not be found.";
+      }
+      return "The requested item could not be found or has expired.";
     }
     if (
+      error.code === "SERVICE_UNAVAILABLE" ||
+      error.status === 503 ||
       error.code === "INTERNAL_SERVER_ERROR" ||
       (error.status && error.status >= 500)
     ) {

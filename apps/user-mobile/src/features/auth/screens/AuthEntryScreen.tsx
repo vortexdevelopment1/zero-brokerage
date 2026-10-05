@@ -42,6 +42,7 @@ export function AuthEntryScreen({
     <AppContainer>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
         className="flex-1 bg-surface"
       >
         {/* Navigation Bar */}

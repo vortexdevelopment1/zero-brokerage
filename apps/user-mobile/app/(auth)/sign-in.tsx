@@ -12,6 +12,7 @@ import { AuthGate } from "@/components/auth/AuthGate";
 import { Button } from "@/components/primitives";
 import { useAuthStore } from "@/services/auth";
 import { ROUTES } from "@/navigation/routes";
+import { colors } from "@/theme/tokens";
 
 export default function SignInScreen() {
   const status = useAuthStore((state) => state.status);
@@ -31,9 +32,16 @@ export default function SignInScreen() {
   }
 
   return (
-    <View className="flex-1 bg-surface">
+    <View style={{ flex: 1, backgroundColor: colors.surface }}>
       {/* Top dismiss bar for guest users */}
-      <View className="pt-4 px-4 flex-row justify-end">
+      <View
+        style={{
+          paddingTop: 16,
+          paddingHorizontal: 16,
+          flexDirection: "row",
+          justifyContent: "flex-end",
+        }}
+      >
         <Button
           label="Cancel"
           variant="tertiary"
@@ -43,7 +51,7 @@ export default function SignInScreen() {
         />
       </View>
 
-      <View className="flex-1">
+      <View style={{ flex: 1 }}>
         <AuthGate />
       </View>
     </View>

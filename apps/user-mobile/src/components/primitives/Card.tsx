@@ -6,7 +6,7 @@ import {
   type ViewProps,
   type ViewStyle,
 } from "react-native";
-import { elevation } from "@/theme/tokens";
+import { colors, elevation } from "@/theme/tokens";
 import { Pressable } from "./Pressable";
 
 export type CardVariant = "elevated" | "outlined" | "flat";
@@ -43,6 +43,38 @@ const variantClasses: Record<CardVariant, string> = {
   flat: "bg-muted-surface border border-transparent",
 };
 
+const variantStyles: Record<CardVariant, ViewStyle> = {
+  elevated: {
+    backgroundColor: colors.surface,
+    borderColor: colors.subtleBorder,
+    borderWidth: 1,
+    ...elevation.low,
+  },
+  outlined: {
+    backgroundColor: colors.surface,
+    borderColor: colors.defaultBorder,
+    borderWidth: 1,
+  },
+  flat: {
+    backgroundColor: colors.mutedSurface,
+    borderColor: "transparent",
+    borderWidth: 1,
+  },
+};
+
+const paddingStyles: Record<CardPadding, ViewStyle> = {
+  none: { padding: 0 },
+  small: { padding: 12 },
+  medium: { padding: 16 },
+  large: { padding: 24 },
+};
+
+const radiusStyles: Record<CardRadius, ViewStyle> = {
+  medium: { borderRadius: 8 },
+  large: { borderRadius: 12 },
+  extraLarge: { borderRadius: 16 },
+};
+
 export const Card = forwardRef<View, CardProps>(function Card(
   {
     variant = "outlined",
@@ -69,7 +101,9 @@ export const Card = forwardRef<View, CardProps>(function Card(
     .join(" ");
 
   const combinedStyle: StyleProp<ViewStyle> = [
-    variant === "elevated" ? elevation.low : undefined,
+    variantStyles[variant],
+    paddingStyles[padding],
+    radiusStyles[radius],
     style,
   ];
 

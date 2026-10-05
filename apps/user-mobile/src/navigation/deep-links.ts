@@ -18,6 +18,12 @@ export type DeepLinkDestination =
   | { type: "ACCOUNT"; requiresAuth: true }
   | { type: "FURNITURE" }
   | { type: "LISTING_DETAIL"; listingId: string }
+  | { type: "LISTING_SCHEDULE"; listingId: string; requiresAuth: true }
+  | { type: "ACTIVITY_VISIT_DETAIL"; visitId: string; requiresAuth: true }
+  | { type: "ACTIVITY_INQUIRY_DETAIL"; inquiryId: string; requiresAuth: true }
+  | { type: "NOTIFICATIONS"; requiresAuth: true }
+  | { type: "SUPPORT" }
+  | { type: "SUPPORT_REQUEST" }
   | { type: "AUTH_SIGN_IN" }
   | { type: "UNKNOWN" };
 
@@ -46,12 +52,37 @@ export function parseDeepLink(url: string): ParsedDeepLink {
 
   const cleanUrl = url.trim();
 
+  const isDev =
+    (typeof __DEV__ !== "undefined" && Boolean(__DEV__)) ||
+    process.env.NODE_ENV !== "production";
+
   // Strip scheme and host
-  let path = cleanUrl
-    .replace(/^zero-brokerage:\/\//i, "")
-    .replace(/^https?:\/\/(?:[a-zA-Z0-9-]+\.)*zerobrokerage\.(?:com|in)/i, "")
-    .split("?")[0]
-    .split("#")[0];
+  let path = cleanUrl;
+
+  // Development compatibility: Support Expo Go URLs (`exp://<host>/--/<path>`)
+  if (isDev && /^exp:\/\//i.test(cleanUrl)) {
+    const expoMatch = cleanUrl.match(/^exp:\/\/[^/]+\/--\/(.*)$/i);
+    if (expoMatch) {
+      path = "/" + expoMatch[1];
+    } else {
+      return {
+        destination: { type: "UNKNOWN" },
+        originalUrl: cleanUrl,
+        isValid: false,
+        targetPath: "/(app)/discover",
+        requiresAuth: false,
+      };
+    }
+  } else {
+    path = path
+      .replace(/^zero-brokerage:\/\//i, "")
+      .replace(
+        /^https?:\/\/(?:[a-zA-Z0-9-]+\.)*zerobrokerage\.(?:com|in)/i,
+        "",
+      );
+  }
+
+  path = path.split("?")[0].split("#")[0];
 
   // Ensure leading slash
   if (!path.startsWith("/")) {
@@ -87,15 +118,57 @@ export function parseDeepLink(url: string): ParsedDeepLink {
     };
   }
 
-  // Match: /activity
+  // Match: /activity or /activity/visits/:visitId or /activity/inquiries/:inquiryId
   if (segments[0] === "activity") {
-    return {
-      destination: { type: "ACTIVITY", requiresAuth: true },
-      originalUrl: cleanUrl,
-      isValid: true,
-      targetPath: "/(app)/activity",
-      requiresAuth: true,
-    };
+    if (segments.length === 1) {
+      return {
+        destination: { type: "ACTIVITY", requiresAuth: true },
+        originalUrl: cleanUrl,
+        isValid: true,
+        targetPath: "/(app)/activity",
+        requiresAuth: true,
+      };
+    }
+
+    if (
+      (segments[1] === "visits" || segments[1] === "visit") &&
+      segments.length >= 3
+    ) {
+      const visitId = segments[2];
+      if (isValidUuid(visitId)) {
+        return {
+          destination: {
+            type: "ACTIVITY_VISIT_DETAIL",
+            visitId,
+            requiresAuth: true,
+          },
+          originalUrl: cleanUrl,
+          isValid: true,
+          targetPath: `/activity/visits/${visitId}`,
+          requiresAuth: true,
+        };
+      }
+    }
+
+    if (
+      (segments[1] === "inquiries" || segments[1] === "inquiry") &&
+      segments.length >= 3
+    ) {
+      const inquiryId = segments[2];
+      if (isValidUuid(inquiryId)) {
+        return {
+          destination: {
+            type: "ACTIVITY_INQUIRY_DETAIL",
+            inquiryId,
+            requiresAuth: true,
+          },
+          originalUrl: cleanUrl,
+          isValid: true,
+          targetPath: `/activity/inquiries/${inquiryId}`,
+          requiresAuth: true,
+        };
+      }
+    }
   }
 
   // Match: /account
@@ -106,6 +179,37 @@ export function parseDeepLink(url: string): ParsedDeepLink {
       isValid: true,
       targetPath: "/(app)/account",
       requiresAuth: true,
+    };
+  }
+
+  // Match: /notifications
+  if (segments[0] === "notifications") {
+    return {
+      destination: { type: "NOTIFICATIONS", requiresAuth: true },
+      originalUrl: cleanUrl,
+      isValid: true,
+      targetPath: "/notifications",
+      requiresAuth: true,
+    };
+  }
+
+  // Match: /support or /support/request
+  if (segments[0] === "support") {
+    if (segments.length >= 2 && segments[1] === "request") {
+      return {
+        destination: { type: "SUPPORT_REQUEST" },
+        originalUrl: cleanUrl,
+        isValid: true,
+        targetPath: "/support/request",
+        requiresAuth: false,
+      };
+    }
+    return {
+      destination: { type: "SUPPORT" },
+      originalUrl: cleanUrl,
+      isValid: true,
+      targetPath: "/support",
+      requiresAuth: false,
     };
   }
 
@@ -131,13 +235,27 @@ export function parseDeepLink(url: string): ParsedDeepLink {
     };
   }
 
-  // Match: /listing/:listingId or /listings/:listingId
+  // Match: /listing/:listingId or /listings/:listingId or /listing/:listingId/schedule
   if (
     (segments[0] === "listing" || segments[0] === "listings") &&
     segments.length >= 2
   ) {
     const rawId = segments[1];
     if (isValidUuid(rawId)) {
+      if (segments.length >= 3 && segments[2] === "schedule") {
+        return {
+          destination: {
+            type: "LISTING_SCHEDULE",
+            listingId: rawId,
+            requiresAuth: true,
+          },
+          originalUrl: cleanUrl,
+          isValid: true,
+          targetPath: `/listing/${rawId}/schedule`,
+          requiresAuth: true,
+        };
+      }
+
       return {
         destination: { type: "LISTING_DETAIL", listingId: rawId },
         originalUrl: cleanUrl,
@@ -155,5 +273,290 @@ export function parseDeepLink(url: string): ParsedDeepLink {
     isValid: false,
     targetPath: "/(app)/discover",
     requiresAuth: false,
+  };
+}
+
+/**
+ * Step 6 Notification Payload Resolution
+ *
+ * Rules:
+ * 1. Validates destination & identifiers strictly.
+ * 2. Requires authentication for private resources (Visits, Inquiries, Scheduling).
+ * 3. Never trusts payload data (times, statuses) as authoritative.
+ * 4. Resolves safe target navigation route or authenticated redirection.
+ */
+export interface NotificationPayload {
+  readonly targetType?:
+    "VISIT_DETAIL" | "INQUIRY_DETAIL" | "SCHEDULE_VISIT" | string;
+  readonly visitId?: string;
+  readonly inquiryId?: string;
+  readonly listingId?: string;
+  readonly deepLinkUrl?: string;
+  readonly [key: string]: unknown;
+}
+
+export type NotificationResolutionResult =
+  | {
+      readonly status: "NAVIGATE";
+      readonly route: string;
+      readonly targetType:
+        | "VISIT_DETAIL"
+        | "INQUIRY_DETAIL"
+        | "SCHEDULE_VISIT"
+        | "LISTING_DETAIL"
+        | "NOTIFICATIONS"
+        | "SUPPORT"
+        | "SUPPORT_REQUEST"
+        | "ACCOUNT";
+      readonly resourceId: string;
+    }
+  | {
+      readonly status: "REQUIRES_AUTH";
+      readonly redirectRoute: string;
+      readonly intendedRoute: string;
+    }
+  | {
+      readonly status: "INVALID";
+      readonly fallbackRoute: string;
+      readonly reason: string;
+    };
+
+export function resolveNotificationTarget(
+  payload: NotificationPayload | null | undefined,
+  isAuthenticated: boolean,
+): NotificationResolutionResult {
+  if (!payload || typeof payload !== "object") {
+    return {
+      status: "INVALID",
+      fallbackRoute: "/(app)/discover",
+      reason: "Missing or invalid notification payload.",
+    };
+  }
+
+  // If a deepLinkUrl is provided, parse via deepLink parser
+  if (payload.deepLinkUrl) {
+    const parsed = parseDeepLink(payload.deepLinkUrl);
+    if (!parsed.isValid) {
+      return {
+        status: "INVALID",
+        fallbackRoute: "/(app)/discover",
+        reason: "Malformed deep link in notification payload.",
+      };
+    }
+    if (parsed.requiresAuth && !isAuthenticated) {
+      return {
+        status: "REQUIRES_AUTH",
+        redirectRoute: "/(auth)/sign-in",
+        intendedRoute: parsed.targetPath,
+      };
+    }
+    if (parsed.destination.type === "ACTIVITY_VISIT_DETAIL") {
+      return {
+        status: "NAVIGATE",
+        route: parsed.targetPath,
+        targetType: "VISIT_DETAIL",
+        resourceId: parsed.destination.visitId,
+      };
+    }
+    if (parsed.destination.type === "ACTIVITY_INQUIRY_DETAIL") {
+      return {
+        status: "NAVIGATE",
+        route: parsed.targetPath,
+        targetType: "INQUIRY_DETAIL",
+        resourceId: parsed.destination.inquiryId,
+      };
+    }
+    if (parsed.destination.type === "LISTING_SCHEDULE") {
+      return {
+        status: "NAVIGATE",
+        route: parsed.targetPath,
+        targetType: "SCHEDULE_VISIT",
+        resourceId: parsed.destination.listingId,
+      };
+    }
+    if (parsed.destination.type === "LISTING_DETAIL") {
+      return {
+        status: "NAVIGATE",
+        route: parsed.targetPath,
+        targetType: "LISTING_DETAIL",
+        resourceId: parsed.destination.listingId,
+      };
+    }
+    if (parsed.destination.type === "NOTIFICATIONS") {
+      return {
+        status: "NAVIGATE",
+        route: parsed.targetPath,
+        targetType: "NOTIFICATIONS",
+        resourceId: "notifications",
+      };
+    }
+    if (parsed.destination.type === "SUPPORT") {
+      return {
+        status: "NAVIGATE",
+        route: parsed.targetPath,
+        targetType: "SUPPORT",
+        resourceId: "support",
+      };
+    }
+    if (parsed.destination.type === "SUPPORT_REQUEST") {
+      return {
+        status: "NAVIGATE",
+        route: parsed.targetPath,
+        targetType: "SUPPORT_REQUEST",
+        resourceId: "support-request",
+      };
+    }
+  }
+
+  const targetType = String(payload.targetType || "").toUpperCase();
+
+  if (targetType === "NOTIFICATIONS") {
+    const targetRoute = "/notifications";
+    if (!isAuthenticated) {
+      return {
+        status: "REQUIRES_AUTH",
+        redirectRoute: "/(auth)/sign-in",
+        intendedRoute: targetRoute,
+      };
+    }
+    return {
+      status: "NAVIGATE",
+      route: targetRoute,
+      targetType: "NOTIFICATIONS",
+      resourceId: "notifications",
+    };
+  }
+
+  if (targetType === "SUPPORT") {
+    return {
+      status: "NAVIGATE",
+      route: "/support",
+      targetType: "SUPPORT",
+      resourceId: "support",
+    };
+  }
+
+  if (targetType === "SUPPORT_REQUEST") {
+    return {
+      status: "NAVIGATE",
+      route: "/support/request",
+      targetType: "SUPPORT_REQUEST",
+      resourceId: "support-request",
+    };
+  }
+
+  if (targetType === "ACCOUNT") {
+    const targetRoute = "/(app)/account";
+    if (!isAuthenticated) {
+      return {
+        status: "REQUIRES_AUTH",
+        redirectRoute: "/(auth)/sign-in",
+        intendedRoute: targetRoute,
+      };
+    }
+    return {
+      status: "NAVIGATE",
+      route: targetRoute,
+      targetType: "ACCOUNT",
+      resourceId: "account",
+    };
+  }
+
+  if (targetType === "LISTING_DETAIL") {
+    const listingId = payload.listingId;
+    if (!listingId || !isValidUuid(listingId)) {
+      return {
+        status: "INVALID",
+        fallbackRoute: "/(app)/discover",
+        reason: "Invalid listingId in notification payload.",
+      };
+    }
+    return {
+      status: "NAVIGATE",
+      route: `/listing/${listingId}`,
+      targetType: "LISTING_DETAIL",
+      resourceId: listingId,
+    };
+  }
+
+  if (targetType === "VISIT_DETAIL") {
+    const visitId = payload.visitId;
+    if (!visitId || !isValidUuid(visitId)) {
+      return {
+        status: "INVALID",
+        fallbackRoute: "/(app)/discover",
+        reason: "Invalid visitId in notification payload.",
+      };
+    }
+    const targetRoute = `/activity/visits/${visitId}`;
+    if (!isAuthenticated) {
+      return {
+        status: "REQUIRES_AUTH",
+        redirectRoute: "/(auth)/sign-in",
+        intendedRoute: targetRoute,
+      };
+    }
+    return {
+      status: "NAVIGATE",
+      route: targetRoute,
+      targetType: "VISIT_DETAIL",
+      resourceId: visitId,
+    };
+  }
+
+  if (targetType === "INQUIRY_DETAIL") {
+    const inquiryId = payload.inquiryId;
+    if (!inquiryId || !isValidUuid(inquiryId)) {
+      return {
+        status: "INVALID",
+        fallbackRoute: "/(app)/discover",
+        reason: "Invalid inquiryId in notification payload.",
+      };
+    }
+    const targetRoute = `/activity/inquiries/${inquiryId}`;
+    if (!isAuthenticated) {
+      return {
+        status: "REQUIRES_AUTH",
+        redirectRoute: "/(auth)/sign-in",
+        intendedRoute: targetRoute,
+      };
+    }
+    return {
+      status: "NAVIGATE",
+      route: targetRoute,
+      targetType: "INQUIRY_DETAIL",
+      resourceId: inquiryId,
+    };
+  }
+
+  if (targetType === "SCHEDULE_VISIT") {
+    const listingId = payload.listingId;
+    if (!listingId || !isValidUuid(listingId)) {
+      return {
+        status: "INVALID",
+        fallbackRoute: "/(app)/discover",
+        reason: "Invalid listingId in notification payload.",
+      };
+    }
+    const targetRoute = `/listing/${listingId}/schedule`;
+    if (!isAuthenticated) {
+      return {
+        status: "REQUIRES_AUTH",
+        redirectRoute: "/(auth)/sign-in",
+        intendedRoute: targetRoute,
+      };
+    }
+    return {
+      status: "NAVIGATE",
+      route: targetRoute,
+      targetType: "SCHEDULE_VISIT",
+      resourceId: listingId,
+    };
+  }
+
+  return {
+    status: "INVALID",
+    fallbackRoute: "/(app)/discover",
+    reason: "Unrecognized notification destination.",
   };
 }

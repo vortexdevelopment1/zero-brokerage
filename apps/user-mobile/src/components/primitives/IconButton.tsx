@@ -30,6 +30,58 @@ export type IconButtonProps = {
   style?: StyleProp<ViewStyle>;
 };
 
+const variantStyles: Record<IconButtonVariant, ViewStyle> = {
+  primary: {
+    backgroundColor: colors.brand.DEFAULT,
+    borderColor: "transparent",
+    borderWidth: 1,
+  },
+  secondary: {
+    backgroundColor: colors.surface,
+    borderColor: colors.defaultBorder,
+    borderWidth: 1,
+  },
+  tertiary: {
+    backgroundColor: "transparent",
+    borderColor: "transparent",
+    borderWidth: 1,
+  },
+  destructive: {
+    backgroundColor: colors.error.DEFAULT,
+    borderColor: "transparent",
+    borderWidth: 1,
+  },
+};
+
+const disabledVariantStyles: Record<IconButtonVariant, ViewStyle> = {
+  primary: {
+    backgroundColor: colors.disabled.background,
+    borderColor: "transparent",
+    borderWidth: 1,
+  },
+  secondary: {
+    backgroundColor: colors.disabled.background,
+    borderColor: colors.disabled.border,
+    borderWidth: 1,
+  },
+  tertiary: {
+    backgroundColor: "transparent",
+    borderColor: "transparent",
+    borderWidth: 1,
+  },
+  destructive: {
+    backgroundColor: colors.disabled.background,
+    borderColor: "transparent",
+    borderWidth: 1,
+  },
+};
+
+const sizeStyles: Record<IconButtonSize, ViewStyle> = {
+  small: { width: 36, height: 36, borderRadius: 8 },
+  medium: { width: 44, height: 44, borderRadius: 12 },
+  large: { width: 52, height: 52, borderRadius: 16 },
+};
+
 const variantContainerClasses: Record<IconButtonVariant, string> = {
   primary: "bg-brand border border-transparent active:bg-brand-dark",
   secondary: "bg-surface border border-default-border active:bg-surface-muted",
@@ -92,6 +144,13 @@ export const IconButton = forwardRef<View, IconButtonProps>(function IconButton(
     .filter(Boolean)
     .join(" ");
 
+  const tokenContainerStyle: ViewStyle = {
+    alignItems: "center",
+    justifyContent: "center",
+    ...sizeStyles[size],
+    ...(isDisabled ? disabledVariantStyles[variant] : variantStyles[variant]),
+  };
+
   return (
     <Pressable
       ref={ref}
@@ -103,7 +162,7 @@ export const IconButton = forwardRef<View, IconButtonProps>(function IconButton(
       hitSlop={sizeHitSlop[size]}
       onPress={onPress}
       className={containerClasses}
-      style={style}
+      style={[tokenContainerStyle, style]}
     >
       {loading ? (
         <ActivityIndicator

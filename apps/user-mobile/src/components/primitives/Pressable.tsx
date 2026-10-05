@@ -41,7 +41,7 @@ export const Pressable = forwardRef<View, PressableProps>(function Pressable(
         }
         return customStyle;
       }}
-      className={className}
+      {...(className ? { className } : {})}
       {...props}
     />
   );

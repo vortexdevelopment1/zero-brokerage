@@ -20,6 +20,8 @@ import {
 import { EmptyState } from "@/components/feedback";
 import { logout, useAuthStore } from "@/services/auth";
 import { maskPhoneNumber } from "@/features/auth/utils/phone-validation";
+import { useUnreadCount } from "@/features/notifications";
+import { colors } from "@/theme/tokens";
 import { ROUTES } from "@/navigation/routes";
 
 export default function AccountTab() {
@@ -27,6 +29,7 @@ export default function AccountTab() {
   const status = useAuthStore((state) => state.status);
   const isAuthenticated = status === "AUTHENTICATED";
   const isLoggingOut = status === "LOGGING_OUT";
+  const { unreadCount } = useUnreadCount({ enabled: isAuthenticated });
 
   async function handleLogout() {
     Alert.alert("Sign Out", "Are you sure you want to sign out?", [
@@ -164,6 +167,75 @@ export default function AccountTab() {
                       </Text>
                     </View>
                   </Stack>
+                </Stack>
+              </Card>
+
+              {/* Communications & Support */}
+              <Card
+                variant="outlined"
+                padding="large"
+                radius="large"
+                className="border-default-border bg-surface"
+              >
+                <Stack spacing={3}>
+                  <Text variant="title" tone="primary" weight="semibold">
+                    Communications & Concierge
+                  </Text>
+
+                  <Pressable
+                    onPress={() => router.push(ROUTES.NOTIFICATIONS as any)}
+                    accessibilityRole="button"
+                    accessibilityLabel="Notifications and alerts"
+                    className="flex-row items-center justify-between py-2.5 border-b border-subtle-border active:opacity-75"
+                  >
+                    <View className="flex-row items-center space-x-2">
+                      <Text className="text-base mr-1">🔔</Text>
+                      <Text variant="bodySmall" tone="primary" weight="semibold">
+                        Notifications & Alerts
+                      </Text>
+                    </View>
+                    <View className="flex-row items-center space-x-2">
+                      {unreadCount > 0 && (
+                        <View
+                          style={{
+                            backgroundColor: colors.brand.primary,
+                            borderRadius: 10,
+                            paddingHorizontal: 7,
+                            paddingVertical: 1,
+                          }}
+                        >
+                          <Text
+                            variant="caption"
+                            tone="inverse"
+                            weight="bold"
+                            className="text-[10px]"
+                          >
+                            {unreadCount}
+                          </Text>
+                        </View>
+                      )}
+                      <Text variant="caption" tone="secondary">
+                        ›
+                      </Text>
+                    </View>
+                  </Pressable>
+
+                  <Pressable
+                    onPress={() => router.push(ROUTES.SUPPORT as any)}
+                    accessibilityRole="button"
+                    accessibilityLabel="Support and help center"
+                    className="flex-row items-center justify-between py-2.5 active:opacity-75"
+                  >
+                    <View className="flex-row items-center space-x-2">
+                      <Text className="text-base mr-1">🎧</Text>
+                      <Text variant="bodySmall" tone="primary" weight="semibold">
+                        Help & Support Concierge
+                      </Text>
+                    </View>
+                    <Text variant="caption" tone="secondary">
+                      ›
+                    </Text>
+                  </Pressable>
                 </Stack>
               </Card>
 

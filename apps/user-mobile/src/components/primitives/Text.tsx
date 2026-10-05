@@ -1,5 +1,10 @@
 import { forwardRef } from "react";
-import { Text as RNText, type TextProps as RNTextProps } from "react-native";
+import {
+  Text as RNText,
+  type TextProps as RNTextProps,
+  type TextStyle,
+} from "react-native";
+import { colors, typography } from "@/theme/tokens";
 
 export type TextVariant =
   | "display"
@@ -58,11 +63,29 @@ const toneClasses: Record<TextTone, string> = {
   error: "text-error-text",
 };
 
+const toneColors: Record<TextTone, string> = {
+  primary: colors.primaryContent,
+  secondary: colors.secondaryContent,
+  muted: colors.mutedContent,
+  inverse: colors.inverseContent,
+  brand: colors.brand.DEFAULT,
+  success: colors.success.text,
+  warning: colors.warning.text,
+  error: colors.error.text,
+};
+
 const weightClasses: Record<TextWeight, string> = {
   regular: "font-normal",
   medium: "font-medium",
   semibold: "font-semibold",
   bold: "font-bold",
+};
+
+const weightMap: Record<TextWeight, TextStyle["fontWeight"]> = {
+  regular: "400",
+  medium: "500",
+  semibold: "600",
+  bold: "700",
 };
 
 const alignClasses: Record<TextAlign, string> = {
@@ -106,12 +129,18 @@ export const Text = forwardRef<RNText, TextProps>(function Text(
     .filter(Boolean)
     .join(" ");
 
+  const tokenStyle: TextStyle = {
+    ...typography[variant],
+    color: toneColors[tone],
+    ...(weight ? { fontWeight: weightMap[weight] } : {}),
+    ...(align ? { textAlign: align } : {}),
+  };
+
   return (
     <RNText
       ref={ref}
       accessibilityRole={role}
-      className={classes}
-      style={style}
+      style={[tokenStyle, style]}
       {...props}
     />
   );

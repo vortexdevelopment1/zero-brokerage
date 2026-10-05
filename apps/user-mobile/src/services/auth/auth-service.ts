@@ -1,6 +1,7 @@
 import {
   apiRequest,
   mapApiErrorToUserMessage,
+  queryCache,
   type CurrentUserProfileResponse,
   type LogoutResponse,
   type RefreshSessionRequest,
@@ -42,6 +43,16 @@ export async function requestOtp(phone: string): Promise<boolean> {
   const normalizedPhone = normalizePhoneForApi(phone);
 
   store.startOtpRequest(normalizedPhone);
+
+  if (process.env.EXPO_PUBLIC_USE_FIXTURES === "true") {
+    store.otpRequired({
+      challengeId: "fixture-challenge-123",
+      expiresInSeconds: 300,
+      resendCooldownSeconds: 30,
+      requestedAt: Date.now(),
+    });
+    return true;
+  }
 
   try {
     const result = await apiRequest<RequestOtpResponse>(
@@ -104,6 +115,35 @@ export async function verifyOtp(code: string): Promise<boolean> {
   }
 
   store.startVerification();
+
+  if (process.env.EXPO_PUBLIC_USE_FIXTURES === "true") {
+    if (code.length !== 6 || code === "000000") {
+      store.verificationFailed(
+        "Invalid verification code. Please check and try again.",
+      );
+      return false;
+    }
+
+    const authUser = {
+      id: "fixture-user-00000000-0000-4000-8000-000000000001",
+      phone: store.phoneNumber || "+919876543210",
+      role: "USER" as const,
+      status: "ACTIVE" as const,
+      fullName: "Verified Resident",
+    };
+
+    await Promise.all([
+      setAccessToken(
+        "fixture-access-token-00000000-0000-4000-8000-000000000001",
+      ),
+      setRefreshToken(
+        "fixture-refresh-token-00000000-0000-4000-8000-000000000001",
+      ),
+    ]);
+
+    store.authenticationSuccess(authUser);
+    return true;
+  }
 
   try {
     const result = await apiRequest<VerifyOtpResponse>(
@@ -192,6 +232,7 @@ export async function logout(): Promise<void> {
   } catch {
     // Network/backend failure must NOT prevent local cleanup
   } finally {
+    queryCache.clearAll();
     await clearAuthCredentials();
     store.logoutComplete();
   }

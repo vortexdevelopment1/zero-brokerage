@@ -1,5 +1,5 @@
 import { forwardRef } from "react";
-import { View, type ViewProps } from "react-native";
+import { View, type ViewProps, type ViewStyle } from "react-native";
 
 export type StackSpacing = 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16;
 export type StackAlign = "start" | "center" | "end" | "stretch" | "baseline";
@@ -45,6 +45,23 @@ const justifyClasses: Record<StackJustify, string> = {
   evenly: "justify-evenly",
 };
 
+const alignMap: Record<StackAlign, ViewStyle["alignItems"]> = {
+  start: "flex-start",
+  center: "center",
+  end: "flex-end",
+  stretch: "stretch",
+  baseline: "baseline",
+};
+
+const justifyMap: Record<StackJustify, ViewStyle["justifyContent"]> = {
+  start: "flex-start",
+  center: "center",
+  end: "flex-end",
+  between: "space-between",
+  around: "space-around",
+  evenly: "space-evenly",
+};
+
 export const Stack = forwardRef<View, StackProps>(function Stack(
   {
     direction = "vertical",
@@ -69,5 +86,13 @@ export const Stack = forwardRef<View, StackProps>(function Stack(
     .filter(Boolean)
     .join(" ");
 
-  return <View ref={ref} className={classes} style={style} {...props} />;
+  const tokenStyle: ViewStyle = {
+    flexDirection: direction === "horizontal" ? "row" : "column",
+    ...(spacing !== undefined ? { gap: spacing * 4 } : {}),
+    ...(align ? { alignItems: alignMap[align] } : {}),
+    ...(justify ? { justifyContent: justifyMap[justify] } : {}),
+    ...(wrap ? { flexWrap: "wrap" } : {}),
+  };
+
+  return <View ref={ref} className={classes} style={[tokenStyle, style]} {...props} />;
 });

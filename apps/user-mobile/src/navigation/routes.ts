@@ -8,12 +8,16 @@
  * 4. Never use client route parameters as an authorization mechanism.
  */
 
-// Canonical UUID v4/RFC 4122 validation pattern
+// Canonical UUID v4/RFC 4122 validation pattern (permitting optional domain/fixture prefixes like inq-, v-, fixture-)
 export const UUID_REGEX =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  /^(?:(?:inq|v|fixture)-)?[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+export const FIXTURE_ID_REGEX = /^(?:inq|v)-fixture-\d+$/i;
 
 export function isValidUuid(id: unknown): id is string {
-  return typeof id === "string" && UUID_REGEX.test(id.trim());
+  if (typeof id !== "string") return false;
+  const trimmed = id.trim();
+  return UUID_REGEX.test(trimmed) || FIXTURE_ID_REGEX.test(trimmed);
 }
 
 /**
@@ -29,6 +33,16 @@ export const ROUTES = {
   // Contextual Sub-journeys
   FURNITURE: "/furniture",
   LISTING_DETAIL: "/listing/[id]",
+  LISTING_SCHEDULE: "/listing/[id]/schedule",
+
+  // Activity Sub-journeys (M05)
+  ACTIVITY_VISIT_DETAIL: "/activity/visits/[visitId]",
+  ACTIVITY_INQUIRY_DETAIL: "/activity/inquiries/[inquiryId]",
+
+  // Notifications & Support (Step 7)
+  NOTIFICATIONS: "/notifications",
+  SUPPORT: "/support",
+  SUPPORT_REQUEST: "/support/request",
 
   // Auth Journeys
   AUTH_SIGN_IN: "/(auth)/sign-in",
@@ -48,6 +62,45 @@ export function getListingDetailRoute(listingId: string): string {
     );
   }
   return `/listing/${sanitizedId}`;
+}
+
+/**
+ * Route Builder for Schedule Private Visit
+ */
+export function getListingScheduleRoute(listingId: string): string {
+  const sanitizedId = listingId.trim();
+  if (!isValidUuid(sanitizedId)) {
+    throw new Error(
+      `Invalid listing identifier: '${listingId}'. Navigation requires a valid UUID.`,
+    );
+  }
+  return `/listing/${sanitizedId}/schedule`;
+}
+
+/**
+ * Route Builder for Visit Detail
+ */
+export function getVisitDetailRoute(visitId: string): string {
+  const sanitizedId = visitId.trim();
+  if (!isValidUuid(sanitizedId)) {
+    throw new Error(
+      `Invalid visit identifier: '${visitId}'. Navigation requires a valid UUID.`,
+    );
+  }
+  return `/activity/visits/${sanitizedId}`;
+}
+
+/**
+ * Route Builder for Inquiry Detail
+ */
+export function getInquiryDetailRoute(inquiryId: string): string {
+  const sanitizedId = inquiryId.trim();
+  if (!isValidUuid(sanitizedId)) {
+    throw new Error(
+      `Invalid inquiry identifier: '${inquiryId}'. Navigation requires a valid UUID.`,
+    );
+  }
+  return `/activity/inquiries/${sanitizedId}`;
 }
 
 /**

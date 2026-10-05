@@ -14,7 +14,8 @@ import type { PropertyCategoryItem } from "../types/discovery.types";
 
 export const PROVISIONAL_CATEGORIES: readonly PropertyCategoryItem[] = [
   { id: "cat-all", label: "All Properties", iconName: "✦" },
-  { id: "cat-residential", label: "Penthouses & Villas", iconName: "🏡" },
+  { id: "cat-penthouse", label: "Penthouses", iconName: "🏙" },
+  { id: "cat-villa", label: "Villas", iconName: "🏡" },
   { id: "cat-apartments", label: "Apartments", iconName: "🏢" },
   { id: "cat-furnished", label: "Furnished Living", iconName: "🛋" },
 ];

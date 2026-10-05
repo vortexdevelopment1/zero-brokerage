@@ -76,3 +76,43 @@ test("error-parsing: parses standard backend error envelope", () => {
   assert.equal(parsed.message, "Invalid phone number format");
   assert.equal(parsed.details?.[0].field, "phone");
 });
+
+test("error-mapping: maps SLOT_EXPIRED to user-friendly retry message", () => {
+  const err = new ApiError("SLOT_EXPIRED", "The slot has expired");
+  const msg = mapApiErrorToUserMessage(err);
+  assert.match(msg, /timeslot has expired/i);
+});
+
+test("error-mapping: maps SLOT_UNAVAILABLE and SLOT_TAKEN to safe message", () => {
+  const err = new ApiError("SLOT_TAKEN", "The slot is taken");
+  const msg = mapApiErrorToUserMessage(err);
+  assert.match(msg, /no longer available/i);
+});
+
+test("error-mapping: maps SESSION_EXPIRED to re-authentication prompt", () => {
+  const err = new ApiError("SESSION_EXPIRED", "Session expired");
+  const msg = mapApiErrorToUserMessage(err);
+  assert.match(msg, /session has expired/i);
+});
+
+test("error-mapping: maps SERVICE_UNAVAILABLE (503) to temporary outage message", () => {
+  const err = new ApiError("SERVICE_UNAVAILABLE", "Down for maintenance", {
+    status: 503,
+  });
+  const msg = mapApiErrorToUserMessage(err);
+  assert.match(msg, /temporarily unavailable/i);
+});
+
+test("error-mapping: maps LISTING_UNAVAILABLE to clear property status message", () => {
+  const err = new ApiError("LISTING_UNAVAILABLE", "Listing unavailable");
+  const msg = mapApiErrorToUserMessage(err);
+  assert.match(msg, /not available for visits or inquiries/i);
+});
+
+test("error-mapping: maps VISIT_CONFLICT and DUPLICATE_ACTIVE_INQUIRY correctly", () => {
+  const visitErr = new ApiError("VISIT_CONFLICT", "Conflict");
+  assert.match(mapApiErrorToUserMessage(visitErr), /active visit request/i);
+
+  const inqErr = new ApiError("DUPLICATE_ACTIVE_INQUIRY", "Duplicate inquiry");
+  assert.match(mapApiErrorToUserMessage(inqErr), /active inquiry/i);
+});

@@ -1,6 +1,7 @@
 import React, { forwardRef } from "react";
 import {
   ActivityIndicator,
+  Pressable as RNPressable,
   View,
   type GestureResponderEvent,
   type Insets,
@@ -8,7 +9,6 @@ import {
   type ViewStyle,
 } from "react-native";
 import { colors } from "@/theme/tokens";
-import { Pressable } from "./Pressable";
 import { Text } from "./Text";
 
 export type ButtonVariant =
@@ -30,6 +30,76 @@ export type ButtonProps = {
   accessibilityHint?: string;
   className?: string;
   style?: StyleProp<ViewStyle>;
+};
+
+const variantStyles: Record<ButtonVariant, ViewStyle> = {
+  primary: {
+    backgroundColor: colors.brand.DEFAULT,
+    borderColor: "transparent",
+    borderWidth: 1,
+  },
+  secondary: {
+    backgroundColor: colors.surface,
+    borderColor: colors.defaultBorder,
+    borderWidth: 1,
+  },
+  tertiary: {
+    backgroundColor: "transparent",
+    borderColor: "transparent",
+    borderWidth: 1,
+  },
+  destructive: {
+    backgroundColor: colors.error.DEFAULT,
+    borderColor: "transparent",
+    borderWidth: 1,
+  },
+};
+
+const disabledVariantStyles: Record<ButtonVariant, ViewStyle> = {
+  primary: {
+    backgroundColor: colors.disabled.background,
+    borderColor: "transparent",
+    borderWidth: 1,
+  },
+  secondary: {
+    backgroundColor: colors.disabled.background,
+    borderColor: colors.disabled.border,
+    borderWidth: 1,
+  },
+  tertiary: {
+    backgroundColor: "transparent",
+    borderColor: "transparent",
+    borderWidth: 1,
+  },
+  destructive: {
+    backgroundColor: colors.disabled.background,
+    borderColor: "transparent",
+    borderWidth: 1,
+  },
+};
+
+const sizeStyles: Record<ButtonSize, ViewStyle> = {
+  small: {
+    height: 40,
+    minHeight: 40,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 8,
+  },
+  medium: {
+    height: 48,
+    minHeight: 48,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+  },
+  large: {
+    height: 56,
+    minHeight: 56,
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 16,
+  },
 };
 
 const variantContainerClasses: Record<ButtonVariant, string> = {
@@ -110,8 +180,20 @@ export const Button = forwardRef<View, ButtonProps>(function Button(
     .filter(Boolean)
     .join(" ");
 
+  const tokenContainerStyle: ViewStyle = {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    flexShrink: 0,
+    overflow: "hidden",
+    ...sizeStyles[size],
+    ...(isDisabled ? disabledVariantStyles[variant] : variantStyles[variant]),
+    ...(fullWidth ? { width: "100%" } : { alignSelf: "flex-start" }),
+  };
+
   return (
-    <Pressable
+    <RNPressable
       ref={ref}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel ?? label}
@@ -120,34 +202,39 @@ export const Button = forwardRef<View, ButtonProps>(function Button(
       disabled={isDisabled}
       hitSlop={sizeHitSlop[size]}
       onPress={onPress}
-      className={containerClasses}
-      style={style}
+      style={({ pressed }) => [
+        fullWidth ? { width: "100%" } : { alignSelf: "flex-start" },
+        pressed && !isDisabled ? { opacity: 0.85 } : null,
+        style,
+      ]}
     >
-      {loading ? (
-        <>
-          <ActivityIndicator
-            size="small"
-            color={
-              isDisabled
-                ? colors.disabled.content
-                : variantIndicatorColors[variant]
-            }
-          />
-          {loadingLabel ? (
-            <Text variant={textVariant} tone={textTone} weight="medium">
-              {loadingLabel}
+      <View style={tokenContainerStyle}>
+        {loading ? (
+          <>
+            <ActivityIndicator
+              size="small"
+              color={
+                isDisabled
+                  ? colors.disabled.content
+                  : variantIndicatorColors[variant]
+              }
+            />
+            {loadingLabel ? (
+              <Text variant={textVariant} tone={textTone} weight="medium">
+                {loadingLabel}
+              </Text>
+            ) : null}
+          </>
+        ) : (
+          <>
+            {leftIcon}
+            <Text variant={textVariant} tone={textTone} weight="semibold">
+              {label}
             </Text>
-          ) : null}
-        </>
-      ) : (
-        <>
-          {leftIcon}
-          <Text variant={textVariant} tone={textTone} weight="semibold">
-            {label}
-          </Text>
-          {rightIcon}
-        </>
-      )}
-    </Pressable>
+            {rightIcon}
+          </>
+        )}
+      </View>
+    </RNPressable>
   );
 });

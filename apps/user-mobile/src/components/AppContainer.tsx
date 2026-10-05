@@ -13,13 +13,13 @@ export function AppContainer({
   children,
   className = "",
   style,
-  edges = ["top", "left", "right"],
+  edges = ["top", "bottom", "left", "right"],
 }: AppContainerProps) {
   return (
     <SafeAreaView
       edges={edges}
       className={"flex-1 bg-canvas " + className}
-      style={style}
+      style={[{ flex: 1 }, style]}
     >
       {children}
     </SafeAreaView>
