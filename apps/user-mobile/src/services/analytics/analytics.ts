@@ -20,6 +20,7 @@ export const ANALYTICS_EVENTS = {
   SPONSORED_LISTING_OPENED: "sponsored_listing_opened",
   EMPTY_RESULTS_DISPLAYED: "empty_results_displayed",
   FURNITURE_BANNER_CLICKED: "furniture_banner_clicked",
+  DISCOVER_MODE_CHANGED: "discover_mode_changed",
   // Step 6 Approved Events (Taxonomy from Blueprint Section 16)
   VISIT_FLOW_STARTED: "visit_flow_started",
   VISIT_AVAILABILITY_VIEWED: "visit_availability_viewed",
@@ -43,6 +44,20 @@ export const ANALYTICS_EVENTS = {
   SUPPORT_REQUEST_SUBMITTED: "support_request_submitted",
   PUSH_PERMISSION_PROMPT_SHOWN: "push_permission_prompt_shown",
   PUSH_PERMISSION_RESULT: "push_permission_result",
+  // Step 8 Approved Events (Taxonomy from Blueprint Section 22)
+  FURNITURE_MARKETPLACE_VIEWED: "furniture_marketplace_viewed",
+  FURNITURE_SEARCH_PERFORMED: "furniture_search_performed",
+  FURNITURE_ITEM_VIEWED: "furniture_item_viewed",
+  FURNITURE_PACKAGE_VIEWED: "furniture_package_viewed",
+  FURNITURE_RENTAL_SELECTED: "furniture_rental_selected",
+  FURNITURE_SALE_SELECTED: "furniture_sale_selected",
+  FURNITURE_CHECKOUT_STARTED: "furniture_checkout_started",
+  FURNITURE_ORDER_SUBMITTED: "furniture_order_submitted",
+  FURNITURE_PAYMENT_STATUS_VIEWED: "furniture_payment_status_viewed",
+  FURNITURE_ORDER_DETAIL_VIEWED: "furniture_order_detail_viewed",
+  FURNITURE_CANCEL_INITIATED: "furniture_cancel_initiated",
+  FURNITURE_RETURN_INITIATED: "furniture_return_initiated",
+  FURNITURE_CLAIM_INITIATED: "furniture_claim_initiated",
 } as const;
 
 export type AnalyticsEventName =
@@ -67,6 +82,16 @@ const FORBIDDEN_PROPERTIES = new Set([
   "description",
   "message",
   "ticketmessage",
+  "address",
+  "addressline1",
+  "addressline2",
+  "pincode",
+  "postalcode",
+  "claimevidence",
+  "claimdescription",
+  "cardnumber",
+  "cvv",
+  "paymentcredential",
 ]);
 
 /**

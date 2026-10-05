@@ -32,6 +32,10 @@ export const ROUTES = {
 
   // Contextual Sub-journeys
   FURNITURE: "/furniture",
+  FURNITURE_DETAIL: "/furniture/[id]",
+  FURNITURE_CHECKOUT: "/furniture/checkout",
+  FURNITURE_ORDERS: "/furniture/orders",
+  FURNITURE_ORDER_DETAIL: "/furniture/orders/[orderId]",
   LISTING_DETAIL: "/listing/[id]",
   LISTING_SCHEDULE: "/listing/[id]/schedule",
 
@@ -101,6 +105,67 @@ export function getInquiryDetailRoute(inquiryId: string): string {
     );
   }
   return `/activity/inquiries/${sanitizedId}`;
+}
+
+/**
+ * Route Builder for Furniture Detail
+ */
+export function getFurnitureDetailRoute(furnitureId: string): string {
+  const sanitizedId = furnitureId.trim();
+  if (!isValidUuid(sanitizedId)) {
+    throw new Error(
+      `Invalid furniture identifier: '${furnitureId}'. Navigation requires a valid UUID.`,
+    );
+  }
+  return `/furniture/${sanitizedId}`;
+}
+
+/**
+ * Route Builder for Furniture Checkout
+ */
+export function getFurnitureCheckoutRoute(options?: {
+  itemId?: string;
+  mode?: "RENTAL" | "SALE";
+  variantId?: string;
+  quantity?: number;
+  durationMonths?: number;
+}): string {
+  if (!options?.itemId) {
+    return "/furniture/checkout";
+  }
+  const sanitizedId = options.itemId.trim();
+  if (!isValidUuid(sanitizedId)) {
+    throw new Error(
+      `Invalid furniture identifier: '${options.itemId}'. Navigation requires a valid UUID.`,
+    );
+  }
+  const query = new URLSearchParams();
+  query.set("itemId", sanitizedId);
+  if (options.mode) query.set("mode", options.mode);
+  if (options.variantId) query.set("variantId", options.variantId);
+  if (options.quantity) query.set("quantity", String(options.quantity));
+  if (options.durationMonths) query.set("durationMonths", String(options.durationMonths));
+  return `/furniture/checkout?${query.toString()}`;
+}
+
+/**
+ * Route Builder for Furniture Order History
+ */
+export function getFurnitureOrdersRoute(): string {
+  return "/furniture/orders";
+}
+
+/**
+ * Route Builder for Furniture Order Detail
+ */
+export function getFurnitureOrderDetailRoute(orderId: string): string {
+  const sanitizedId = orderId.trim();
+  if (!isValidUuid(sanitizedId)) {
+    throw new Error(
+      `Invalid order identifier: '${orderId}'. Navigation requires a valid UUID.`,
+    );
+  }
+  return `/furniture/orders/${sanitizedId}`;
 }
 
 /**

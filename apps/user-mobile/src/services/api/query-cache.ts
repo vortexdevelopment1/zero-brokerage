@@ -29,6 +29,16 @@ export const QUERY_KEYS = {
     list: () => "support.list",
     detail: (id: string) => `support.detail:${id}`,
   },
+  furniture: {
+    catalog: (params?: Record<string, unknown>) =>
+      params ? `furniture.catalog:${JSON.stringify(params)}` : "furniture.catalog",
+    detail: (id: string) => `furniture.detail:${id}`,
+    orders: (params?: Record<string, unknown>) =>
+      params ? `furniture.orders:${JSON.stringify(params)}` : "furniture.orders",
+    orderDetail: (orderId: string) => `furniture.orderDetail:${orderId}`,
+    checkoutSummary: (params?: Record<string, unknown>) =>
+      params ? `furniture.checkoutSummary:${JSON.stringify(params)}` : "furniture.checkoutSummary",
+  },
 } as const;
 
 type InvalidationListener = () => void;

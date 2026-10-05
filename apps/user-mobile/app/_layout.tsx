@@ -45,6 +45,10 @@ export default function RootLayout() {
           options={{ headerShown: false }}
         />
         <Stack.Screen name="furniture/index" options={{ headerShown: false }} />
+        <Stack.Screen name="furniture/[id]" options={{ headerShown: false }} />
+        <Stack.Screen name="furniture/checkout" options={{ headerShown: false }} />
+        <Stack.Screen name="furniture/orders/index" options={{ headerShown: false }} />
+        <Stack.Screen name="furniture/orders/[orderId]" options={{ headerShown: false }} />
         <Stack.Screen
           name="notifications/index"
           options={{ headerShown: false }}

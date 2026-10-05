@@ -17,6 +17,10 @@ export type DeepLinkDestination =
   | { type: "ACTIVITY"; requiresAuth: true }
   | { type: "ACCOUNT"; requiresAuth: true }
   | { type: "FURNITURE" }
+  | { type: "FURNITURE_DETAIL"; furnitureId: string }
+  | { type: "FURNITURE_CHECKOUT"; requiresAuth: true }
+  | { type: "FURNITURE_ORDERS"; requiresAuth: true }
+  | { type: "FURNITURE_ORDER_DETAIL"; orderId: string; requiresAuth: true }
   | { type: "LISTING_DETAIL"; listingId: string }
   | { type: "LISTING_SCHEDULE"; listingId: string; requiresAuth: true }
   | { type: "ACTIVITY_VISIT_DETAIL"; visitId: string; requiresAuth: true }
@@ -213,15 +217,64 @@ export function parseDeepLink(url: string): ParsedDeepLink {
     };
   }
 
-  // Match: /furniture
+  // Match: /furniture, /furniture/orders, /furniture/orders/:orderId, /furniture/checkout, /furniture/:id
   if (segments[0] === "furniture") {
-    return {
-      destination: { type: "FURNITURE" },
-      originalUrl: cleanUrl,
-      isValid: true,
-      targetPath: "/furniture",
-      requiresAuth: false,
-    };
+    if (segments.length === 1) {
+      return {
+        destination: { type: "FURNITURE" },
+        originalUrl: cleanUrl,
+        isValid: true,
+        targetPath: "/furniture",
+        requiresAuth: false,
+      };
+    }
+
+    if (segments[1] === "orders") {
+      if (segments.length >= 3) {
+        const orderId = segments[2];
+        if (isValidUuid(orderId)) {
+          return {
+            destination: {
+              type: "FURNITURE_ORDER_DETAIL",
+              orderId,
+              requiresAuth: true,
+            },
+            originalUrl: cleanUrl,
+            isValid: true,
+            targetPath: `/furniture/orders/${orderId}`,
+            requiresAuth: true,
+          };
+        }
+      }
+      return {
+        destination: { type: "FURNITURE_ORDERS", requiresAuth: true },
+        originalUrl: cleanUrl,
+        isValid: true,
+        targetPath: "/furniture/orders",
+        requiresAuth: true,
+      };
+    }
+
+    if (segments[1] === "checkout") {
+      return {
+        destination: { type: "FURNITURE_CHECKOUT", requiresAuth: true },
+        originalUrl: cleanUrl,
+        isValid: true,
+        targetPath: "/furniture/checkout",
+        requiresAuth: true,
+      };
+    }
+
+    const rawId = segments[1];
+    if (isValidUuid(rawId)) {
+      return {
+        destination: { type: "FURNITURE_DETAIL", furnitureId: rawId },
+        originalUrl: cleanUrl,
+        isValid: true,
+        targetPath: `/furniture/${rawId}`,
+        requiresAuth: false,
+      };
+    }
   }
 
   // Match: /auth or /sign-in
@@ -307,7 +360,11 @@ export type NotificationResolutionResult =
         | "NOTIFICATIONS"
         | "SUPPORT"
         | "SUPPORT_REQUEST"
-        | "ACCOUNT";
+        | "ACCOUNT"
+        | "FURNITURE"
+        | "FURNITURE_DETAIL"
+        | "FURNITURE_ORDERS"
+        | "FURNITURE_ORDER_DETAIL";
       readonly resourceId: string;
     }
   | {
@@ -404,6 +461,38 @@ export function resolveNotificationTarget(
         route: parsed.targetPath,
         targetType: "SUPPORT_REQUEST",
         resourceId: "support-request",
+      };
+    }
+    if (parsed.destination.type === "FURNITURE") {
+      return {
+        status: "NAVIGATE",
+        route: parsed.targetPath,
+        targetType: "FURNITURE",
+        resourceId: "furniture",
+      };
+    }
+    if (parsed.destination.type === "FURNITURE_DETAIL") {
+      return {
+        status: "NAVIGATE",
+        route: parsed.targetPath,
+        targetType: "FURNITURE_DETAIL",
+        resourceId: parsed.destination.furnitureId,
+      };
+    }
+    if (parsed.destination.type === "FURNITURE_ORDERS") {
+      return {
+        status: "NAVIGATE",
+        route: parsed.targetPath,
+        targetType: "FURNITURE_ORDERS",
+        resourceId: "furniture-orders",
+      };
+    }
+    if (parsed.destination.type === "FURNITURE_ORDER_DETAIL") {
+      return {
+        status: "NAVIGATE",
+        route: parsed.targetPath,
+        targetType: "FURNITURE_ORDER_DETAIL",
+        resourceId: parsed.destination.orderId,
       };
     }
   }
@@ -551,6 +640,74 @@ export function resolveNotificationTarget(
       route: targetRoute,
       targetType: "SCHEDULE_VISIT",
       resourceId: listingId,
+    };
+  }
+
+  if (targetType === "FURNITURE") {
+    return {
+      status: "NAVIGATE",
+      route: "/furniture",
+      targetType: "FURNITURE",
+      resourceId: "furniture",
+    };
+  }
+
+  if (targetType === "FURNITURE_ORDERS") {
+    const targetRoute = "/furniture/orders";
+    if (!isAuthenticated) {
+      return {
+        status: "REQUIRES_AUTH",
+        redirectRoute: "/(auth)/sign-in",
+        intendedRoute: targetRoute,
+      };
+    }
+    return {
+      status: "NAVIGATE",
+      route: targetRoute,
+      targetType: "FURNITURE_ORDERS",
+      resourceId: "furniture-orders",
+    };
+  }
+
+  if (targetType === "FURNITURE_ORDER_DETAIL") {
+    const orderId = String(payload.orderId || payload.resourceId || "");
+    if (!orderId || !isValidUuid(orderId)) {
+      return {
+        status: "INVALID",
+        fallbackRoute: "/furniture/orders",
+        reason: "Invalid orderId in notification payload.",
+      };
+    }
+    const targetRoute = `/furniture/orders/${orderId}`;
+    if (!isAuthenticated) {
+      return {
+        status: "REQUIRES_AUTH",
+        redirectRoute: "/(auth)/sign-in",
+        intendedRoute: targetRoute,
+      };
+    }
+    return {
+      status: "NAVIGATE",
+      route: targetRoute,
+      targetType: "FURNITURE_ORDER_DETAIL",
+      resourceId: orderId,
+    };
+  }
+
+  if (targetType === "FURNITURE_DETAIL") {
+    const furnitureId = String(payload.furnitureId || payload.resourceId || "");
+    if (!furnitureId || !isValidUuid(furnitureId)) {
+      return {
+        status: "INVALID",
+        fallbackRoute: "/furniture",
+        reason: "Invalid furnitureId in notification payload.",
+      };
+    }
+    return {
+      status: "NAVIGATE",
+      route: `/furniture/${furnitureId}`,
+      targetType: "FURNITURE_DETAIL",
+      resourceId: furnitureId,
     };
   }
 
