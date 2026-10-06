@@ -48,6 +48,12 @@ export const ROUTES = {
   SUPPORT: "/support",
   SUPPORT_REQUEST: "/support/request",
 
+  // Subscriptions, Memberships & Financial History (Step 9)
+  SUBSCRIPTION_PLANS: "/subscriptions",
+  SUBSCRIPTION_PLAN_DETAIL: "/subscriptions/[planId]",
+  SUBSCRIPTION_CURRENT: "/subscriptions/current",
+  PAYMENT_HISTORY: "/subscriptions/history",
+
   // Auth Journeys
   AUTH_SIGN_IN: "/(auth)/sign-in",
 } as const;
@@ -168,6 +174,46 @@ export function getFurnitureOrderDetailRoute(orderId: string): string {
   return `/furniture/orders/${sanitizedId}`;
 }
 
+export function isValidPlanId(id: unknown): id is string {
+  if (typeof id !== "string") return false;
+  const trimmed = id.trim();
+  return /^[a-zA-Z0-9_-]{1,128}$/.test(trimmed) || isValidUuid(trimmed);
+}
+
+/**
+ * Route Builder for Subscription Plans
+ */
+export function getSubscriptionPlansRoute(): string {
+  return "/subscriptions";
+}
+
+/**
+ * Route Builder for Subscription Plan Details
+ */
+export function getSubscriptionPlanDetailRoute(planId: string): string {
+  const sanitizedId = planId?.trim();
+  if (!isValidPlanId(sanitizedId)) {
+    throw new Error(
+      `Invalid plan identifier: '${planId}'. Navigation requires a valid identifier.`,
+    );
+  }
+  return `/subscriptions/${encodeURIComponent(sanitizedId)}`;
+}
+
+/**
+ * Route Builder for Current Active Membership
+ */
+export function getSubscriptionCurrentRoute(): string {
+  return "/subscriptions/current";
+}
+
+/**
+ * Route Builder for Payment History Ledger
+ */
+export function getPaymentHistoryRoute(): string {
+  return "/subscriptions/history";
+}
+
 /**
  * Sanitizes route parameters to prevent accidental leakage of sensitive tokens,
  * passwords, OTPs, or complex nested objects.
@@ -183,6 +229,12 @@ export function sanitizeRouteParams(
     "secret",
     "password",
     "code",
+    "cardnumber",
+    "cvv",
+    "upi",
+    "vpa",
+    "bankaccount",
+    "amount",
   ]);
 
   const sanitized: Record<string, string> = {};

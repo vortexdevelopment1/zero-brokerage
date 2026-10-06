@@ -178,6 +178,88 @@ export default function AccountTab() {
               </>
             )}
 
+            {/* Membership & Billing */}
+            <Card
+              variant="outlined"
+              padding="large"
+              radius="large"
+              className="border-default-border bg-surface"
+            >
+              <Stack spacing={3}>
+                <Text variant="title" tone="primary" weight="semibold">
+                  Membership & Subscriptions
+                </Text>
+
+                <Pressable
+                  onPress={() => {
+                    if (isAuthenticated) {
+                      router.push(ROUTES.SUBSCRIPTION_CURRENT as any);
+                    } else {
+                      router.push(ROUTES.AUTH_SIGN_IN as any);
+                    }
+                  }}
+                  accessibilityRole="button"
+                  accessibilityLabel="Subscription and tier benefits"
+                  className="flex-row items-center justify-between py-2.5 border-b border-subtle-border active:opacity-75"
+                >
+                  <View className="flex-row items-center space-x-2">
+                    <Text className="text-base mr-1">⭐</Text>
+                    <View>
+                      <Text variant="bodySmall" tone="primary" weight="semibold">
+                        My Subscription & Benefits
+                      </Text>
+                      <Text variant="caption" tone="muted">
+                        {isAuthenticated
+                          ? "View active tier, dates, and quotas"
+                          : "Sign in to view subscription state"}
+                      </Text>
+                    </View>
+                  </View>
+                  <Text variant="caption" tone="secondary">
+                    ›
+                  </Text>
+                </Pressable>
+
+                <Pressable
+                  onPress={() => router.push(ROUTES.SUBSCRIPTION_PLANS as any)}
+                  accessibilityRole="button"
+                  accessibilityLabel="Explore membership plans and pricing"
+                  className={`flex-row items-center justify-between py-2.5 active:opacity-75 ${
+                    isAuthenticated ? "border-b border-subtle-border" : ""
+                  }`}
+                >
+                  <View className="flex-row items-center space-x-2">
+                    <Text className="text-base mr-1">🏷</Text>
+                    <Text variant="bodySmall" tone="primary" weight="semibold">
+                      Explore Plans & Pricing
+                    </Text>
+                  </View>
+                  <Text variant="caption" tone="secondary">
+                    ›
+                  </Text>
+                </Pressable>
+
+                {isAuthenticated && (
+                  <Pressable
+                    onPress={() => router.push(ROUTES.PAYMENT_HISTORY as any)}
+                    accessibilityRole="button"
+                    accessibilityLabel="Payment and transaction history"
+                    className="flex-row items-center justify-between py-2.5 active:opacity-75"
+                  >
+                    <View className="flex-row items-center space-x-2">
+                      <Text className="text-base mr-1">📜</Text>
+                      <Text variant="bodySmall" tone="primary" weight="semibold">
+                        Payment & Billing History
+                      </Text>
+                    </View>
+                    <Text variant="caption" tone="secondary">
+                      ›
+                    </Text>
+                  </Pressable>
+                )}
+              </Stack>
+            </Card>
+
             {/* Communications & Support */}
             <Card
               variant="outlined"

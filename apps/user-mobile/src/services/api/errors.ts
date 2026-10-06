@@ -58,6 +58,32 @@ export function mapApiErrorToUserMessage(error: unknown): string {
     if (error.code === "RATE_LIMITED" || error.status === 429) {
       return "Too many attempts. Please wait a few moments before trying again.";
     }
+    if (
+      error.code === "PAYMENT_STATUS_UNCERTAIN" ||
+      error.code === "RECONCILIATION_PENDING" ||
+      error.code === "TRANSACTION_IN_FLIGHT" ||
+      error.code === "PURCHASE_ALREADY_IN_PROGRESS"
+    ) {
+      return "Payment verification is in progress. Please check your payment history before attempting another payment.";
+    }
+    if (error.code === "CONTRACT_PENDING") {
+      return "This financial capability is undergoing backend activation.";
+    }
+    if (error.code === "ENTITLEMENT_MISSING") {
+      return "You have reached your membership quota or need an upgraded plan for this feature.";
+    }
+    if (error.code === "PLAN_UNAVAILABLE" || error.code === "PLAN_NOT_FOUND") {
+      return "The requested subscription plan is currently unavailable.";
+    }
+    if (error.code === "ACCOUNT_INELIGIBLE") {
+      return "Your account is not eligible for this membership tier.";
+    }
+    if (error.code === "PAYMENT_FAILED") {
+      return "The payment could not be completed. No funds were captured for this subscription.";
+    }
+    if (error.code === "INVOICE_UNAVAILABLE" || error.code === "INVOICE_NOT_FOUND") {
+      return "Tax invoice is not yet available for download.";
+    }
     if (error.code === "VISIT_CONFLICT") {
       return "You already have an active visit request for this property.";
     }

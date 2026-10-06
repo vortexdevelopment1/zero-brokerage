@@ -58,6 +58,12 @@ export const ANALYTICS_EVENTS = {
   FURNITURE_CANCEL_INITIATED: "furniture_cancel_initiated",
   FURNITURE_RETURN_INITIATED: "furniture_return_initiated",
   FURNITURE_CLAIM_INITIATED: "furniture_claim_initiated",
+  // Step 9 Approved Events (Presentation & Exploration Only)
+  SUBSCRIPTION_PLANS_VIEWED: "subscription_plans_viewed",
+  SUBSCRIPTION_PLAN_DETAIL_VIEWED: "subscription_plan_detail_viewed",
+  SUBSCRIPTION_CURRENT_VIEWED: "subscription_current_viewed",
+  PAYMENT_HISTORY_VIEWED: "payment_history_viewed",
+  PAYMENT_SUPPORT_STARTED: "payment_support_started",
 } as const;
 
 export type AnalyticsEventName =
@@ -92,6 +98,14 @@ const FORBIDDEN_PROPERTIES = new Set([
   "cardnumber",
   "cvv",
   "paymentcredential",
+  "upi",
+  "vpa",
+  "bankaccount",
+  "accountnumber",
+  "ifsc",
+  "providerpayload",
+  "rawpayload",
+  "invoicepayload",
 ]);
 
 /**

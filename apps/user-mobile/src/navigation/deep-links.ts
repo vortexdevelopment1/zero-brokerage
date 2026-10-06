@@ -9,7 +9,7 @@
  * 5. Safely fallback to Discover for unrecognized or malformed deep links.
  */
 
-import { isValidUuid } from "./routes";
+import { isValidUuid, isValidPlanId } from "./routes";
 
 export type DeepLinkDestination =
   | { type: "DISCOVER" }
@@ -28,6 +28,10 @@ export type DeepLinkDestination =
   | { type: "NOTIFICATIONS"; requiresAuth: true }
   | { type: "SUPPORT" }
   | { type: "SUPPORT_REQUEST" }
+  | { type: "SUBSCRIPTION_PLANS" }
+  | { type: "SUBSCRIPTION_PLAN_DETAIL"; planId: string }
+  | { type: "SUBSCRIPTION_CURRENT"; requiresAuth: true }
+  | { type: "PAYMENT_HISTORY"; requiresAuth: true }
   | { type: "AUTH_SIGN_IN" }
   | { type: "UNKNOWN" };
 
@@ -319,6 +323,76 @@ export function parseDeepLink(url: string): ParsedDeepLink {
     }
   }
 
+  // Match: /subscriptions, /plans, /membership
+  if (
+    segments[0] === "subscriptions" ||
+    segments[0] === "plans" ||
+    segments[0] === "membership"
+  ) {
+    if (segments.length === 1) {
+      if (segments[0] === "membership") {
+        return {
+          destination: { type: "SUBSCRIPTION_CURRENT", requiresAuth: true },
+          originalUrl: cleanUrl,
+          isValid: true,
+          targetPath: "/subscriptions/current",
+          requiresAuth: true,
+        };
+      }
+      return {
+        destination: { type: "SUBSCRIPTION_PLANS" },
+        originalUrl: cleanUrl,
+        isValid: true,
+        targetPath: "/subscriptions",
+        requiresAuth: false,
+      };
+    }
+
+    if (segments[1] === "current") {
+      return {
+        destination: { type: "SUBSCRIPTION_CURRENT", requiresAuth: true },
+        originalUrl: cleanUrl,
+        isValid: true,
+        targetPath: "/subscriptions/current",
+        requiresAuth: true,
+      };
+    }
+
+    if (segments[1] === "history") {
+      return {
+        destination: { type: "PAYMENT_HISTORY", requiresAuth: true },
+        originalUrl: cleanUrl,
+        isValid: true,
+        targetPath: "/subscriptions/history",
+        requiresAuth: true,
+      };
+    }
+
+    const planId = segments[1];
+    if (isValidPlanId(planId)) {
+      return {
+        destination: { type: "SUBSCRIPTION_PLAN_DETAIL", planId },
+        originalUrl: cleanUrl,
+        isValid: true,
+        targetPath: `/subscriptions/${encodeURIComponent(planId)}`,
+        requiresAuth: false,
+      };
+    }
+  }
+
+  // Match: /payments/history
+  if (segments[0] === "payments") {
+    if (segments.length >= 2 && segments[1] === "history") {
+      return {
+        destination: { type: "PAYMENT_HISTORY", requiresAuth: true },
+        originalUrl: cleanUrl,
+        isValid: true,
+        targetPath: "/subscriptions/history",
+        requiresAuth: true,
+      };
+    }
+  }
+
   // Unrecognized deep link - safe fallback
   return {
     destination: { type: "UNKNOWN" },
@@ -364,7 +438,11 @@ export type NotificationResolutionResult =
         | "FURNITURE"
         | "FURNITURE_DETAIL"
         | "FURNITURE_ORDERS"
-        | "FURNITURE_ORDER_DETAIL";
+        | "FURNITURE_ORDER_DETAIL"
+        | "SUBSCRIPTION_PLANS"
+        | "SUBSCRIPTION_PLAN_DETAIL"
+        | "SUBSCRIPTION_CURRENT"
+        | "PAYMENT_HISTORY";
       readonly resourceId: string;
     }
   | {
@@ -493,6 +571,38 @@ export function resolveNotificationTarget(
         route: parsed.targetPath,
         targetType: "FURNITURE_ORDER_DETAIL",
         resourceId: parsed.destination.orderId,
+      };
+    }
+    if (parsed.destination.type === "SUBSCRIPTION_PLANS") {
+      return {
+        status: "NAVIGATE",
+        route: parsed.targetPath,
+        targetType: "SUBSCRIPTION_PLANS",
+        resourceId: "plans",
+      };
+    }
+    if (parsed.destination.type === "SUBSCRIPTION_PLAN_DETAIL") {
+      return {
+        status: "NAVIGATE",
+        route: parsed.targetPath,
+        targetType: "SUBSCRIPTION_PLAN_DETAIL",
+        resourceId: parsed.destination.planId,
+      };
+    }
+    if (parsed.destination.type === "SUBSCRIPTION_CURRENT") {
+      return {
+        status: "NAVIGATE",
+        route: parsed.targetPath,
+        targetType: "SUBSCRIPTION_CURRENT",
+        resourceId: "current",
+      };
+    }
+    if (parsed.destination.type === "PAYMENT_HISTORY") {
+      return {
+        status: "NAVIGATE",
+        route: parsed.targetPath,
+        targetType: "PAYMENT_HISTORY",
+        resourceId: "history",
       };
     }
   }
@@ -708,6 +818,49 @@ export function resolveNotificationTarget(
       route: `/furniture/${furnitureId}`,
       targetType: "FURNITURE_DETAIL",
       resourceId: furnitureId,
+    };
+  }
+
+  if (targetType === "SUBSCRIPTION_PLANS") {
+    return {
+      status: "NAVIGATE",
+      route: "/subscriptions",
+      targetType: "SUBSCRIPTION_PLANS",
+      resourceId: "plans",
+    };
+  }
+
+  if (targetType === "SUBSCRIPTION_CURRENT") {
+    const targetRoute = "/subscriptions/current";
+    if (!isAuthenticated) {
+      return {
+        status: "REQUIRES_AUTH",
+        redirectRoute: "/(auth)/sign-in",
+        intendedRoute: targetRoute,
+      };
+    }
+    return {
+      status: "NAVIGATE",
+      route: targetRoute,
+      targetType: "SUBSCRIPTION_CURRENT",
+      resourceId: "current",
+    };
+  }
+
+  if (targetType === "PAYMENT_HISTORY") {
+    const targetRoute = "/subscriptions/history";
+    if (!isAuthenticated) {
+      return {
+        status: "REQUIRES_AUTH",
+        redirectRoute: "/(auth)/sign-in",
+        intendedRoute: targetRoute,
+      };
+    }
+    return {
+      status: "NAVIGATE",
+      route: targetRoute,
+      targetType: "PAYMENT_HISTORY",
+      resourceId: "history",
     };
   }
 

@@ -55,6 +55,10 @@ export default function RootLayout() {
         />
         <Stack.Screen name="support/index" options={{ headerShown: false }} />
         <Stack.Screen name="support/request" options={{ headerShown: false }} />
+        <Stack.Screen name="subscriptions/index" options={{ headerShown: false }} />
+        <Stack.Screen name="subscriptions/[planId]" options={{ headerShown: false }} />
+        <Stack.Screen name="subscriptions/current" options={{ headerShown: false }} />
+        <Stack.Screen name="subscriptions/history" options={{ headerShown: false }} />
       </Stack>
     </>
   );
