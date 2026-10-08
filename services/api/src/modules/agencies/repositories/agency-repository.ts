@@ -201,6 +201,12 @@ export class AgencyRepository {
       values.push(params.city);
     }
 
+    if (params.search) {
+      conditions.push(`(name ILIKE $${paramIndex} OR legal_name ILIKE $${paramIndex} OR city ILIKE $${paramIndex})`);
+      values.push(`%${params.search}%`);
+      paramIndex++;
+    }
+
     if (params.cursor) {
       const decoded = decodeCursor(params.cursor, paginationConfig);
       const keyset = buildKeysetCondition({
@@ -280,5 +286,27 @@ export class AgencyRepository {
     );
 
     return result.rows.map(mapAgencyMemberRow);
+  }
+
+  async updateStatus(
+    id: string,
+    status: Agency["status"],
+    executor?: QueryExecutor,
+  ): Promise<Agency | null> {
+    const exec = executor ?? this.pool;
+    const result = await executeQuery<AgencyRow>(
+      exec,
+      `UPDATE agencies
+       SET status = $1, updated_at = NOW()
+       WHERE id = $2 AND deleted_at IS NULL
+       RETURNING
+         id, name, slug, legal_name, license_number, status,
+         email, phone, address_line_1, address_line_2, city,
+         state, postal_code, country_code, created_at, updated_at, deleted_at;`,
+      [status, id],
+    );
+
+    const row = result.rows[0];
+    return row ? mapAgencyRow(row) : null;
   }
 }

@@ -221,6 +221,12 @@ export class ListingRepository {
       values.push(params.listingIntent);
     }
 
+    if (params.search) {
+      conditions.push(`(title ILIKE $${paramIndex} OR description ILIKE $${paramIndex})`);
+      values.push(`%${params.search}%`);
+      paramIndex++;
+    }
+
     if (params.cursor) {
       const decoded = decodeCursor(params.cursor, paginationConfig);
       const keyset = buildKeysetCondition({

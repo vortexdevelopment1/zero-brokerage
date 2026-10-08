@@ -64,4 +64,5 @@ export interface ListAgenciesParams {
   cursor?: string | null | undefined;
   status?: AgencyStatus | undefined;
   city?: string | undefined;
+  search?: string | undefined;
 }

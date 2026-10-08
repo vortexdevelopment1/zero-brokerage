@@ -1,11 +1,21 @@
 import { executeQuery, type QueryExecutor } from "@zero-brokerage/database";
+import {
+  buildKeysetCondition,
+  buildPaginatedResult,
+  decodeCursor,
+  normalizeLimit,
+  type PaginatedResponse,
+} from "../../../common/pagination/index.js";
 import type {
   AgencyMembership,
   AuthIdentity,
   BrokerVerification,
+  BrokerVerificationStatus,
   PlatformRole,
   UserProfile,
   UserStatus,
+  AdminUserListItem,
+  AdminBrokerListItem,
 } from "../types.js";
 
 type DBExecutor = QueryExecutor;
@@ -279,6 +289,261 @@ export async function findBrokerVerificationByUserId(
   }
 
   const row = result.rows[0];
+  return {
+    id: row.id,
+    userId: row.user_id,
+    status: row.status,
+    licenseNumber: row.license_number,
+    documentUrls: Array.isArray(row.document_urls) ? row.document_urls : [],
+    rejectionReason: row.rejection_reason,
+    reviewedBy: row.reviewed_by,
+    reviewedAt: row.reviewed_at,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+export async function listUsers(
+  executor: DBExecutor,
+  params: {
+    limit?: number | undefined;
+    cursor?: string | null | undefined;
+    status?: UserStatus | undefined;
+    role?: PlatformRole | undefined;
+    search?: string | undefined;
+  },
+): Promise<PaginatedResponse<AdminUserListItem>> {
+  const limit = normalizeLimit(params.limit);
+
+  const paginationConfig = {
+    sortField: "createdAt" as const,
+    direction: "DESC" as const,
+    tieBreakerField: "id" as const,
+    queryContext: "admin_users_list",
+  };
+
+  const conditions: string[] = ["i.status != 'DELETED'"];
+  const values: unknown[] = [];
+  let paramIndex = 1;
+
+  if (params.status) {
+    conditions.push(`i.status = $${paramIndex++}`);
+    values.push(params.status);
+  }
+
+  if (params.role) {
+    conditions.push(`i.role = $${paramIndex++}`);
+    values.push(params.role);
+  }
+
+  if (params.search) {
+    conditions.push(`(i.phone ILIKE $${paramIndex} OR p.full_name ILIKE $${paramIndex} OR p.email ILIKE $${paramIndex})`);
+    values.push(`%${params.search}%`);
+    paramIndex++;
+  }
+
+  if (params.cursor) {
+    const decoded = decodeCursor(params.cursor, paginationConfig);
+    const keyset = buildKeysetCondition({
+      sortColumn: "i.created_at",
+      tieBreakerColumn: "i.id",
+      sortValue: decoded.sortValue,
+      tieBreakerValue: decoded.tieBreakerValue,
+      direction: decoded.direction,
+      startIndex: paramIndex,
+    });
+    conditions.push(keyset.clause);
+    values.push(...keyset.values);
+    paramIndex += 2;
+  }
+
+  const whereClause = `WHERE ${conditions.join(" AND ")}`;
+  const query = `
+    SELECT
+      i.id, i.phone, i.role, i.status, i.created_at, i.updated_at,
+      p.full_name, p.email, p.avatar_url
+    FROM auth_identities i
+    LEFT JOIN user_profiles p ON p.user_id = i.id
+    ${whereClause}
+    ORDER BY i.created_at DESC, i.id DESC
+    LIMIT $${paramIndex};
+  `;
+  values.push(limit + 1);
+
+  interface UserListRow {
+    id: string;
+    phone: string;
+    role: PlatformRole;
+    status: UserStatus;
+    created_at: Date;
+    updated_at: Date;
+    full_name: string | null;
+    email: string | null;
+    avatar_url: string | null;
+  }
+
+  const result = await executeQuery<UserListRow>(executor, query, values);
+  const items: AdminUserListItem[] = result.rows.map((row) => ({
+    id: row.id,
+    phone: row.phone,
+    role: row.role,
+    status: row.status,
+    fullName: row.full_name,
+    email: row.email,
+    avatarUrl: row.avatar_url,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  }));
+
+  return buildPaginatedResult(items, limit, paginationConfig);
+}
+
+export async function listBrokers(
+  executor: DBExecutor,
+  params: {
+    limit?: number | undefined;
+    cursor?: string | null | undefined;
+    verificationStatus?: BrokerVerificationStatus | undefined;
+    search?: string | undefined;
+  },
+): Promise<PaginatedResponse<AdminBrokerListItem>> {
+  const limit = normalizeLimit(params.limit);
+
+  const paginationConfig = {
+    sortField: "createdAt" as const,
+    direction: "DESC" as const,
+    tieBreakerField: "id" as const,
+    queryContext: "admin_brokers_list",
+  };
+
+  const conditions: string[] = [
+    "i.status != 'DELETED'",
+    "i.role IN ('INDEPENDENT_BROKER', 'AGENCY_BROKER')",
+  ];
+  const values: unknown[] = [];
+  let paramIndex = 1;
+
+  if (params.verificationStatus) {
+    conditions.push(`COALESCE(bv.status, 'UNSUBMITTED') = $${paramIndex++}`);
+    values.push(params.verificationStatus);
+  }
+
+  if (params.search) {
+    conditions.push(`(i.phone ILIKE $${paramIndex} OR p.full_name ILIKE $${paramIndex} OR p.email ILIKE $${paramIndex} OR a.name ILIKE $${paramIndex})`);
+    values.push(`%${params.search}%`);
+    paramIndex++;
+  }
+
+  if (params.cursor) {
+    const decoded = decodeCursor(params.cursor, paginationConfig);
+    const keyset = buildKeysetCondition({
+      sortColumn: "i.created_at",
+      tieBreakerColumn: "i.id",
+      sortValue: decoded.sortValue,
+      tieBreakerValue: decoded.tieBreakerValue,
+      direction: decoded.direction,
+      startIndex: paramIndex,
+    });
+    conditions.push(keyset.clause);
+    values.push(...keyset.values);
+    paramIndex += 2;
+  }
+
+  const whereClause = `WHERE ${conditions.join(" AND ")}`;
+  const query = `
+    SELECT
+      i.id, i.phone, i.role, i.status, i.created_at, i.updated_at,
+      p.full_name, p.email, p.avatar_url,
+      a.name AS agency_name,
+      COALESCE(bv.status, 'UNSUBMITTED') AS verification_status,
+      bv.license_number,
+      COALESCE(bv.document_urls, '[]'::jsonb) AS document_urls,
+      bv.rejection_reason,
+      bv.reviewed_at
+    FROM auth_identities i
+    LEFT JOIN user_profiles p ON p.user_id = i.id
+    LEFT JOIN broker_verifications bv ON bv.user_id = i.id
+    LEFT JOIN agency_memberships am ON am.user_id = i.id AND am.status = 'ACTIVE'
+    LEFT JOIN agencies a ON a.id = am.agency_id
+    ${whereClause}
+    ORDER BY i.created_at DESC, i.id DESC
+    LIMIT $${paramIndex};
+  `;
+  values.push(limit + 1);
+
+  interface BrokerListRow {
+    id: string;
+    phone: string;
+    role: PlatformRole;
+    status: UserStatus;
+    created_at: Date;
+    updated_at: Date;
+    full_name: string | null;
+    email: string | null;
+    avatar_url: string | null;
+    agency_name: string | null;
+    verification_status: BrokerVerificationStatus;
+    license_number: string | null;
+    document_urls: string[];
+    rejection_reason: string | null;
+    reviewed_at: Date | null;
+  }
+
+  const result = await executeQuery<BrokerListRow>(executor, query, values);
+  const items: AdminBrokerListItem[] = result.rows.map((row) => ({
+    id: row.id,
+    phone: row.phone,
+    role: row.role,
+    status: row.status,
+    fullName: row.full_name,
+    email: row.email,
+    avatarUrl: row.avatar_url,
+    agencyName: row.agency_name,
+    verificationStatus: row.verification_status,
+    licenseNumber: row.license_number,
+    documentUrls: Array.isArray(row.document_urls) ? row.document_urls : [],
+    rejectionReason: row.rejection_reason,
+    reviewedAt: row.reviewed_at,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  }));
+
+  return buildPaginatedResult(items, limit, paginationConfig);
+}
+
+export async function updateBrokerVerification(
+  executor: DBExecutor,
+  params: {
+    userId: string;
+    status: BrokerVerificationStatus;
+    rejectionReason?: string | null | undefined;
+    reviewedBy?: string | null | undefined;
+  },
+): Promise<BrokerVerification> {
+  const result = await executeQuery<BrokerVerificationRow>(
+    executor,
+    `INSERT INTO broker_verifications (user_id, status, rejection_reason, reviewed_by, reviewed_at, updated_at)
+     VALUES ($1, $2, $3, $4, NOW(), NOW())
+     ON CONFLICT (user_id) DO UPDATE
+     SET status = $2,
+         rejection_reason = $3,
+         reviewed_by = $4,
+         reviewed_at = NOW(),
+         updated_at = NOW()
+     RETURNING *;`,
+    [
+      params.userId,
+      params.status,
+      params.rejectionReason ?? null,
+      params.reviewedBy ?? null,
+    ],
+  );
+
+  const row = result.rows[0];
+  if (!row) {
+    throw new Error("Failed to update broker verification.");
+  }
+
   return {
     id: row.id,
     userId: row.user_id,

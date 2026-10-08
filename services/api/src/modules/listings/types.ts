@@ -146,6 +146,15 @@ export interface CreateListingParams {
   createdBy: string;
 }
 
+export interface ListPropertiesParams {
+  limit?: number | undefined;
+  cursor?: string | null | undefined;
+  propertyType?: PropertyType | undefined;
+  city?: string | undefined;
+  locality?: string | undefined;
+  search?: string | undefined;
+}
+
 export interface ListListingsParams {
   limit?: number | undefined;
   cursor?: string | null | undefined;
@@ -154,4 +163,5 @@ export interface ListListingsParams {
   brokerId?: string | undefined;
   status?: ListingStatus | undefined;
   listingIntent?: ListingIntent | undefined;
+  search?: string | undefined;
 }

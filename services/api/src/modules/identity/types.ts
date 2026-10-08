@@ -188,3 +188,33 @@ export interface CurrentUserProfileResponse {
     licenseNumber: string | null;
   } | null;
 }
+
+export interface AdminUserListItem {
+  id: string;
+  phone: string;
+  role: PlatformRole;
+  status: UserStatus;
+  fullName: string | null;
+  email: string | null;
+  avatarUrl: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface AdminBrokerListItem {
+  id: string;
+  phone: string;
+  role: PlatformRole;
+  status: UserStatus;
+  fullName: string | null;
+  email: string | null;
+  avatarUrl: string | null;
+  agencyName: string | null;
+  verificationStatus: BrokerVerificationStatus;
+  licenseNumber: string | null;
+  documentUrls: string[];
+  rejectionReason: string | null;
+  reviewedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+}

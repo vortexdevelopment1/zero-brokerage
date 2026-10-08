@@ -9,11 +9,19 @@ import {
   buildDistanceSelect,
   validateCoordinates,
 } from "@zero-brokerage/database";
+import {
+  buildKeysetCondition,
+  buildPaginatedResult,
+  decodeCursor,
+  normalizeLimit,
+  type PaginatedResponse,
+} from "../../../common/pagination/index.js";
 import type {
   Property,
   PropertyWithDistance,
   CreatePropertyParams,
   PropertyType,
+  ListPropertiesParams,
 } from "../types.js";
 
 interface PropertyRow {
@@ -272,5 +280,90 @@ export class PropertyRepository {
 
     const result = await executeQuery<PropertyRow>(exec, query, values);
     return result.rows.map(mapPropertyRow);
+  }
+
+  async listProperties(
+    params: ListPropertiesParams,
+    executor?: QueryExecutor,
+  ): Promise<PaginatedResponse<Property>> {
+    const exec = executor ?? this.pool;
+    const limit = normalizeLimit(params.limit);
+
+    const paginationConfig = {
+      sortField: "createdAt" as const,
+      direction: "DESC" as const,
+      tieBreakerField: "id" as const,
+      queryContext: "properties_list",
+    };
+
+    const conditions: string[] = ["deleted_at IS NULL"];
+    const values: unknown[] = [];
+    let paramIndex = 1;
+
+    if (params.propertyType) {
+      conditions.push(`property_type = $${paramIndex++}`);
+      values.push(params.propertyType);
+    }
+
+    if (params.city) {
+      conditions.push(`city = $${paramIndex++}`);
+      values.push(params.city);
+    }
+
+    if (params.locality) {
+      conditions.push(`locality = $${paramIndex++}`);
+      values.push(params.locality);
+    }
+
+    if (params.search) {
+      conditions.push(`(title ILIKE $${paramIndex} OR address_line_1 ILIKE $${paramIndex} OR locality ILIKE $${paramIndex} OR city ILIKE $${paramIndex})`);
+      values.push(`%${params.search}%`);
+      paramIndex++;
+    }
+
+    if (params.cursor) {
+      const decoded = decodeCursor(params.cursor, paginationConfig);
+      const keyset = buildKeysetCondition({
+        sortColumn: "created_at",
+        tieBreakerColumn: "id",
+        sortValue: decoded.sortValue,
+        tieBreakerValue: decoded.tieBreakerValue,
+        direction: decoded.direction,
+        startIndex: paramIndex,
+      });
+      conditions.push(keyset.clause);
+      values.push(...keyset.values);
+      paramIndex += 2;
+    }
+
+    const whereClause = `WHERE ${conditions.join(" AND ")}`;
+    const query = `
+      SELECT ${PROPERTY_SELECT_FIELDS}
+      FROM properties
+      ${whereClause}
+      ORDER BY created_at DESC, id DESC
+      LIMIT $${paramIndex};
+    `;
+    values.push(limit + 1);
+
+    const result = await executeQuery<PropertyRow>(exec, query, values);
+    const properties = result.rows.map(mapPropertyRow);
+
+    return buildPaginatedResult(properties, limit, paginationConfig);
+  }
+
+  async deleteProperty(
+    id: string,
+    executor?: QueryExecutor,
+  ): Promise<boolean> {
+    const exec = executor ?? this.pool;
+    const result = await executeQuery(
+      exec,
+      `UPDATE properties
+       SET deleted_at = NOW(), updated_at = NOW()
+       WHERE id = $1 AND deleted_at IS NULL;`,
+      [id],
+    );
+    return (result.rowCount ?? 0) > 0;
   }
 }

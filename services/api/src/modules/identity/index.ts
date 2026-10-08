@@ -1,6 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import type { OtpDeliveryProvider } from "./providers/otp-provider.js";
 import { registerAuthRoutes } from "./routes/auth-routes.js";
+import { registerAdminRoutes } from "./routes/admin-routes.js";
 
 export * from "./types.js";
 export * from "./authorization/roles-and-permissions.js";
@@ -22,4 +23,5 @@ export async function registerIdentityModule(
   options?: { otpProvider?: OtpDeliveryProvider },
 ): Promise<void> {
   await registerAuthRoutes(app, options);
+  await registerAdminRoutes(app, options);
 }
